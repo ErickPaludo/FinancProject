@@ -35,7 +35,7 @@ namespace Financ.Application.CQRS.Handler
                 var filtroNome = !string.IsNullOrEmpty(request.NomeUsuario);
                
 
-                var contaUsuarios = await _unitOfWork.contasUsuariosRepositorio.ObterContasDoUsuario(x => x.IdConta == request.IdConta && x.IdUsuario != request.IdUsuarioSolicitante
+                var contaUsuarios = await _unitOfWork.contasUsuariosRepositorio.ObterContasDoUsuario(x => x.IdConta == request.IdConta //&& x.IdUsuario != request.IdUsuarioSolicitante
                 && (!filtroIdUsuario || x.IdUsuario.Equals(request.IdUsuario))
                 && (!filtroStatus || x.Status.Equals(request.Status))
                 && (!filtroAcesso || x.Acesso.Equals(request.Acesso)));

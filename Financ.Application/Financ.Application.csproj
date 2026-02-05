@@ -14,8 +14,4 @@
     <ProjectReference Include="..\Financ.Domain\Financ.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="CQRS\Convites\Query\" />
-  </ItemGroup>
-
 </Project>

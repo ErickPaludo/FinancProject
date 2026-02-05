@@ -17,7 +17,7 @@ namespace Financ.Infra.Data.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.20");
 
-            modelBuilder.Entity("Financ.Domain.Entidades.Contas", b =>
+            modelBuilder.Entity("Financ.Domain.Entidades.Conta", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -127,6 +127,28 @@ namespace Financ.Infra.Data.Migrations
                     b.HasIndex("IdUsuarioRemetente");
 
                     b.ToTable("fnc_convites", (string)null);
+                });
+
+            modelBuilder.Entity("Financ.Domain.Entidades.Usuario", b =>
+                {
+                    b.Property<string>("IdUsuario")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PrimeiroNome")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SegundoNome")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("IdUsuario");
+
+                    b.ToTable("Usuario");
                 });
 
             modelBuilder.Entity("Financ.Infra.Data.Identity.UsuarioIdentity", b =>
@@ -331,8 +353,8 @@ namespace Financ.Infra.Data.Migrations
 
             modelBuilder.Entity("Financ.Domain.Entidades.ContasUsuarios", b =>
                 {
-                    b.HasOne("Financ.Domain.Entidades.Contas", "Contas")
-                        .WithMany("ContasUsuarios")
+                    b.HasOne("Financ.Domain.Entidades.Conta", "Contas")
+                        .WithMany("ContasUsuariosVinculados")
                         .HasForeignKey("IdConta")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -343,28 +365,42 @@ namespace Financ.Infra.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Financ.Domain.Entidades.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("IdUsuario")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Contas");
+
+                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("Financ.Domain.Entidades.Convites", b =>
                 {
-                    b.HasOne("Financ.Domain.Entidades.Contas", null)
+                    b.HasOne("Financ.Domain.Entidades.Conta", "Contas")
                         .WithMany()
                         .HasForeignKey("IdConta")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Financ.Infra.Data.Identity.UsuarioIdentity", null)
+                    b.HasOne("Financ.Domain.Entidades.Usuario", "Destinatario")
                         .WithMany()
                         .HasForeignKey("IdUsuarioDestinatario")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Financ.Infra.Data.Identity.UsuarioIdentity", null)
+                    b.HasOne("Financ.Domain.Entidades.Usuario", "Remetente")
                         .WithMany()
                         .HasForeignKey("IdUsuarioRemetente")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Contas");
+
+                    b.Navigation("Destinatario");
+
+                    b.Navigation("Remetente");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -418,9 +454,9 @@ namespace Financ.Infra.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Financ.Domain.Entidades.Contas", b =>
+            modelBuilder.Entity("Financ.Domain.Entidades.Conta", b =>
                 {
-                    b.Navigation("ContasUsuarios");
+                    b.Navigation("ContasUsuariosVinculados");
                 });
 #pragma warning restore 612, 618
         }

@@ -67,7 +67,7 @@ namespace Financ.TesteUnitarios.Domain
 
             // Assert
             action.Should().Throw<ContasUsuariosValidacao>()
-                .WithMessage(MensagensContasUsuarios.IDUSUARIO_VAZIO);
+                .WithMessage(MensagensContasUsuarios.IDUSUARIO_INVALIDO);
         }
 
         [Fact(DisplayName = "Construtor: Enums inválidos devem gerar divergência")]

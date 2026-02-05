@@ -11,7 +11,7 @@ namespace Financ.Domain.Validacoes.Mensagens
         public const string IDCONTA_IGUAL_MENOR_ZERO = "IdConta não pode ser menor que zero";
         public const string CONTA_NAO_ESTA_ATIVA = "A conta selecionada não está ativa!";
         public const string CONTA_NAO_PODE_SER_NULA = "A conta não pode ser nula!";
-        public const string IDUSUARIO_VAZIO = "IdUsuario não deve ser vazio!";
+        public const string IDUSUARIO_INVALIDO = "IdUsuario não deve ser vazio!";
         public const string ACESSO_INVALIDO = "O acesso informado é inválido.";
         public const string ACESSO_NEGADO = "O usuário não é um administrador!";
         public const string ACESSO_NEGADO_POR_STATUS = "O usuário remetente não está ativo!";

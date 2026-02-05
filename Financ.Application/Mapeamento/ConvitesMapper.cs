@@ -11,6 +11,6 @@ namespace Financ.Application.Mapeamento
 {
     public static class ConvitesMapper
     {
-        public static RetornoConvitesDTO ParaDTO(Convites convite) => new RetornoConvitesDTO(convite.Id, convite.Acesso, convite.Aceito);
+        public static GetCriaConviteDTO ParaDTO(Convites convite) => new GetCriaConviteDTO(convite.Id, convite.Acesso);
     }
 }

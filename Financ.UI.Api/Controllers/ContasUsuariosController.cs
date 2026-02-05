@@ -1,9 +1,11 @@
 ﻿using Financ.Application.CQRS.Commands;
+using Financ.Application.CQRS.Query;
 using Financ.Application.CQRS.Querys;
 using Financ.Application.DTOs.Autenticação.Post;
 using Financ.Application.DTOs.ContasUsuarios.Get.Filtros;
 using Financ.Application.DTOs.ContasUsuarios.Patch;
 using Financ.Application.DTOs.ContasUsuarios.Post;
+using Financ.Application.DTOs.Convites.Get;
 using Financ.Application.DTOs.Convites.Post;
 using Financ.Domain.Entidades;
 using Financ.Domain.Interfaces.Repositorios;
@@ -53,6 +55,12 @@ namespace Financ.UI.Api.Controllers
         public async Task<IActionResult> ConvidaUsuario(CriaConviteDTO conviteDTO)
         {
             var convite = await _mediator.Send(new CriaConviteCommand(User.RetornaIdUsuario(), conviteDTO.EmailDestinatario, conviteDTO.IdConta, conviteDTO.Acesso));
+            return convite.RetornoAutomatico();
+        } 
+        [HttpGet("retorna_convites")]
+        public async Task<IActionResult> RetornaConvites()
+        {
+            var convite = await _mediator.Send(new RetornaConvitesQuery(User.RetornaIdUsuario()));
             return convite.RetornoAutomatico();
         }
     }

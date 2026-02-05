@@ -3,6 +3,7 @@ using Financ.Domain.Validacoes;
 using Financ.Domain.Validacoes.Mensagens;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ namespace Financ.Domain.Entidades
 {
     public class Usuario : IUsuarioIdentity
     {
+        [Key]
         public string IdUsuario { get; private set; }
         public string PrimeiroNome { get; private set; }
         public string SegundoNome { get; private set; }

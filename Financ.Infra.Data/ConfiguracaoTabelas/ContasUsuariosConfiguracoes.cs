@@ -29,6 +29,11 @@ namespace Financ.Infra.Data.ConfiguracaoTabelas
               .HasForeignKey(e => e.IdUsuario)
               .HasPrincipalKey(u => u.Id)
               .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(e => e.Usuario)
+            .WithMany()
+            .HasForeignKey(e => e.IdUsuario)
+            .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

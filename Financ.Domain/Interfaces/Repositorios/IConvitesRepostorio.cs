@@ -7,5 +7,8 @@ using System.Threading.Tasks;
 
 namespace Financ.Domain.Interfaces.Repositorios
 {
-    public interface IConvitesRepostorio : IBaseRepositorio<Convites>{}
+    public interface IConvitesRepostorio : IBaseRepositorio<Convites>
+    {
+        public Task<IEnumerable<Convites>> ObtemConvites(string idUsuario);
+    }
 }

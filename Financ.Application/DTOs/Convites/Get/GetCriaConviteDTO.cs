@@ -7,5 +7,5 @@ using System.Threading.Tasks;
 
 namespace Financ.Application.DTOs.Convites.Get
 {
-    public record RetornoConvitesDTO(int idConvite,TiposAcessos acessos,bool? aceito);
+    public record GetCriaConviteDTO(int idConvite,TiposAcessos permissao);
 }

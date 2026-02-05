@@ -15,29 +15,36 @@ namespace Financ.Infra.Data.ConfiguracaoTabelas
         public void Configure(EntityTypeBuilder<Convites> builder)
         {
             builder.ToTable("fnc_convites");
+
+            builder.HasKey(e => e.Id);
+
             builder.Property(e => e.IdConta).IsRequired();
             builder.Property(e => e.IdUsuarioRemetente).IsRequired();
             builder.Property(e => e.IdUsuarioDestinatario).IsRequired();
             builder.Property(e => e.Expiracao).IsRequired();
-            builder.HasKey(e => e.Id);
 
-            builder.HasOne<UsuarioIdentity>()
-            .WithMany()
-            .HasForeignKey(e => e.IdUsuarioRemetente)
-            .HasPrincipalKey(u => u.Id)
-            .OnDelete(DeleteBehavior.Restrict);      
-            
-            builder.HasOne<UsuarioIdentity>()
-            .WithMany()
-            .HasForeignKey(e => e.IdUsuarioDestinatario)
-            .HasPrincipalKey(u => u.Id)
-            .OnDelete(DeleteBehavior.Restrict); 
-            
-            builder.HasOne<Conta>()
-            .WithMany()
-            .HasForeignKey(e => e.IdConta)
-            .HasPrincipalKey(u => u.Id)
-            .OnDelete(DeleteBehavior.Restrict);
+            // Índices para performance
+            builder.HasIndex(e => e.IdConta);
+            builder.HasIndex(e => e.IdUsuarioRemetente);
+            builder.HasIndex(e => e.IdUsuarioDestinatario);
+
+            // Relação com Conta
+            builder.HasOne(e => e.Contas)
+                .WithMany()
+                .HasForeignKey(e => e.IdConta)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Relação com remetente
+            builder.HasOne(e => e.Remetente)
+                .WithMany()
+                .HasForeignKey(e => e.IdUsuarioRemetente)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Relação com destinatário
+            builder.HasOne(e => e.Destinatario)
+                .WithMany()
+                .HasForeignKey(e => e.IdUsuarioDestinatario)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
