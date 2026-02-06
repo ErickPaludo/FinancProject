@@ -34,17 +34,17 @@ namespace Financ.Infra.Data.ConfiguracaoTabelas
                 .HasForeignKey(e => e.IdConta)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Relação com remetente
-            builder.HasOne(e => e.Remetente)
-                .WithMany()
-                .HasForeignKey(e => e.IdUsuarioRemetente)
-                .OnDelete(DeleteBehavior.Restrict);
+            //// Relação com remetente
+            //builder.HasOne(e => e.Remetente)
+            //    .WithMany()
+            //    .HasForeignKey(e => e.IdUsuarioRemetente)
+            //    .OnDelete(DeleteBehavior.Restrict);
 
-            // Relação com destinatário
-            builder.HasOne(e => e.Destinatario)
-                .WithMany()
-                .HasForeignKey(e => e.IdUsuarioDestinatario)
-                .OnDelete(DeleteBehavior.Restrict);
+            //// Relação com destinatário
+            //builder.HasOne(e => e.Destinatario)
+            //    .WithMany()
+            //    .HasForeignKey(e => e.IdUsuarioDestinatario)
+            //    .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

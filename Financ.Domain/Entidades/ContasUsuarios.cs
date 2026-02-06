@@ -1,4 +1,5 @@
 ﻿using Financ.Domain.Enums;
+using Financ.Domain.Interfaces.InterfaceEntidades;
 using Financ.Domain.Validacoes;
 using Financ.Domain.Validacoes.Mensagens;
 using System;
@@ -16,23 +17,24 @@ namespace Financ.Domain.Entidades
         public string IdUsuario { get; private set; }
         public TiposAcessos Acesso { get; private set; }
         public Conta? Contas { get; private set; }
-        public Usuario Usuario { get; private set; }
+        
         public ContasUsuarios() { }
         public ContasUsuarios(int id, Conta conta, Usuario usuario, TiposAcessos acesso, TiposStatus status)
         {
             ContasUsuariosValidacao.Verifica(id <= 0, MensagensBase.ID_IGUAL_MENOR_ZERO);
             Id = id;
-            ValidaContasUsuarios(conta, usuario);
+            ValidaContasUsuarios(conta, usuario.IdUsuario);
             ValidaEnums(acesso, status);
         }
-        public ContasUsuarios(Conta conta, Usuario usuario, TiposAcessos acesso, TiposStatus? status)
+        public ContasUsuarios(Conta conta, string idUsuario, TiposAcessos acesso, TiposStatus? status)
         {
-            ValidaContasUsuarios(conta, usuario);
+            ValidaContasUsuarios(conta, idUsuario);
             ValidaEnums(acesso, status);
         }
+
         public ContasUsuarios(Conta conta, Usuario usuario)
         {
-            ValidaContasUsuarios(conta, usuario);
+            ValidaContasUsuarios(conta, usuario.IdUsuario);
             Status = TiposStatus.Ativo;
             Acesso = TiposAcessos.Mestre;
         }
@@ -48,14 +50,14 @@ namespace Financ.Domain.Entidades
             else
                 Status = TiposStatus.Ativo;
         }
-        private void ValidaContasUsuarios(Conta conta, Usuario usuario)
+        private void ValidaContasUsuarios(Conta conta, string idUsuario)
         {
             ContasUsuariosValidacao.Verifica(conta is null, MensagensContasUsuarios.CONTA_NAO_PODE_SER_NULA);
             ContasUsuariosValidacao.Verifica(conta!.Status != TiposStatus.Ativo, MensagensContasUsuarios.CONTA_NAO_ESTA_ATIVA);
-            ContasUsuariosValidacao.Verifica(usuario is null, MensagensContasUsuarios.IDUSUARIO_INVALIDO);
+            ContasUsuariosValidacao.Verifica(string.IsNullOrEmpty(idUsuario), MensagensContasUsuarios.IDUSUARIO_INVALIDO);
             Contas = conta;
-            Usuario = usuario!;
-            IdUsuario = usuario!.IdUsuario;
+            //Usuario = usuario!;
+            IdUsuario = idUsuario;
             DthrReg = DateTime.Now;
         }
         public void AtualizaOutraContaUsuario(ContasUsuarios contasUsuarioRemetente, TiposAcessos? acessos, TiposStatus? status)

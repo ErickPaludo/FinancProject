@@ -35,8 +35,7 @@ namespace Financ.Application.CQRS.Handler
                 var contaUsuario = new ContasUsuarios(conta, usuario);
                 conta.ContasUsuariosVinculados!.Add(contaUsuario);
 
-                await _unitOfWork.contasRepositorio.Adicionar(conta);
-                await _unitOfWork.contasUsuariosRepositorio.Adicionar(contaUsuario);
+                await _unitOfWork.contasUsuariosRepositorio.Adicionar(contaUsuario); //Cria a conta e a conta usuario pois os objetos estão linkados
                 await _unitOfWork.Commit();
 
                 return Resultado<RetornaContasDTO>.GeraSucesso(ContaMapper.ParaDTO(conta));

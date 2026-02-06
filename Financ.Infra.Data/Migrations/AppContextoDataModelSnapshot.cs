@@ -129,28 +129,6 @@ namespace Financ.Infra.Data.Migrations
                     b.ToTable("fnc_convites", (string)null);
                 });
 
-            modelBuilder.Entity("Financ.Domain.Entidades.Usuario", b =>
-                {
-                    b.Property<string>("IdUsuario")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PrimeiroNome")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("SegundoNome")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("IdUsuario");
-
-                    b.ToTable("Usuario");
-                });
-
             modelBuilder.Entity("Financ.Infra.Data.Identity.UsuarioIdentity", b =>
                 {
                     b.Property<string>("Id")
@@ -365,15 +343,7 @@ namespace Financ.Infra.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Financ.Domain.Entidades.Usuario", "Usuario")
-                        .WithMany()
-                        .HasForeignKey("IdUsuario")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("Contas");
-
-                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("Financ.Domain.Entidades.Convites", b =>
@@ -384,23 +354,7 @@ namespace Financ.Infra.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Financ.Domain.Entidades.Usuario", "Destinatario")
-                        .WithMany()
-                        .HasForeignKey("IdUsuarioDestinatario")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Financ.Domain.Entidades.Usuario", "Remetente")
-                        .WithMany()
-                        .HasForeignKey("IdUsuarioRemetente")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("Contas");
-
-                    b.Navigation("Destinatario");
-
-                    b.Navigation("Remetente");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

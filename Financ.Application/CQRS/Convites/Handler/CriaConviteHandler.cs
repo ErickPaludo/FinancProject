@@ -62,11 +62,12 @@ namespace Financ.Application.CQRS.Handler
                    return Resultado<GetCriaConviteDTO>.GeraFalha(Falha.ErroOperacional("Já existe um convite em andamento, aguarde o retorno do usuário destinatário."));
                 }
                 Usuario usuarioDestinatario = await _usuarioIdentity.ObtemUsuario(idUsuarioDestinatario);
-                Convites convite = new Convites(contaUsuario, usuarioDestinatario, conta, request.acesso);
-                await _unitOfWork.convitesRepostorio.Adicionar(convite);
-                await _unitOfWork.Commit();
+                //   Convites convite = new Convites(contaUsuario, usuarioDestinatario, conta, request.acesso);
+                //await _unitOfWork.convitesRepostorio.Adicionar(convite);
+                //await _unitOfWork.Commit();
 
-                return Resultado<GetCriaConviteDTO>.GeraSucesso(ConvitesMapper.ParaDTO(convite));
+                //  return Resultado<GetCriaConviteDTO>.GeraSucesso(ConvitesMapper.ParaDTO(convite));
+                return null;
             }
             catch (ConvitesValidacao ex)
             {
