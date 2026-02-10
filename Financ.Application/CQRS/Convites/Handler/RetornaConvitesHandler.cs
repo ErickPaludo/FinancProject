@@ -9,24 +9,34 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Financ.Application.CQRS.Query;
+using Financ.Application.Interfaces;
+using Financ.Application.Mapeamento;
 
 namespace Financ.Application.CQRS.Handler
 {
     public class RetornaConvitesHandler : IRequestHandler<RetornaConvitesQuery, Resultado<List<GetRetornaConvitesDTO>>>
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IConvitesLeituraRepositorio _convitesLeituraRepositorio;
         private readonly IUsuariosIdentityServicos _usuarioIdentity;
 
-        public RetornaConvitesHandler(IUnitOfWork unitOfWork, IUsuariosIdentityServicos usuarioIdentity)
+        public RetornaConvitesHandler(IUnitOfWork unitOfWork, IUsuariosIdentityServicos usuarioIdentity, IConvitesLeituraRepositorio convitesLeituraRepositorio)
         {
             _unitOfWork = unitOfWork;
             _usuarioIdentity = usuarioIdentity;
+            _convitesLeituraRepositorio = convitesLeituraRepositorio;
         }
 
         public async Task<Resultado<List<GetRetornaConvitesDTO>>> Handle(RetornaConvitesQuery request, CancellationToken cancellationToken)
         {
-            var teste = await _unitOfWork.convitesRepostorio.ObtemConvites(request.IdUsuario);
-            return null;
+            var convites = await _convitesLeituraRepositorio.RetornoConvites(request.IdUsuario, request.RetornaConvitesRemetente);
+
+            var convitesDTO = ConvitesMapper.ParaDTO(convites);
+
+            if (convitesDTO.Count() == 0)
+                return Resultado<List<GetRetornaConvitesDTO>>.GeraFalha(Falha.NaoEncontrado("Nenhum convite foi encontrado!"));
+
+            return Resultado<List<GetRetornaConvitesDTO>>.GeraSucesso(convitesDTO);
         }
     }
 }

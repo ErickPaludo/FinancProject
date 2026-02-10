@@ -104,6 +104,9 @@ namespace Financ.Infra.Data.Migrations
                     b.Property<int>("Acesso")
                         .HasColumnType("INTEGER");
 
+                    b.Property<DateTime>("DataEnvio")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("Expiracao")
                         .HasColumnType("TEXT");
 
@@ -351,6 +354,12 @@ namespace Financ.Infra.Data.Migrations
                     b.HasOne("Financ.Domain.Entidades.Conta", "Contas")
                         .WithMany()
                         .HasForeignKey("IdConta")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Financ.Infra.Data.Identity.UsuarioIdentity", null)
+                        .WithMany()
+                        .HasForeignKey("IdUsuarioRemetente")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

@@ -4,7 +4,6 @@ using Financ.Application.CQRS.Querys;
 using Financ.Application.DTOs.Autenticação.Post;
 using Financ.Application.DTOs.ContasUsuarios.Get.Filtros;
 using Financ.Application.DTOs.ContasUsuarios.Patch;
-using Financ.Application.DTOs.ContasUsuarios.Post;
 using Financ.Application.DTOs.Convites.Get;
 using Financ.Application.DTOs.Convites.Post;
 using Financ.Domain.Entidades;
@@ -31,9 +30,9 @@ namespace Financ.UI.Api.Controllers
         }
 
         [HttpPost("entrar_na_conta")]
-        public async Task<IActionResult> EntrarNaConta(InclusaoContaUsuarioDTO inclusaoContaUsuarioDTO)
+        public async Task<IActionResult> EntrarNaConta(int idConvite,bool aceito)
         {
-            var usuarioConta = await _mediator.Send(new IncluiUsuarioContaCommand(inclusaoContaUsuarioDTO.IdConta, User.RetornaIdUsuario(), inclusaoContaUsuarioDTO.Acesso));
+            var usuarioConta = await _mediator.Send(new IncluiUsuarioContaCommand(idConvite,aceito, User.RetornaIdUsuario()));
             return usuarioConta.RetornoAutomatico();
         }
 
@@ -58,9 +57,9 @@ namespace Financ.UI.Api.Controllers
             return convite.RetornoAutomatico();
         } 
         [HttpGet("retorna_convites")]
-        public async Task<IActionResult> RetornaConvites()
+        public async Task<IActionResult> RetornaConvites(bool retornaConvitesRemetente)
         {
-            var convite = await _mediator.Send(new RetornaConvitesQuery(User.RetornaIdUsuario()));
+            var convite = await _mediator.Send(new RetornaConvitesQuery(User.RetornaIdUsuario(), retornaConvitesRemetente));
             return convite.RetornoAutomatico();
         }
     }

@@ -18,24 +18,23 @@ namespace Financ.Domain.Entidades
         public int IdConta { get; private set; }
         public TiposAcessos Acesso { get; private set; }
         public bool? Aceito { get; private set; }
+        public DateTime DataEnvio { get; private set; }
         public DateTime Expiracao { get; private set; }
-       // public Usuario Remetente { get; private set; }
-       // public Usuario Destinatario { get; private set; }
+
         public Conta Contas { get; private set; }
         private Convites() { }
-        public Convites(Conta conta, TiposAcessos acesso)
+        public Convites(Conta conta, TiposAcessos acesso, ContasUsuarios usuarioRemetente, Usuario usuarioDestinatario)
         {
-            //ConvitesValidacao.Verifica(usuarioRemetente.Acesso != TiposAcessos.Mestre, MensagensConvite.USUARIO_SEM_PERMISSAO);
+            ConvitesValidacao.Verifica(usuarioRemetente.Acesso != TiposAcessos.Mestre, MensagensConvite.USUARIO_SEM_PERMISSAO);
             ConvitesValidacao.Verifica(acesso == TiposAcessos.Mestre, MensagensConvite.CONTA_JA_POSSUI_UM_USUARIO_MASTER);
             ConvitesValidacao.Verifica(conta.Status != TiposStatus.Ativo, MensagensConvite.USUARIO_SEM_PERMISSAO);
 
-            //ValidaUsuarios(usuarioRemetente.IdUsuario, usuarioDestinatario.IdUsuario);
+            ValidaUsuarios(usuarioRemetente.IdUsuario, usuarioDestinatario.IdUsuario);
+            DataEnvio = DateTime.Now;
             IdConta = conta.Id;
             Acesso = acesso;
             Expiracao = DateTime.Now.AddDays(7);
             Contas = conta;
-           // Remetente = usuarioRemetente.Usuario;
-          //  Destinatario = usuarioDestinatario;
         }
         private void ValidaUsuarios(string idUsuarioRemetente, string idUsuarioDestinatario)
         {
@@ -43,6 +42,16 @@ namespace Financ.Domain.Entidades
             ConvitesValidacao.Verifica(string.IsNullOrWhiteSpace(idUsuarioDestinatario), MensagensConvite.USUARIO_DESTINATARIO_INVALIDO);
             IdUsuarioRemetente = idUsuarioRemetente;
             IdUsuarioDestinatario = idUsuarioDestinatario;
+        }
+        public void AceitaConvite(bool aceito)
+        {
+            if (Aceito.HasValue)
+            {
+                string msg = Aceito.Value ? "aceito" : "rejeitado";
+                ConvitesValidacao.Verifica( true, MensagensConvite.CONVITE_JA_VIZUALIZADO + msg);
+            }
+            ConvitesValidacao.Verifica(DateTime.Now > Expiracao, MensagensConvite.CONVITE_EXPIRADO);
+            Aceito = aceito;
         }
     }
 }

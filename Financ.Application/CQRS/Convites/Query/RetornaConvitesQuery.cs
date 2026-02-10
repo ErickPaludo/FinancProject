@@ -12,10 +12,12 @@ namespace Financ.Application.CQRS.Query
     public class RetornaConvitesQuery : IRequest<Resultado<List<GetRetornaConvitesDTO>>>
     {
         public string IdUsuario { get; }
+        public bool RetornaConvitesRemetente { get; }
 
-        public RetornaConvitesQuery(string idUsuario)
+        public RetornaConvitesQuery(string idUsuario, bool retornaConvitesRemetente)
         {
             IdUsuario = idUsuario;
+            RetornaConvitesRemetente = retornaConvitesRemetente;
         }
     }
 }

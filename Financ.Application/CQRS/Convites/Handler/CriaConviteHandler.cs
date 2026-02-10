@@ -51,6 +51,7 @@ namespace Financ.Application.CQRS.Handler
                 {
                     return Resultado<GetCriaConviteDTO>.GeraFalha(Falha.ErroOperacional("Usuário destinataio já pertente a está conta."));
                 }
+
                 //Verifica se já existe um convite, que não tenha sido reprovado e que que não esteja expirado
                 if (( await _unitOfWork.convitesRepostorio.BuscarPorCondicao(
                 x => x.IdConta == request.idConta &&
@@ -62,12 +63,13 @@ namespace Financ.Application.CQRS.Handler
                    return Resultado<GetCriaConviteDTO>.GeraFalha(Falha.ErroOperacional("Já existe um convite em andamento, aguarde o retorno do usuário destinatário."));
                 }
                 Usuario usuarioDestinatario = await _usuarioIdentity.ObtemUsuario(idUsuarioDestinatario);
-                //   Convites convite = new Convites(contaUsuario, usuarioDestinatario, conta, request.acesso);
-                //await _unitOfWork.convitesRepostorio.Adicionar(convite);
-                //await _unitOfWork.Commit();
+                Usuario usuarioRemetente = await _usuarioIdentity.ObtemUsuario(request.idRemetente);
 
-                //  return Resultado<GetCriaConviteDTO>.GeraSucesso(ConvitesMapper.ParaDTO(convite));
-                return null;
+                Convites convite = new Convites(contaUsuario!.Contas!,request.acesso, contaUsuario, usuarioDestinatario);
+                await _unitOfWork.convitesRepostorio.Adicionar(convite);
+                await _unitOfWork.Commit();
+
+                return Resultado<GetCriaConviteDTO>.GeraSucesso(ConvitesMapper.ParaDTO(convite));
             }
             catch (ConvitesValidacao ex)
             {

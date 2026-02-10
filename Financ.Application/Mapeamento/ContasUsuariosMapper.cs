@@ -1,4 +1,5 @@
 ﻿using Financ.Application.DTOs.ContasUsuarios.Get;
+using Financ.Application.DTOs.ContasUsuarios.Post;
 using Financ.Domain.Entidades;
 using System;
 using System.Collections.Generic;
@@ -23,5 +24,8 @@ namespace Financ.Application.Mapeamento
                           contaUsuario.IdConta,
                           contaUsuario.Acesso,
                           contaUsuario.IdUsuario);
+
+        public static RetornaPostCadastro ParaDTO(bool aceito, ContasUsuarios contaUsuario) =>
+         new RetornaPostCadastro(aceito,ParaDTO(contaUsuario));
     }
 }
