@@ -41,10 +41,13 @@ namespace Financ.Infra.Data.Repositorios
         {
             return await _contexto.Set<T>().AsNoTracking().Where(predicado).ToListAsync();
         }
-
         public void Atualiza(T entity)
         {
           _contexto.Set<T>().Update(entity);
+        }
+        public void Delete(T entity)
+        {
+            _contexto.Set<T>().Remove(entity);
         }
     }
 }

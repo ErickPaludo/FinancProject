@@ -15,5 +15,6 @@ namespace Financ.Domain.Interfaces
         Task<T?> BuscarObjetoUnico(Expression<Func<T, bool>> predicado);
         Task<IEnumerable<T>> BuscarPorCondicao(Expression<Func<T, bool>> predicado);
         void Atualiza(T entity);
+        void Delete(T entity);
     }
 }

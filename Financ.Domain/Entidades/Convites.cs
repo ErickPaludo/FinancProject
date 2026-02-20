@@ -43,15 +43,24 @@ namespace Financ.Domain.Entidades
             IdUsuarioRemetente = idUsuarioRemetente;
             IdUsuarioDestinatario = idUsuarioDestinatario;
         }
-        public void AceitaConvite(bool aceito)
+        private void ValidaConviteAtivo(bool? aceito)
         {
             if (Aceito.HasValue)
             {
                 string msg = Aceito.Value ? "aceito" : "rejeitado";
-                ConvitesValidacao.Verifica( true, MensagensConvite.CONVITE_JA_VIZUALIZADO + msg);
+                ConvitesValidacao.Verifica(true, MensagensConvite.CONVITE_JA_VIZUALIZADO + msg);
             }
             ConvitesValidacao.Verifica(DateTime.Now > Expiracao, MensagensConvite.CONVITE_EXPIRADO);
+        }
+        public void AceitaConvite(bool aceito)
+        {
+            ValidaConviteAtivo(aceito);
             Aceito = aceito;
+        }
+        public void RevogaConvite(string idUsuarioRemetente)
+        {
+            ConvitesValidacao.Verifica(IdUsuarioRemetente != idUsuarioRemetente, MensagensConvite.CONVITE_EXPIRADO);
+            ValidaConviteAtivo(Aceito);
         }
     }
 }
