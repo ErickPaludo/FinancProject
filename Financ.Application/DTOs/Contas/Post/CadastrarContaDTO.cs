@@ -14,12 +14,5 @@ namespace Financ.Application.DTOs.Contas.Get
         [MinLength(3, ErrorMessage = "O título deve possuir no mínimo 3 caracteres")]
         [MaxLength(100, ErrorMessage = "O título deve possuir no máximo 100 caracteres")]
         public string Titulo { get; set; } = string.Empty;
-        public bool CreditoAtivo { get; set; } = false;
-        public bool CreditoLimite { get; set; } = false;
-        public double? CreditoMaximo { get; set; }
-        [DefaultValue(1)]
-        public int? DiaFechamento { get; init; }
-        [DefaultValue(8)]
-        public int? DiaVencimento { get; set; }
     }
 }

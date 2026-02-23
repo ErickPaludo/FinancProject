@@ -13,10 +13,5 @@ namespace Financ.Application.CQRS.Commands
 {
     public sealed record CriarContaCommand(
         string IdUsuario,
-        string Titulo,
-        bool CreditoAtivo,
-        int? DiaFechamento,
-        int? DiaVencimento,
-        bool CreditoLimite,
-        double? CreditoMaximo) : IRequest<Resultado<RetornaContasDTO>>;
+        string Titulo) : IRequest<Resultado<RetornaContasDTO>>;
 }

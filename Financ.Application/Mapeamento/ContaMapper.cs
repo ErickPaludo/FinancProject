@@ -11,6 +11,6 @@ namespace Financ.Application.Mapeamento
 {
     public static class ContaMapper
     {
-        public static RetornaContasDTO ParaDTO(Conta dto) => new RetornaContasDTO(dto.Id,dto.Titulo,dto.Status,dto.CreditoAtivo,dto.CreditoLimite,dto.CreditoMaximo,dto.DiaFechamento,dto.DiaVencimento);
+        public static RetornaContasDTO ParaDTO(Conta dto) => new RetornaContasDTO(dto.Id,dto.Titulo,dto.Status);
     }
 }

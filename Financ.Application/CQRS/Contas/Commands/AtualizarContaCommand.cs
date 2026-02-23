@@ -14,12 +14,7 @@ namespace Financ.Application.CQRS.Commands
     public sealed record AtualizarContaCommand(
           int IdConta,           
           string IdUsuario,      
-          bool? CreditoAtivo,
-          bool? CreditoLimite,
-          TiposStatus? Status,
-          string? Titulo,
-          int? DiaFechamento,
-          int? DiaVencimento,
-          double? CreditoMaximo
+          TiposStatusContas? Status,
+          string? Titulo
       ) : IRequest<Resultado<RetornaContasDTO>>;
 }

@@ -12,11 +12,6 @@ namespace Financ.Application.DTOs.Contas.Ptch
     public class AtualizaContaDTO 
     {   
         public string? Titulo { get; set; }
-        public bool? CreditoAtivo { get; set; }
-        public bool? CreditoLimite { get; set; }
-        public double? CreditoMaximo { get; set; }
-        public int? DiaFechamento { get; set; }
-        public int? DiaVencimento { get; set; }
-        public TiposStatus? Status { get; set; }
+        public TiposStatusContas? Status { get; set; }
     }
 }

@@ -17,10 +17,12 @@ namespace Financ.Infra.Data.ConfiguracaoTabelas
             builder.Property(e => e.Titulo).IsRequired().HasMaxLength(100);
             builder.Property(e => e.TipoConta).IsRequired();
             builder.Property(e => e.Status).IsRequired();
-            builder.Property(e => e.DiaFechamento).HasMaxLength(16).HasPrecision(2,0);
-            builder.Property(e => e.DiaVencimento).HasMaxLength(12).HasPrecision(2, 0);
             builder.Property(e => e.DthrReg).IsRequired();
             builder.HasKey(e => e.Id);
         }
     }
 }
+#region Linhas de Credito
+//builder.Property(e => e.DiaFechamento).HasMaxLength(16).HasPrecision(2,0);
+//builder.Property(e => e.DiaVencimento).HasMaxLength(12).HasPrecision(2, 0);
+#endregion

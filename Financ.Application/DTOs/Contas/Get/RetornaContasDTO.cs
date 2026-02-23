@@ -13,11 +13,6 @@ namespace Financ.Application.DTOs.Contas.Get
     (
         int IdConta,
         string Titulo,
-        TiposStatus Status,
-        bool CreditoAtivo,
-        bool CreditoLimite,
-        double? CreditoMaximo,
-        int? DiaFechamento,
-        int? DiaVencimento
+        TiposStatusContas Status
     );
 }

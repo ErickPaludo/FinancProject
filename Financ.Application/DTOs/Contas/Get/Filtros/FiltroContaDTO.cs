@@ -11,6 +11,6 @@ namespace Financ.Application.DTOs.Contas.Get.Filtros
     {
         public int? Id { get; set; }
         public string? Titulo { get; set; }
-        public TiposStatus? Status { get; set; }
+        public TiposStatusContas? Status { get; set; }
     }
 }

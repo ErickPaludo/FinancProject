@@ -30,7 +30,7 @@ namespace Financ.Application.CQRS.Handler
         {
             try
             {
-                Conta conta = new Conta(request.Titulo, request.CreditoAtivo, request.DiaFechamento, request.DiaVencimento, request.CreditoLimite, request.CreditoMaximo);
+                Conta conta = new Conta(request.Titulo);
                 Usuario usuario = await _usuariosServico.ObtemUsuario(request.IdUsuario);
                 var contaUsuario = new ContasUsuarios(conta, usuario);
                 conta.ContasUsuariosVinculados!.Add(contaUsuario);

@@ -10,7 +10,7 @@ namespace Financ.Domain.Entidades
     public abstract class BaseConta
     {
         public int Id { get; protected set; }
-        public TiposStatus Status { get; protected set; }
+        public TiposStatusContas Status { get; protected set; }
         public DateTime DthrReg { get; protected set; }
     }
 }

@@ -36,7 +36,7 @@ namespace Financ.Application.CQRS.Handler
                 {
                     return Resultado<List<RetornaContasDTO>>.GeraFalha(Falha.NaoEncontrado("Conta não encontrada!"));
                 }
-                listaContas.Add(new RetornaContasDTO(conta.Contas.Id, conta.Contas.Titulo!, conta.Contas.Status, conta.Contas.CreditoAtivo, conta.Contas.CreditoLimite, conta.Contas.CreditoMaximo, conta.Contas.DiaFechamento, conta.Contas.DiaVencimento));
+                listaContas.Add(new RetornaContasDTO(conta.Contas.Id, conta.Contas.Titulo!, conta.Contas.Status));
             }
 
             return Resultado<List<RetornaContasDTO>>.GeraSucesso(listaContas);
@@ -49,7 +49,7 @@ namespace Financ.Application.CQRS.Handler
             var possuiFiltros = filtros.Filtros != null;
 
             var contasUsuario = await _unitOfWork.contasUsuariosRepositorio.ObterContasDoUsuario(
-                x => x.IdUsuario == filtros.IdUsuario && x.Contas!.Status != TiposStatus.Deletado
+                x => x.IdUsuario == filtros.IdUsuario && x.Contas!.Status != TiposStatusContas.Deletado
                 && (!possuiFiltros || (
                     (!filtroId.HasValue || x.IdConta == filtroId.Value) &&
                     (string.IsNullOrEmpty(filtroTitulo) || x.Contas!.Titulo!.Contains(filtroTitulo)) &&
