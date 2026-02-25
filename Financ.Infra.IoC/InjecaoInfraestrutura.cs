@@ -22,7 +22,7 @@ namespace Financ.Infra.IoC
         public static void ConfigurarInjecaoInfraestrutura(this IServiceCollection services, IConfiguration configure)
         {
 
-            services.AddDbContext<AppContextoData>(op => op.UseSqlite(configure.GetConnectionString("Sqlite"), b => b.MigrationsAssembly(typeof(AppContextoData).Assembly.FullName))); //variavel b diz aonde gerar as migrations, pois o contexto esta em outro projeto
+            services.AddDbContext<AppContextoData>(op => op.UseSqlServer(configure.GetConnectionString("SqlServer"), b => b.MigrationsAssembly(typeof(AppContextoData).Assembly.FullName))); //variavel b diz aonde gerar as migrations, pois o contexto esta em outro projeto
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IConvitesLeituraRepositorio, ConvitesLeituraRepositorio>();

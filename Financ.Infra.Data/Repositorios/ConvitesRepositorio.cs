@@ -3,7 +3,6 @@ using Financ.Application.Leitura.Convite;
 using Financ.Domain.Entidades;
 using Financ.Domain.Interfaces.Repositorios;
 using Financ.Infra.Data.Contexto;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;

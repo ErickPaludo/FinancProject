@@ -2,7 +2,8 @@
 using Financ.Application.Interfaces;
 using Financ.Application.Leitura.Convite;
 using Financ.Domain.Entidades;
-using Microsoft.Data.Sqlite;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -24,7 +25,7 @@ namespace Financ.Infra.Data.Repositorios.Leitura
 
         public async Task<IEnumerable<LeituraRetornoConvites>> RetornoConvites(string idUsuario, bool retornaConvitesRemetente)
         {
-            using IDbConnection db = new SqliteConnection(_connectionString);
+            using IDbConnection db = new SqlConnection(_connectionString);
 
             string sql = $@"select cv.id,
                            cv.Acesso,

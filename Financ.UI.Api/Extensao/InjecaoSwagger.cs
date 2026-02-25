@@ -2,8 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi;
 
-
-namespace Financ.Infra.IoC
+namespace Financ.Ui.Api
 {
     public static class InjecaoSwagger
     {
@@ -24,6 +23,8 @@ namespace Financ.Infra.IoC
                     Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] " +
                     "and then your token in the text input below.\r\n\r\nExample: \"Bearer 12345abcdef\"",
                 });
+
+              
             });
             return services;
         }
