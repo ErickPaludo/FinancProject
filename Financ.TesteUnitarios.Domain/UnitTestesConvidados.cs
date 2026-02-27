@@ -1,28 +1,104 @@
 ﻿using Financ.Domain.Entidades;
 using Financ.Domain.Enums;
-using Financ.Domain.Validacoes.Mensagens;
 using Financ.Domain.Validacoes;
+using Financ.Domain.Validacoes.Mensagens;
 using FluentAssertions;
+using Xunit;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Financ.TesteUnitarios.Domain
 {
-    public class UnitTestesConvidados
+    public class UnitTestesConvites
     {
-        [Fact(DisplayName = "Gera convite sem divergência")]
-        public void Id_NuloOuVazio_GeraDivergencia()
-        {
-            Conta conta = new Conta(1,"Teste x", true, 5, 15, true, 200);
-            Usuario usuarioRemetente = new Usuario(Guid.NewGuid().ToString(), "Joao", "Silva", "teste@teste.com");
-            Usuario usuarioDestinatario = new Usuario(Guid.NewGuid().ToString(), "Marcos", "Costa", "marcos@teste.com");
-            ContasUsuarios contasUsuarioRemetente = new ContasUsuarios(1, conta, usuarioRemetente.IdUsuario, TiposAcessos.Mestre, TiposStatus.Ativo);
+        private Conta CriarContaAtiva()
+            => new Conta(1, "Conta Teste");
 
-            Action action = () => new Convites(contasUsuarioRemetente,usuarioDestinatario.IdUsuario,conta,TiposAcessos.Administrador);
+        private Usuario CriarUsuario(string id)
+            => new Usuario(id, "Nome", "Sobrenome", $"{id}@teste.com");
+
+        private ContasUsuarios CriarContaUsuarioMestre(Conta conta, string idUsuario)
+            => new ContasUsuarios(
+                1,
+                conta,
+                idUsuario,
+                TiposAcessos.Mestre);
+
+        [Fact(DisplayName = "Deve criar convite quando dados são válidos")]
+        public void CriarConvite_DadosValidos_NaoDeveLancarExcecao()
+        {
+            var conta = CriarContaAtiva();
+            var usuarioRemetente = CriarUsuario(Guid.NewGuid().ToString());
+            var usuarioDestinatario = CriarUsuario(Guid.NewGuid().ToString());
+            var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuarioRemetente.IdUsuario);
+
+            Action action = () => new Convites(
+                conta,
+                TiposAcessos.Administrador,
+                contaUsuarioRemetente,
+                usuarioDestinatario);
+
             action.Should().NotThrow();
+        }
+
+        [Fact(DisplayName = "Não deve permitir convite se usuário não for mestre")]
+        public void CriarConvite_UsuarioNaoMestre_DeveLancarExcecao()
+        {
+            var conta = CriarContaAtiva();
+            var usuarioRemetente = CriarUsuario(Guid.NewGuid().ToString());
+            var usuarioDestinatario = CriarUsuario(Guid.NewGuid().ToString());
+
+            var contaUsuarioRemetente = new ContasUsuarios(
+                1,
+                conta,
+                usuarioRemetente.IdUsuario,
+                TiposAcessos.Administrador);
+
+            Action action = () => new Convites(
+                conta,
+                TiposAcessos.Administrador,
+                contaUsuarioRemetente,
+                usuarioDestinatario);
+
+            action.Should().Throw<ConvitesValidacao>()
+                .WithMessage(MensagensConvite.USUARIO_SEM_PERMISSAO);
+        }
+
+        [Fact(DisplayName = "Não deve permitir convite se conta não for ativa")]
+        public void CriarConvite_ContaInativa_DeveLancarExcecao()
+        {
+            var conta = new Conta(1, "Conta Teste");
+
+            var usuarioRemetente = CriarUsuario(Guid.NewGuid().ToString());
+            var usuarioDestinatario = CriarUsuario(Guid.NewGuid().ToString());
+            var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuarioRemetente.IdUsuario);
+
+            conta.AtualizaConta(CriarContaUsuarioMestre(conta,Guid.NewGuid().ToString()),null,TiposStatusContas.Inativo); // ajuste se necessário
+            Action action = () => new Convites(
+                conta,
+                TiposAcessos.Administrador,
+                contaUsuarioRemetente,
+                usuarioDestinatario);
+
+            action.Should().Throw<ConvitesValidacao>();
+        }
+
+        [Fact(DisplayName = "Aceitar convite deve funcionar quando válido")]
+        public void AceitarConvite_Valido_DeveAlterarEstado()
+        {
+            var conta = CriarContaAtiva();
+            var usuarioRemetente = CriarUsuario(Guid.NewGuid().ToString());
+            var usuarioDestinatario = CriarUsuario(Guid.NewGuid().ToString());
+            var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuarioRemetente.IdUsuario);
+
+            var convite = new Convites(
+                conta,
+                TiposAcessos.Administrador,
+                contaUsuarioRemetente,
+                usuarioDestinatario);
+
+            convite.AceitaConvite(true);
+
+            convite.Aceito.Should().BeTrue();
         }
     }
 }

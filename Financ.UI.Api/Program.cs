@@ -1,5 +1,6 @@
 
 using Financ.Infra.IoC;
+using Financ.Ui.Api;
 
 namespace Financ.UI.Api
 {

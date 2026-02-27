@@ -21,7 +21,7 @@ namespace Financ.Domain.Entidades
             ValidaTitulo(titulo);
             ContaPadrao();
         }
-        public Conta(int id, string titulo, bool creditoAtivo, int? diaFechamento, int? diaVencimento, bool creditoLimite, double? creditoMaximo)
+        public Conta(int id, string titulo)
         {
             ValidaTitulo(titulo);
             ContaPadrao();

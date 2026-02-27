@@ -20,7 +20,7 @@ namespace Financ.Infra.Data.Repositorios.Leitura
 
         public ConvitesLeituraRepositorio(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("Sqlite");
+            _connectionString = configuration.GetConnectionString("SqlServer");
         }
 
         public async Task<IEnumerable<LeituraRetornoConvites>> RetornoConvites(string idUsuario, bool retornaConvitesRemetente)
@@ -38,11 +38,11 @@ namespace Financ.Infra.Data.Repositorios.Leitura
                            r.Id as IdUsuarioRemetente,
                            r.PrimeiroNome as PrimeiroNomeRemetente,
                            r.SegundoNome  as SegundoNomeRemetente,
-                           r.PrimeiroNome || ' ' || r.SegundoNome as NomeCompletoRemetente,
+                           r.PrimeiroNome + ' ' + r.SegundoNome as NomeCompletoRemetente,
                            d.Id as IdUsuarioDestinatario,
                            d.PrimeiroNome as PrimeiroNomeDestinatario,
                            d.SegundoNome  as SegundoNomeDestinatario,
-                           d.PrimeiroNome || ' ' || d.SegundoNome as NomeCompletoDestinatario
+                           d.PrimeiroNome + ' ' + d.SegundoNome as NomeCompletoDestinatario
                            from fnc_convites cv 
                            inner join aspnetusers r ON 
                            r.Id = cv.IdUsuarioRemetente 
@@ -53,7 +53,7 @@ namespace Financ.Infra.Data.Repositorios.Leitura
                            where 
                            {(retornaConvitesRemetente ? "cv.IdUsuarioRemetente" : "cv.IdUsuarioDestinatario")} = @idUsuario
                            and cv.aceito is null
-                           and datetime('now') <= cv.Expiracao";
+                           and sysdatetime() <= cv.Expiracao";
 
             return await db.QueryAsync<LeituraRetornoConvites>(sql, new { idUsuario });
 

@@ -50,7 +50,7 @@ namespace Financ.Application.CQRS.Handler
 
                 Conta? conta = await _unitOfWork.contasRepositorio.BuscarObjetoUnico(x => x.Id == convite.IdConta);
 
-                var contaUsuario = new ContasUsuarios(conta!, convite.IdUsuarioDestinatario, convite.Acesso, null);
+                var contaUsuario = new ContasUsuarios(conta!, convite.IdUsuarioDestinatario, convite.Acesso);
 
                 contaUsuario = await _unitOfWork.contasUsuariosRepositorio.Adicionar(contaUsuario);
 

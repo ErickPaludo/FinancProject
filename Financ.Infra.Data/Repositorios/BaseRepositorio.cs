@@ -39,7 +39,7 @@ namespace Financ.Infra.Data.Repositorios
         }
         public async Task<IEnumerable<T>> BuscarPorCondicao(Expression<Func<T, bool>> predicado)
         {
-            return await _contexto.Set<T>().AsNoTracking().Where(predicado).ToListAsync();
+            return await _contexto.Set<T>().Where(predicado).ToListAsync();
         }
         public void Atualiza(T entity)
         {

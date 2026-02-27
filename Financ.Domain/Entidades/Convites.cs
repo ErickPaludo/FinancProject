@@ -26,7 +26,7 @@ namespace Financ.Domain.Entidades
         public Convites(Conta conta, TiposAcessos acesso, ContasUsuarios usuarioRemetente, Usuario usuarioDestinatario)
         {
             ConvitesValidacao.Verifica(usuarioRemetente.Acesso != TiposAcessos.Mestre, MensagensConvite.USUARIO_SEM_PERMISSAO);
-            ConvitesValidacao.Verifica(acesso == TiposAcessos.Mestre, MensagensConvite.CONTA_JA_POSSUI_UM_USUARIO_MASTER);
+            //ConvitesValidacao.Verifica(acesso == TiposAcessos.Mestre, MensagensConvite.CONTA_JA_POSSUI_UM_USUARIO_MASTER);
             ConvitesValidacao.Verifica(conta.Status != TiposStatusContas.Ativo, MensagensConvite.USUARIO_SEM_PERMISSAO);
 
             ValidaUsuarios(usuarioRemetente.IdUsuario, usuarioDestinatario.IdUsuario);

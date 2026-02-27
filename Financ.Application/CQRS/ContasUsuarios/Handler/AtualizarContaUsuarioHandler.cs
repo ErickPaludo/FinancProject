@@ -25,8 +25,14 @@ namespace Financ.Application.CQRS.Handler
         {
             try
             {
-                var contaUsuarioAlterado = await _unitOfWork.contasUsuariosRepositorio.BuscarObjetoUnico(x => x.IdConta == request.idConta && x.IdUsuario == request.idUsuarioAlterado);
-                var contaUsuarioSolicitante = await _unitOfWork.contasUsuariosRepositorio.BuscarObjetoUnico(x => x.IdConta == request.idConta && x.IdUsuario == request.idUsuarioSolicitante);
+                var contasUsuarios = await _unitOfWork.contasUsuariosRepositorio.BuscarPorCondicao(x => x.IdConta == request.idConta);
+
+                if (contasUsuarios.Count() == 0)
+                    return Resultado<RetornaCadastroContasUsuariosDTO>.GeraFalha(Falha.NaoEncontrado("Conta não encontrada!"));
+
+                var contaUsuarioAlterado = contasUsuarios?.First(x => x.IdUsuario == request.idUsuarioAlterado);
+
+                var contaUsuarioSolicitante = contasUsuarios?.First(x => x.IdUsuario == request.idUsuarioSolicitante);
 
                 if (contaUsuarioAlterado is not null && contaUsuarioSolicitante is not null)
                 {
