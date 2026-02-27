@@ -22,10 +22,10 @@ namespace Financ.Infra.Data.ConfiguracaoTabelas
             builder.Property(e => e.Status).IsRequired();
             builder.Property(e => e.DthrReg).IsRequired();
 
-            builder.HasOne(e => e.Contas)
-                .WithMany(e => e.ContasUsuariosVinculados)
-                .HasForeignKey(e => e.IdConta)
-                .OnDelete(DeleteBehavior.Restrict);
+            //builder.HasOne(e => e.Contas)
+            //    .WithMany(e => e.ContasUsuariosVinculados)
+            //    .HasForeignKey(e => e.IdConta)
+            //    .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne<UsuarioIdentity>()
                     .WithMany()

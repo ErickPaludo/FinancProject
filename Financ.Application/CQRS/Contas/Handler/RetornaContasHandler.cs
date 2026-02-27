@@ -26,6 +26,7 @@ namespace Financ.Application.CQRS.Handler
         {
            var contasUsuarios = await ContasUsuariosSelecionadas(request);
 
+
             if (contasUsuarios.Count() == 0)
                 return Resultado<List<RetornaContasDTO>>.GeraFalha(Falha.NaoEncontrado("Nenhuma conta foi encontrada!"));
 

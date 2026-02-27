@@ -19,6 +19,12 @@ namespace Financ.Infra.Data.ConfiguracaoTabelas
             builder.Property(e => e.Status).IsRequired();
             builder.Property(e => e.DthrReg).IsRequired();
             builder.HasKey(e => e.Id);
+
+            builder
+    .HasMany(c => c.ContaUsuarios)
+    .WithOne(u => u.Contas)
+    .HasForeignKey(u => u.IdConta)
+    .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

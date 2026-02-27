@@ -14,8 +14,14 @@ namespace Financ.Domain.Entidades
         public string Titulo { get; private set; }
         public TiposContas TipoConta { get; private set; }
 
+        private readonly List<ContasUsuarios> _contasUsuarios = new();
+        public IReadOnlyCollection<ContasUsuarios> ContaUsuarios => _contasUsuarios;
+
         private Conta() { }
-        public ICollection<ContasUsuarios>? ContasUsuariosVinculados { get; set; }
+      //  public ICollection<ContasUsuarios>? ContasUsuariosVinculados { get; set; }
+
+        public void AddUsuario(ContasUsuarios usuario) => _contasUsuarios.Add(usuario);
+
         public Conta(string titulo)
         {
             ValidaTitulo(titulo);
@@ -34,7 +40,7 @@ namespace Financ.Domain.Entidades
             Status = TiposStatusContas.Ativo;
             TipoConta = TiposContas.Corrente;
             DthrReg = DateTime.Now;
-            ContasUsuariosVinculados = new List<ContasUsuarios>();
+          //  ContasUsuariosVinculados = new List<ContasUsuarios>();
         }
       
         private void ValidaTitulo(string titulo)

@@ -34,14 +34,14 @@ namespace Financ.Application.CQRS.Handler
                 if (string.IsNullOrEmpty(idUsuarioDestinatario))
                        return Resultado<GetCriaConviteDTO>.GeraFalha(Falha.NaoEncontrado("Usuário destinatário do convite não existe."));
                 
-                var conta = await _unitOfWork.contasRepositorio.BuscarPorCondicao(x => x.Id == request.idConta);
+                var conta = await _unitOfWork.contasRepositorio.BuscarContaComUsuarios(x => x.Id == request.idConta);
 
                 if (conta is null)
                     return Resultado<GetCriaConviteDTO>.GeraFalha(Falha.NaoEncontrado("Conta não encontrada."));
                 
                 var contaUsuario = await _unitOfWork.contasUsuariosRepositorio.BuscarPorCondicao(x => x.IdConta == request.idConta );
                
-                bool usuariosMaster = contaUsuario.Where(x => x.Acesso == TiposAcessos.Mestre).Take(2).Count() == 2;
+                bool usuariosMaster = conta.ContaUsuarios.Where(x => x.Acesso == TiposAcessos.Mestre).Take(2).Count() == 2;
                 if (usuariosMaster)
                     return Resultado<GetCriaConviteDTO>.GeraFalha(Falha.NaoEncontrado("A conta já possui 2 usuários masters."));
 
@@ -68,7 +68,7 @@ namespace Financ.Application.CQRS.Handler
 
                 Usuario usuarioDestinatario = await _usuarioIdentity.ObtemUsuario(idUsuarioDestinatario);
                 Usuario usuarioRemetente = await _usuarioIdentity.ObtemUsuario(request.idRemetente);
-
+                contaUsuarioRemetente.ValidaPermissoeNaConta();
                 Convites convite = new Convites(contaUsuarioRemetente!.Contas!,request.acesso, contaUsuarioRemetente, usuarioDestinatario);
                 await _unitOfWork.convitesRepostorio.Adicionar(convite);
                 await _unitOfWork.Commit();

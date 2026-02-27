@@ -16,7 +16,7 @@ namespace Financ.Domain.Entidades
         public int IdConta { get; private set; }
         public string IdUsuario { get; private set; }
         public TiposAcessos Acesso { get; private set; }
-        public Conta? Contas { get; private set; }
+        public Conta Contas { get; private set; }
         
         public ContasUsuarios() { }
         public ContasUsuarios(int id,Conta conta, string idUsuario, TiposAcessos acesso, TiposStatusContas? status = null)
@@ -79,7 +79,10 @@ namespace Financ.Domain.Entidades
                 Status = status.Value;
             }
         }
-        
+        public void ValidaPermissoeNaConta()
+        {
+            ContasUsuariosValidacao.Verifica(Contas.ContaUsuarios.Where(x => x.Acesso == TiposAcessos.Mestre).Take(2).Count() == 2, "O número máximo de usuários master já foi alcançado.");
+        }
 
     }
 }
