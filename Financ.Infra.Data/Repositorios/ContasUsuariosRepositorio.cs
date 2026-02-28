@@ -22,7 +22,7 @@ namespace Financ.Infra.Data.Repositorios
         {
             return await _contexto.ContasUsuarios
                 .AsNoTracking()
-                .Include(fcu => fcu.Contas) // ISSO GERA O INNER JOIN AUTOMÁTICO
+                .Include(fcu => fcu.Conta) // ISSO GERA O INNER JOIN AUTOMÁTICO
                 .Where(predicado)
                 .ToListAsync();
         }

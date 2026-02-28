@@ -16,8 +16,10 @@ namespace Financ.Domain.Entidades
         public int IdConta { get; private set; }
         public string IdUsuario { get; private set; }
         public TiposAcessos Acesso { get; private set; }
-        public Conta Contas { get; private set; }
-        
+        public Conta Conta { get; private set; }
+        public IUsuarioIdentity Usuario { get; private set; }
+
+
         public ContasUsuarios() { }
         public ContasUsuarios(int id,Conta conta, string idUsuario, TiposAcessos acesso, TiposStatusContas? status = null)
         {
@@ -55,7 +57,7 @@ namespace Financ.Domain.Entidades
             ContasUsuariosValidacao.Verifica(conta is null, MensagensContasUsuarios.CONTA_NAO_PODE_SER_NULA);
             ContasUsuariosValidacao.Verifica(conta!.Status != TiposStatusContas.Ativo, MensagensContasUsuarios.CONTA_NAO_ESTA_ATIVA);
             ContasUsuariosValidacao.Verifica(string.IsNullOrEmpty(idUsuario), MensagensContasUsuarios.IDUSUARIO_INVALIDO);
-            Contas = conta;
+            Conta = conta;
             //Usuario = usuario!;
             IdUsuario = idUsuario;
             DthrReg = DateTime.Now;
@@ -79,9 +81,9 @@ namespace Financ.Domain.Entidades
                 Status = status.Value;
             }
         }
-        public void ValidaPermissoeNaConta()
+        public bool ValidaPermissoeNaConta(TiposAcessos acessoDestinatario)
         {
-            ContasUsuariosValidacao.Verifica(Contas.ContaUsuarios.Where(x => x.Acesso == TiposAcessos.Mestre).Take(2).Count() == 2, "O número máximo de usuários master já foi alcançado.");
+            return !(acessoDestinatario.Equals(TiposAcessos.Mestre) && Conta.ContaUsuarios.Where(x => x.Acesso.Equals(TiposAcessos.Mestre) && x.Status.Equals(TiposStatusContas.Ativo)).Take(2).Count() == 2);
         }
 
     }

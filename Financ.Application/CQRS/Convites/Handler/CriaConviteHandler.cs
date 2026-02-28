@@ -68,8 +68,8 @@ namespace Financ.Application.CQRS.Handler
 
                 Usuario usuarioDestinatario = await _usuarioIdentity.ObtemUsuario(idUsuarioDestinatario);
                 Usuario usuarioRemetente = await _usuarioIdentity.ObtemUsuario(request.idRemetente);
-                contaUsuarioRemetente.ValidaPermissoeNaConta();
-                Convites convite = new Convites(contaUsuarioRemetente!.Contas!,request.acesso, contaUsuarioRemetente, usuarioDestinatario);
+               // contaUsuarioRemetente.ValidaPermissoeNaConta();
+                Convites convite = new Convites(request.acesso, contaUsuarioRemetente,usuarioRemetente.IdUsuario);
                 await _unitOfWork.convitesRepostorio.Adicionar(convite);
                 await _unitOfWork.Commit();
 

@@ -28,17 +28,11 @@ namespace Financ.Infra.Data.ConfiguracaoTabelas
             builder.HasIndex(e => e.IdUsuarioRemetente);
             builder.HasIndex(e => e.IdUsuarioDestinatario);
 
-            // Relação com Conta
-            builder.HasOne(e => e.Contas)
-                .WithMany()
-                .HasForeignKey(e => e.IdConta)
-                .OnDelete(DeleteBehavior.Restrict);
-
             // Mapeia a string para a tabela do Identity sem precisar do objeto na classe Convites
             builder.HasOne<UsuarioIdentity>()
                 .WithMany()
                 .HasForeignKey(e => e.IdUsuarioRemetente)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
             //// Relação com remetente
             //builder.HasOne(e => e.Remetente)
             //    .WithMany()

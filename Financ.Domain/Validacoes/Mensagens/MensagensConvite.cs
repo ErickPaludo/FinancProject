@@ -17,5 +17,7 @@ namespace Financ.Domain.Validacoes.Mensagens
         public const string CONVITE_JA_VIZUALIZADO = "O convite já foi ";
         public const string CONVITE_EXPIRADO = "Convite expirado!";
         public const string USUARIO_REMETENTE_NAO_AUTORIZADO = "Você não é o usuário remetente!";
+
+        public const string LIMITE_USUARIOS_MASTER = "O limite de usuários master foi atingido. ";
     }
 }

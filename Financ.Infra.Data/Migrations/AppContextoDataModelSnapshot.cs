@@ -350,15 +350,15 @@ namespace Financ.Infra.Data.Migrations
             modelBuilder.Entity("Financ.Domain.Entidades.Convites", b =>
                 {
                     b.HasOne("Financ.Domain.Entidades.Conta", "Contas")
-                        .WithMany()
+                        .WithMany("Convites")
                         .HasForeignKey("IdConta")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Financ.Infra.Data.Identity.UsuarioIdentity", null)
                         .WithMany()
                         .HasForeignKey("IdUsuarioRemetente")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Contas");
@@ -418,6 +418,8 @@ namespace Financ.Infra.Data.Migrations
             modelBuilder.Entity("Financ.Domain.Entidades.Conta", b =>
                 {
                     b.Navigation("ContaUsuarios");
+
+                    b.Navigation("Convites");
                 });
 #pragma warning restore 612, 618
         }

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Financ.Domain.Interfaces.InterfaceEntidades;
+using System.Globalization;
 
 namespace Financ.Domain.Entidades
 {
@@ -23,26 +24,21 @@ namespace Financ.Domain.Entidades
 
         public Conta Contas { get; private set; }
         private Convites() { }
-        public Convites(Conta conta, TiposAcessos acesso, ContasUsuarios usuarioRemetente, Usuario usuarioDestinatario)
+        public Convites(TiposAcessos acesso, ContasUsuarios usuarioRemetente, string usuairoDestinatario)
         {
             ConvitesValidacao.Verifica(usuarioRemetente.Acesso != TiposAcessos.Mestre, MensagensConvite.USUARIO_SEM_PERMISSAO);
-            //ConvitesValidacao.Verifica(acesso == TiposAcessos.Mestre, MensagensConvite.CONTA_JA_POSSUI_UM_USUARIO_MASTER);
-            ConvitesValidacao.Verifica(conta.Status != TiposStatusContas.Ativo, MensagensConvite.USUARIO_SEM_PERMISSAO);
-
-            ValidaUsuarios(usuarioRemetente.IdUsuario, usuarioDestinatario.IdUsuario);
+            ConvitesValidacao.Verifica(usuarioRemetente.Conta.Status != TiposStatusContas.Ativo, MensagensConvite.USUARIO_SEM_PERMISSAO);
+            ConvitesValidacao.Verifica(!usuarioRemetente.ValidaPermissoeNaConta(acesso), MensagensConvite.LIMITE_USUARIOS_MASTER);
+            
+            IdUsuarioRemetente = usuarioRemetente.IdUsuario;
+            IdUsuarioDestinatario = usuairoDestinatario;
             DataEnvio = DateTime.Now;
-            IdConta = conta.Id;
+            IdConta = usuarioRemetente.Conta.Id;
             Acesso = acesso;
             Expiracao = DateTime.Now.AddDays(7);
-            Contas = conta;
+            Contas = usuarioRemetente.Conta;
         }
-        private void ValidaUsuarios(string idUsuarioRemetente, string idUsuarioDestinatario)
-        {
-            ConvitesValidacao.Verifica(string.IsNullOrWhiteSpace(idUsuarioRemetente), MensagensConvite.USUARIO_REMETENTE_INVALIDO);
-            ConvitesValidacao.Verifica(string.IsNullOrWhiteSpace(idUsuarioDestinatario), MensagensConvite.USUARIO_DESTINATARIO_INVALIDO);
-            IdUsuarioRemetente = idUsuarioRemetente;
-            IdUsuarioDestinatario = idUsuarioDestinatario;
-        }
+   
         private void ValidaConviteAtivo(bool? aceito)
         {
             if (Aceito.HasValue)

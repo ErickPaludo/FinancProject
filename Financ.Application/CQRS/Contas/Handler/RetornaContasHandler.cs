@@ -33,11 +33,11 @@ namespace Financ.Application.CQRS.Handler
             List<RetornaContasDTO> listaContas = new List<RetornaContasDTO>();
             foreach (var conta in contasUsuarios)
             {
-                if (conta.Contas is null)
+                if (conta.Conta is null)
                 {
                     return Resultado<List<RetornaContasDTO>>.GeraFalha(Falha.NaoEncontrado("Conta não encontrada!"));
                 }
-                listaContas.Add(new RetornaContasDTO(conta.Contas.Id, conta.Contas.Titulo!, conta.Contas.Status));
+                listaContas.Add(new RetornaContasDTO(conta.Conta.Id, conta.Conta.Titulo!, conta.Conta.Status));
             }
 
             return Resultado<List<RetornaContasDTO>>.GeraSucesso(listaContas);
@@ -50,11 +50,11 @@ namespace Financ.Application.CQRS.Handler
             var possuiFiltros = filtros.Filtros != null;
 
             var contasUsuario = await _unitOfWork.contasUsuariosRepositorio.ObterContasDoUsuario(
-                x => x.IdUsuario == filtros.IdUsuario && x.Contas!.Status != TiposStatusContas.Deletado
+                x => x.IdUsuario == filtros.IdUsuario && x.Conta!.Status != TiposStatusContas.Deletado
                 && (!possuiFiltros || (
                     (!filtroId.HasValue || x.IdConta == filtroId.Value) &&
-                    (string.IsNullOrEmpty(filtroTitulo) || x.Contas!.Titulo!.Contains(filtroTitulo)) &&
-                    (!filtroStatus.HasValue || x.Contas!.Status == filtroStatus.Value)))
+                    (string.IsNullOrEmpty(filtroTitulo) || x.Conta!.Titulo!.Contains(filtroTitulo)) &&
+                    (!filtroStatus.HasValue || x.Conta!.Status == filtroStatus.Value)))
             );
             return contasUsuario;
         }

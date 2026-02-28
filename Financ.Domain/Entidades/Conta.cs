@@ -17,8 +17,9 @@ namespace Financ.Domain.Entidades
         private readonly List<ContasUsuarios> _contasUsuarios = new();
         public IReadOnlyCollection<ContasUsuarios> ContaUsuarios => _contasUsuarios;
 
+        private readonly List<Convites> _convites = new();
+        public IReadOnlyCollection<Convites> Convites => _convites;
         private Conta() { }
-      //  public ICollection<ContasUsuarios>? ContasUsuariosVinculados { get; set; }
 
         public void AddUsuario(ContasUsuarios usuario) => _contasUsuarios.Add(usuario);
 
