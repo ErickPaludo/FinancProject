@@ -18,5 +18,7 @@ namespace Financ.Domain.Validacoes.Mensagens
         public const string USUARIO_MESTRE_NAO_PODE_SER_ATUALIZADO = "Não é possível alterar um usuário mestre!";
         public const string USUARIO_INATIVO_NAO_PODE_SER_ATUALIZADO = "O usuário não está ativo!";
         public const string USUARIO_NAO_PODE_SE_ATUALIZAR = "Não é possível alterar sua propria conta!";
+        public const string MAX_MESTRES_CONVERTE_PARA_ADMIN = "Permissão de administrador concedida.";
+
     }
 }

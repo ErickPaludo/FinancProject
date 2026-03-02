@@ -12,6 +12,8 @@ namespace Financ.Domain.Entidades
     public sealed class Conta : BaseConta
     {
         public string Titulo { get; private set; }
+        public TiposStatusContas Status { get; private set; }
+
         public TiposContas TipoConta { get; private set; }
 
         private readonly List<ContasUsuarios> _contasUsuarios = new();

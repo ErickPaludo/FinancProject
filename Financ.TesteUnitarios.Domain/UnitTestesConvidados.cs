@@ -16,13 +16,13 @@ namespace Financ.TesteUnitarios.Domain
         private Usuario CriarUsuario(string id)
             => new Usuario(id, "Nome", "Sobrenome", $"{id}@teste.com");
 
-        private ContasUsuarios CriarContaUsuarioMestre(Conta conta, string idUsuario)
+        private ContasUsuarios CriarContaUsuarioMestre(Conta conta, string idUsuario,TipoStatusContasUsuario status =  TipoStatusContasUsuario.Ativo)
         {
             ContasUsuarios contaUsuario = new ContasUsuarios(
                 1,
                 conta,
                 idUsuario,
-                TiposAcessos.Mestre);
+                TiposAcessos.Mestre,status);
             conta.AddUsuario(contaUsuario);
             return contaUsuario;
         }
@@ -84,8 +84,30 @@ namespace Financ.TesteUnitarios.Domain
                 contaUsuarioRemetente,
                 usuarioDestinatario);
 
-            action.Should().Throw<ConvitesValidacao>();
+            action.Should().Throw<ConvitesValidacao>()
+              .WithMessage(MensagensContas.CONTA_INATIVA);
         }
+
+        [Theory(DisplayName = "Não deve permitir convite se o  usuário remetente não for ativo")]
+        [InlineData(TipoStatusContasUsuario.Inativo)]
+        [InlineData(TipoStatusContasUsuario.Bloqueado)]
+        public void CriarConvite_UsuarioInativo_DeveLancarExcecao(TipoStatusContasUsuario status)
+        {
+            var conta = new Conta(1, "Conta Teste");
+
+            var usuarioRemetente = CriarUsuario(Guid.NewGuid().ToString());
+            var usuarioDestinatario = CriarUsuario(Guid.NewGuid().ToString()).IdUsuario;
+            var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuarioRemetente.IdUsuario,status);
+
+            Action action = () => new Convites(
+                TiposAcessos.Administrador,
+                contaUsuarioRemetente,
+                usuarioDestinatario);
+
+            action.Should().Throw<ConvitesValidacao>()
+              .WithMessage(MensagensConvite.USUARIO_CONTA_REMETENTE_INATIVO);
+        }
+
 
         [Fact(DisplayName = "Aceitar convite deve funcionar quando válido")]
         public void AceitarConvite_Valido_DeveAlterarEstado()
@@ -127,7 +149,7 @@ namespace Financ.TesteUnitarios.Domain
 
             // Assert
             action.Should().Throw<ConvitesValidacao>()
-                .WithMessage(MensagensConvite.LIMITE_USUARIOS_MASTER);
+                .WithMessage(MensagensConvite.LIMITE_USUARIOS_MESTRES);
         }
     }
 }

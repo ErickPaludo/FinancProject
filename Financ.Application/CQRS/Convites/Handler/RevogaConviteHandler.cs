@@ -32,7 +32,7 @@ namespace Financ.Application.CQRS.Handler
             _unitOfWork.convitesRepostorio.Delete(convite);
             await _unitOfWork.Commit();
 
-            return Resultado<string>.GeraSucesso("Convite recusado com sucesso!");
+            return Resultado<string>.GeraSucesso("Convite revogado com sucesso!");
         }
     }
 }

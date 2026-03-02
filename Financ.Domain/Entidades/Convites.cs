@@ -21,14 +21,17 @@ namespace Financ.Domain.Entidades
         public bool? Aceito { get; private set; }
         public DateTime DataEnvio { get; private set; }
         public DateTime Expiracao { get; private set; }
+        public string? Observacao { get; private set; }
 
-        public Conta Contas { get; private set; }
+        public Conta Conta { get; private set; }
+
         private Convites() { }
         public Convites(TiposAcessos acesso, ContasUsuarios usuarioRemetente, string usuairoDestinatario)
         {
             ConvitesValidacao.Verifica(usuarioRemetente.Acesso != TiposAcessos.Mestre, MensagensConvite.USUARIO_SEM_PERMISSAO);
-            ConvitesValidacao.Verifica(usuarioRemetente.Conta.Status != TiposStatusContas.Ativo, MensagensConvite.USUARIO_SEM_PERMISSAO);
-            ConvitesValidacao.Verifica(!usuarioRemetente.ValidaPermissoeNaConta(acesso), MensagensConvite.LIMITE_USUARIOS_MASTER);
+            ConvitesValidacao.Verifica(usuarioRemetente.Status != TipoStatusContasUsuario.Ativo, MensagensConvite.USUARIO_CONTA_REMETENTE_INATIVO);
+            ConvitesValidacao.Verifica(usuarioRemetente.Conta.Status != TiposStatusContas.Ativo, MensagensContas.CONTA_INATIVA);
+            ConvitesValidacao.Verifica(!usuarioRemetente.ValidaPermissoeNaConta(acesso), MensagensConvite.LIMITE_USUARIOS_MESTRES);
             
             IdUsuarioRemetente = usuarioRemetente.IdUsuario;
             IdUsuarioDestinatario = usuairoDestinatario;
@@ -36,7 +39,7 @@ namespace Financ.Domain.Entidades
             IdConta = usuarioRemetente.Conta.Id;
             Acesso = acesso;
             Expiracao = DateTime.Now.AddDays(7);
-            Contas = usuarioRemetente.Conta;
+            Conta = usuarioRemetente.Conta;
         }
    
         private void ValidaConviteAtivo(bool? aceito)
@@ -52,6 +55,10 @@ namespace Financ.Domain.Entidades
         {
             ValidaConviteAtivo(aceito);
             Aceito = aceito;
+        }
+        public void InsereObservacao(string observacao)
+        {
+            Observacao = observacao;
         }
         public void RevogaConvite(string idUsuarioRemetente)
         {

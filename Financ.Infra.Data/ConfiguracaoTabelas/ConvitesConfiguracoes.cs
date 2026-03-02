@@ -33,6 +33,13 @@ namespace Financ.Infra.Data.ConfiguracaoTabelas
                 .WithMany()
                 .HasForeignKey(e => e.IdUsuarioRemetente)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(c => c.Conta)
+                 .WithMany(u => u.Convites)
+                 .HasForeignKey(u => u.IdConta)
+                 .OnDelete(DeleteBehavior.Cascade);
+
+
             //// Relação com remetente
             //builder.HasOne(e => e.Remetente)
             //    .WithMany()

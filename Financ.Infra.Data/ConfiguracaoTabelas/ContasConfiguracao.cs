@@ -26,7 +26,7 @@ namespace Financ.Infra.Data.ConfiguracaoTabelas
                    .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasMany(c => c.Convites)
-                  .WithOne(u => u.Contas)
+                  .WithOne(u => u.Conta)
                   .HasForeignKey(u => u.IdConta)
                   .OnDelete(DeleteBehavior.Cascade);
 

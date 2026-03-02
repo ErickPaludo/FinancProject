@@ -113,6 +113,9 @@ namespace Financ.Infra.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("Observacao")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("IdConta");
@@ -332,7 +335,7 @@ namespace Financ.Infra.Data.Migrations
 
             modelBuilder.Entity("Financ.Domain.Entidades.ContasUsuarios", b =>
                 {
-                    b.HasOne("Financ.Domain.Entidades.Conta", "Contas")
+                    b.HasOne("Financ.Domain.Entidades.Conta", "Conta")
                         .WithMany("ContaUsuarios")
                         .HasForeignKey("IdConta")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -344,12 +347,12 @@ namespace Financ.Infra.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Contas");
+                    b.Navigation("Conta");
                 });
 
             modelBuilder.Entity("Financ.Domain.Entidades.Convites", b =>
                 {
-                    b.HasOne("Financ.Domain.Entidades.Conta", "Contas")
+                    b.HasOne("Financ.Domain.Entidades.Conta", "Conta")
                         .WithMany("Convites")
                         .HasForeignKey("IdConta")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -361,7 +364,7 @@ namespace Financ.Infra.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Contas");
+                    b.Navigation("Conta");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

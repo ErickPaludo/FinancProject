@@ -17,9 +17,9 @@ namespace Financ.Application.CQRS.Querys
         public string? IdUsuario { get; set; }
         public string? NomeUsuario { get; set; }
         public TiposAcessos? Acesso { get; set; }
-        public TiposStatusContas? Status { get; set; }
+        public TipoStatusContasUsuario? Status { get; set; }
 
-        public RetornaUsuariosAssociadosQuery(string idUsuarioSolicitante, int idConta, string? idUsuario, string? nomeUsuario, TiposAcessos? acesso, TiposStatusContas? status)
+        public RetornaUsuariosAssociadosQuery(string idUsuarioSolicitante, int idConta, string? idUsuario, string? nomeUsuario, TiposAcessos? acesso, TipoStatusContasUsuario? status)
         {
             IdUsuarioSolicitante = idUsuarioSolicitante;
             IdConta = idConta;

@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,6 +22,11 @@ namespace Financ.Infra.Data.Repositorios
         public ConvitesRepositorio(AppContextoData contexto) : base(contexto)
         {
             _contexto = contexto;
+        }
+
+        public async Task<Convites> BuscarConviteComConta(Expression<Func<Convites, bool>> predicado)
+        {
+            return await _contexto.Convites.Include(c => c.Conta).ThenInclude(c => c.ContaUsuarios).FirstOrDefaultAsync(predicado);
         }
     }
 }

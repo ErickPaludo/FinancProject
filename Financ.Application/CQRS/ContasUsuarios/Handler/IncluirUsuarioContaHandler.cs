@@ -31,33 +31,31 @@ namespace Financ.Application.CQRS.Handler
         {
             try
             {
-                var convite = await _unitOfWork.convitesRepostorio.BuscarObjetoUnico(x => x.Id == request.IdConvite && x.IdUsuarioDestinatario.Equals(request.IdUsuario) && x.Aceito == null);
+                var convite = await _unitOfWork.convitesRepostorio.BuscarConviteComConta(x => x.Id == request.IdConvite && x.IdUsuarioDestinatario.Equals(request.IdUsuario) && x.Aceito == null);
+
                 if (convite is null)
                     return Resultado<RetornaPostCadastro>.GeraFalha(Falha.NaoEncontrado("Convite não encontrado!"));
 
-                if ((await _unitOfWork.contasUsuariosRepositorio.ExisteId(x => x.IdUsuario == request.IdUsuario && x.IdConta == convite.IdConta)))
+                if (convite.Conta.ContaUsuarios.Any(x => x.IdUsuario == request.IdUsuario && x.IdConta == convite.IdConta))
                     return Resultado<RetornaPostCadastro>.GeraFalha(Falha.ErroOperacional("Usuário já está cadastrado nesta conta!"));
 
                 convite.AceitaConvite(request.aceito);
 
-                _unitOfWork.convitesRepostorio.Atualiza(convite);
                 if (!request.aceito)
                 {
+                    _unitOfWork.convitesRepostorio.Atualiza(convite);
                     await _unitOfWork.Commit();
-                    return Resultado<RetornaPostCadastro>.GeraSucesso(new RetornaPostCadastro(request.aceito, null));
+                    return Resultado<RetornaPostCadastro>.GeraSucesso(new RetornaPostCadastro(request.aceito, null,convite.Observacao));
                 }
 
-
-                Conta? conta = await _unitOfWork.contasRepositorio.BuscarObjetoUnico(x => x.Id == convite.IdConta);
-
-                var contaUsuario = new ContasUsuarios(conta!, convite.IdUsuarioDestinatario, convite.Acesso);
+                var contaUsuario = new ContasUsuarios(convite);
 
                 contaUsuario = await _unitOfWork.contasUsuariosRepositorio.Adicionar(contaUsuario);
 
                 _unitOfWork.convitesRepostorio.Atualiza(convite);
 
                 await _unitOfWork.Commit();
-                return Resultado<RetornaPostCadastro>.GeraSucesso(ContasUsuariosMapper.ParaDTO(request.aceito, contaUsuario));
+                return Resultado<RetornaPostCadastro>.GeraSucesso(ContasUsuariosMapper.ParaDTO(convite, contaUsuario));
             }
             catch (ContasUsuariosValidacao contasUsuariosExcessao)
             {

@@ -40,17 +40,12 @@ namespace Financ.Application.CQRS.Handler
                     return Resultado<GetCriaConviteDTO>.GeraFalha(Falha.NaoEncontrado("Conta não encontrada."));
                 
                 var contaUsuario = await _unitOfWork.contasUsuariosRepositorio.BuscarPorCondicao(x => x.IdConta == request.idConta );
-               
-                bool usuariosMaster = conta.ContaUsuarios.Where(x => x.Acesso == TiposAcessos.Mestre).Take(2).Count() == 2;
-                if (usuariosMaster)
-                    return Resultado<GetCriaConviteDTO>.GeraFalha(Falha.NaoEncontrado("A conta já possui 2 usuários masters."));
+             
 
                 var contaUsuarioRemetente = contaUsuario.FirstOrDefault(x => x.IdUsuario == request.idRemetente);
                 if (contaUsuarioRemetente is null)
                     return Resultado<GetCriaConviteDTO>.GeraFalha(Falha.NaoEncontrado("Você não está associado a está conta."));
                 
-                var contaUsuarioDestinatario = contaUsuario.FirstOrDefault(x => x.IdUsuario == idUsuarioDestinatario);
-
                 bool usuarioAssociado = contaUsuario.Any(x => x.IdUsuario == idUsuarioDestinatario);
                 if (usuarioAssociado)
                     return Resultado<GetCriaConviteDTO>.GeraFalha(Falha.ErroOperacional("Usuário já pertence a está conta"));  
@@ -67,9 +62,8 @@ namespace Financ.Application.CQRS.Handler
                     return Resultado<GetCriaConviteDTO>.GeraFalha(Falha.ErroOperacional("Já existe um convite em andamento."));
 
                 Usuario usuarioDestinatario = await _usuarioIdentity.ObtemUsuario(idUsuarioDestinatario);
-                Usuario usuarioRemetente = await _usuarioIdentity.ObtemUsuario(request.idRemetente);
-               // contaUsuarioRemetente.ValidaPermissoeNaConta();
-                Convites convite = new Convites(request.acesso, contaUsuarioRemetente,usuarioRemetente.IdUsuario);
+
+                Convites convite = new Convites(request.acesso, contaUsuarioRemetente, usuarioDestinatario.IdUsuario);
                 await _unitOfWork.convitesRepostorio.Adicionar(convite);
                 await _unitOfWork.Commit();
 

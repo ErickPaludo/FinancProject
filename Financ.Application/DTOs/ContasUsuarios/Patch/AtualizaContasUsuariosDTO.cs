@@ -10,6 +10,6 @@ namespace Financ.Application.DTOs.ContasUsuarios.Patch
     public class AtualizaContasUsuariosDTO
     {
         public TiposAcessos? Acesso { get; set; }
-        public TiposStatusContas? Status { get; set; }
+        public TipoStatusContasUsuario? Status { get; set; }
     }
 }

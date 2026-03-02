@@ -16,41 +16,49 @@ namespace Financ.Domain.Entidades
         public int IdConta { get; private set; }
         public string IdUsuario { get; private set; }
         public TiposAcessos Acesso { get; private set; }
+        public TipoStatusContasUsuario Status { get; protected set; }
+
         public Conta Conta { get; private set; }
-        public IUsuarioIdentity Usuario { get; private set; }
 
 
         public ContasUsuarios() { }
-        public ContasUsuarios(int id,Conta conta, string idUsuario, TiposAcessos acesso, TiposStatusContas? status = null)
+        public ContasUsuarios(int id,Conta conta, string idUsuario, TiposAcessos acesso, TipoStatusContasUsuario? status = null)
         {
             ContasUsuariosValidacao.Verifica(id <= 0, MensagensBase.ID_IGUAL_MENOR_ZERO);
             Id = id;
             ValidaContasUsuarios(conta, idUsuario);
             ValidaEnums(acesso, status);
         }
-        public ContasUsuarios(Conta conta, string idUsuario, TiposAcessos acesso)
+        public ContasUsuarios(Convites convite)
         {
-            ValidaContasUsuarios(conta, idUsuario);
-            ValidaEnums(acesso, null);
+            ValidaContasUsuarios(convite.Conta, convite.IdUsuarioDestinatario);
+            ValidaEnums(convite.Acesso, null);
+
+            if (!ValidaPermissoeNaConta(convite.Acesso))
+            {
+                Acesso = TiposAcessos.Administrador;
+                convite.InsereObservacao($"{MensagensConvite.CONTA_JA_POSSUI_UM_USUARIO_MESTRES} { MensagensContasUsuarios.MAX_MESTRES_CONVERTE_PARA_ADMIN}");
+            }
+
         }
 
         public ContasUsuarios(Conta conta, Usuario usuario)
         {
             ValidaContasUsuarios(conta, usuario.IdUsuario);
-            Status = TiposStatusContas.Ativo;
+            Status = TipoStatusContasUsuario.Ativo;
             Acesso = TiposAcessos.Mestre;
         }
-        private void ValidaEnums(TiposAcessos acesso, TiposStatusContas? status)
+        private void ValidaEnums(TiposAcessos acesso, TipoStatusContasUsuario? status)
         {
             Acesso = acesso;
             if (status.HasValue)
             {
-                ContasUsuariosValidacao.Verifica(!Enum.IsDefined(typeof(TiposStatusContas), status), MensagensBase.STATUS_INVALIDO);
+                ContasUsuariosValidacao.Verifica(!Enum.IsDefined(typeof(TipoStatusContasUsuario), status), MensagensBase.STATUS_INVALIDO);
                 ContasUsuariosValidacao.Verifica(!Enum.IsDefined(typeof(TiposAcessos), acesso), MensagensContasUsuarios.ACESSO_INVALIDO);
                 Status = status.Value;
             }
             else
-                Status = TiposStatusContas.Ativo;
+                Status = TipoStatusContasUsuario.Ativo;
         }
         private void ValidaContasUsuarios(Conta conta, string idUsuario)
         {
@@ -62,11 +70,11 @@ namespace Financ.Domain.Entidades
             IdUsuario = idUsuario;
             DthrReg = DateTime.Now;
         }
-        public void AtualizaOutraContaUsuario(ContasUsuarios contasUsuarioRemetente,TiposAcessos? acessos, TiposStatusContas? status)
+        public void AtualizaOutraContaUsuario(ContasUsuarios contasUsuarioRemetente,TiposAcessos? acessos, TipoStatusContasUsuario? status)
         {
             ContasUsuariosValidacao.Verifica(contasUsuarioRemetente.IdUsuario == IdUsuario, MensagensContasUsuarios.ACESSO_NEGADO);
             ContasUsuariosValidacao.Verifica(contasUsuarioRemetente.Acesso != TiposAcessos.Mestre, MensagensContasUsuarios.ACESSO_NEGADO);
-            ContasUsuariosValidacao.Verifica(contasUsuarioRemetente.Status != TiposStatusContas.Ativo, MensagensContasUsuarios.ACESSO_NEGADO_POR_STATUS);
+            ContasUsuariosValidacao.Verifica(contasUsuarioRemetente.Status != TipoStatusContasUsuario.Ativo, MensagensContasUsuarios.ACESSO_NEGADO_POR_STATUS);
             ContasUsuariosValidacao.Verifica(Acesso == TiposAcessos.Mestre, MensagensContasUsuarios.USUARIO_MESTRE_NAO_PODE_SER_ATUALIZADO);
 
 
@@ -77,13 +85,13 @@ namespace Financ.Domain.Entidades
             }
             if (status.HasValue)
             {
-                ContasUsuariosValidacao.Verifica(!Enum.IsDefined(typeof(TiposStatusContas), status.Value), MensagensBase.STATUS_INVALIDO);
+                ContasUsuariosValidacao.Verifica(!Enum.IsDefined(typeof(TipoStatusContasUsuario), status.Value), MensagensBase.STATUS_INVALIDO);
                 Status = status.Value;
             }
         }
         public bool ValidaPermissoeNaConta(TiposAcessos acessoDestinatario)
         {
-            return !(acessoDestinatario.Equals(TiposAcessos.Mestre) && Conta.ContaUsuarios.Where(x => x.Acesso.Equals(TiposAcessos.Mestre) && x.Status.Equals(TiposStatusContas.Ativo)).Take(2).Count() == 2);
+            return !(acessoDestinatario.Equals(TiposAcessos.Mestre) && Conta.ContaUsuarios.Where(x => x.Acesso.Equals(TiposAcessos.Mestre) && x.Status.Equals(TipoStatusContasUsuario.Ativo)).Take(2).Count() == 2);
         }
 
     }
