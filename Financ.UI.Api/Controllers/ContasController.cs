@@ -33,7 +33,7 @@ namespace Financ.UI.Api.Controllers
             return conta.RetornoAutomatico();
         }
         [HttpGet("retorna_contas")]
-        public async Task<IActionResult> RetornarContas([FromQuery]FiltroContaDTO? parametros)
+        public async Task<IActionResult> RetornarContas([FromQuery] FiltroContaDTO? parametros)
         {
             var contasLista = await _mediator.Send(new RetornaContaQuery(User.RetornaIdUsuario(), parametros));
             return contasLista.RetornoAutomatico();

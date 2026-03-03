@@ -198,6 +198,43 @@ namespace Financ.TesteUnitarios.Domain
             alvo.Status.Should().Be(TipoStatusContasUsuario.Inativo);
         }
 
+        [Fact]
+        public void Usuario_Sai_Da_Conta_Sendo_Unico_Mestre()
+        {
+            var conta = CriarContaAtiva();
+            var contaUsuario = CriarContaUsuario(conta, CriarUsuario(NovoIdUsuario()).IdUsuario);
+
+            Action act = () =>  contaUsuario.SairDaConta();
+            act.Should();
+        }
+
+
+        [Theory]
+        [InlineData(TiposAcessos.Administrador)]
+        [InlineData(TiposAcessos.Visualizador)]
+        public void Usuario_Sai_Da_Conta_Com_Acesso_Inferior(TiposAcessos acesso)
+        {
+            var conta = CriarContaAtiva();
+            var contaUsuario = CriarContaUsuario(conta, CriarUsuario(NovoIdUsuario()).IdUsuario,acesso);
+
+            Action act = () => contaUsuario.SairDaConta();
+            act.Should();
+        }
+
+        [Theory]
+        [InlineData(TiposAcessos.Administrador)]
+        [InlineData(TiposAcessos.Visualizador)]
+
+        public void Usuario_Mestre_Sai_Da_Conta_Contendo_Usuario_Com_Acesso_Inferior(TiposAcessos acesso)
+        {
+            var conta = CriarContaAtiva();
+            var contaMestre = CriarContaUsuario(conta, CriarUsuario(NovoIdUsuario()).IdUsuario);
+            var contInferior = CriarContaUsuario(conta, CriarUsuario(NovoIdUsuario()).IdUsuario,acesso);
+
+            Action act = () => contaMestre.SairDaConta();
+            act.Should().Throw<ContasUsuariosValidacao>().WithMessage(MensagensContasUsuarios.UNICO_USUARIO_MESTRE_NA_CONTA);
+        }
+
         #endregion
     }
 }

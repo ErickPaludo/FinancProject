@@ -33,7 +33,7 @@ namespace Financ.Application.CQRS.Handler
                 if (contaUsuario == null)
                     return Resultado<RetornaContasDTO>.GeraFalha(Falha.ErroOperacional("O Usuário não pertence a está conta!"));
 
-                if (!contaUsuario.Status.Equals(TiposStatusContas.Ativo))
+                if (!contaUsuario.Status.Equals(TipoStatusContasUsuario.Ativo))
                     return Resultado<RetornaContasDTO>.GeraFalha(Falha.ErroOperacional($"Não foi possível concluir a operação pois seu usuário está {contaUsuario.Status.ToString()}!"));
 
                 var conta = await _unitOfWork.contasRepositorio.BuscarPeloId<int>(contaUsuario.IdConta);

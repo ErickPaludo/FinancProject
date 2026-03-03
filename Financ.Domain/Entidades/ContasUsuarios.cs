@@ -89,6 +89,14 @@ namespace Financ.Domain.Entidades
                 Status = status.Value;
             }
         }
+
+        public void SairDaConta()
+        {
+
+            ContasUsuariosValidacao.Verifica(Acesso.Equals(TiposAcessos.Mestre) && Conta.ContaUsuarios.Any(x => !x.Acesso.Equals (TiposAcessos.Mestre) && !x.IdUsuario.Equals(IdUsuario)),MensagensContasUsuarios.UNICO_USUARIO_MESTRE_NA_CONTA); //Verifica se a conta possui mais usuários conectados a conta, e se o usuário é o único mestre, para evitar que a conta fique sem um usuário mestre.
+
+
+        }
         public bool ValidaPermissoeNaConta(TiposAcessos acessoDestinatario)
         {
             return !(acessoDestinatario.Equals(TiposAcessos.Mestre) && Conta.ContaUsuarios.Where(x => x.Acesso.Equals(TiposAcessos.Mestre) && x.Status.Equals(TipoStatusContasUsuario.Ativo)).Take(2).Count() == 2);
