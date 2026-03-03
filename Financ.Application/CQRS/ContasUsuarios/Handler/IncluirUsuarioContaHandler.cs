@@ -31,7 +31,7 @@ namespace Financ.Application.CQRS.Handler
         {
             try
             {
-                var convite = await _unitOfWork.convitesRepostorio.BuscarConviteComConta(x => x.Id == request.IdConvite && x.IdUsuarioDestinatario.Equals(request.IdUsuario) && x.Aceito == null);
+                var convite = await _unitOfWork.convitesRepostorio.BuscarConviteComConta(x => x.Id == request.IdConvite && x.IdUsuarioDestinatario.Equals(request.IdUsuario) && x.Aceito == null && x.Expiracao >= DateTime.Now);
 
                 if (convite is null)
                     return Resultado<RetornaPostCadastro>.GeraFalha(Falha.NaoEncontrado("Convite não encontrado!"));

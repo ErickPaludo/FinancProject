@@ -38,9 +38,8 @@ namespace Financ.Application.CQRS.Handler
 
                 if (conta is null)
                     return Resultado<GetCriaConviteDTO>.GeraFalha(Falha.NaoEncontrado("Conta não encontrada."));
-                
-                var contaUsuario = await _unitOfWork.contasUsuariosRepositorio.BuscarPorCondicao(x => x.IdConta == request.idConta );
-             
+
+                var contaUsuario = await _unitOfWork.contasUsuariosRepositorio.BuscarPorCondicao(x => x.IdConta == request.idConta );            
 
                 var contaUsuarioRemetente = contaUsuario.FirstOrDefault(x => x.IdUsuario == request.idRemetente);
                 if (contaUsuarioRemetente is null)
@@ -50,12 +49,12 @@ namespace Financ.Application.CQRS.Handler
                 if (usuarioAssociado)
                     return Resultado<GetCriaConviteDTO>.GeraFalha(Falha.ErroOperacional("Usuário já pertence a está conta"));  
 
-                bool usuarioPossuiConvite = (await _unitOfWork.convitesRepostorio.BuscarPorCondicao(
+                bool usuarioPossuiConvite = (conta.Convites.Any(
                 x => x.IdConta == request.idConta &&
                 x.IdUsuarioDestinatario == idUsuarioDestinatario &&
-                x.IdUsuarioRemetente == request.idRemetente &&
+            //    x.IdUsuarioRemetente == request.idRemetente &&
                 DateTime.Now <= x.Expiracao &&
-                x.Aceito == null)).Any();
+                x.Aceito == null));
                 
 
                 if(usuarioPossuiConvite)
