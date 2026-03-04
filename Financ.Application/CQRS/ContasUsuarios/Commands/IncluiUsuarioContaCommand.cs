@@ -12,5 +12,5 @@ using System.Threading.Tasks;
 
 namespace Financ.Application.CQRS.Commands
 {
-    public record IncluiUsuarioContaCommand(int IdConvite,bool aceito, string IdUsuario) : IRequest<Resultado<RetornaPostCadastro>>;
+    public record IncluiUsuarioContaCommand(int IdConvite,bool aceito, string IdUsuario) : IRequest<Resultado<RetornaPostCadastroDTO>>;
 }

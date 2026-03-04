@@ -7,5 +7,5 @@ using System.Threading.Tasks;
 
 namespace Financ.Application.DTOs.ContasUsuarios.Post
 {
-    public record RetornaPostCadastro(bool Aceito, RetornaCadastroContasUsuariosDTO? ContaUsuario,string? Obs);
+    public record RetornaPostCadastroDTO(bool Aceito, RetornaCadastroContasUsuariosDTO? ContaUsuario,string? Obs);
 }

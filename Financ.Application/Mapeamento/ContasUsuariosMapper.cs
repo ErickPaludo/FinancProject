@@ -25,7 +25,7 @@ namespace Financ.Application.Mapeamento
                           contaUsuario.Acesso,
                           contaUsuario.IdUsuario);
 
-        public static RetornaPostCadastro ParaDTO(Convites convite, ContasUsuarios contaUsuario) =>
-         new RetornaPostCadastro(convite.Aceito!.Value,ParaDTO(contaUsuario),convite.Observacao);
+        public static RetornaPostCadastroDTO ParaDTO(Convites convite, ContasUsuarios contaUsuario) =>
+         new RetornaPostCadastroDTO(convite.Aceito!.Value,ParaDTO(contaUsuario),convite.Observacao);
     }
 }

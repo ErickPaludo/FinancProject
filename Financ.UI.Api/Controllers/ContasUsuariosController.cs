@@ -61,11 +61,17 @@ namespace Financ.UI.Api.Controllers
         {
             var convite = await _mediator.Send(new RetornaConvitesQuery(User.RetornaIdUsuario(), retornaConvitesRemetente));
             return convite.RetornoAutomatico();
-        }    
+        }
         [HttpPost("revogar_convite")]
         public async Task<IActionResult> RevogarConvites(int idConvite)
         {
-            var convite = await _mediator.Send(new RevogaConviteCommand(idConvite,User.RetornaIdUsuario()));
+            var convite = await _mediator.Send(new RevogaConviteCommand(idConvite, User.RetornaIdUsuario()));
+            return convite.RetornoAutomatico();
+        }
+        [HttpPost("sair_conta")]
+        public async Task<IActionResult> SairDaConta(int idConta)
+        {
+            var convite = await _mediator.Send(new SairContaUsuarioCommand( User.RetornaIdUsuario(),idConta));
             return convite.RetornoAutomatico();
         }
     }
