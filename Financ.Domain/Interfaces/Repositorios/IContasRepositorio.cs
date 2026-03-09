@@ -10,6 +10,6 @@ using System.Threading.Tasks;
 namespace Financ.Domain.Interfaces
 {
     public interface IContasRepositorio : IBaseRepositorio<Conta>{
-        Task<Conta> BuscarContaComUsuarios(Expression<Func<Conta, bool>> predicado);
+        Task<Conta?> BuscarContaComUsuarios(Expression<Func<Conta, bool>> predicado);
     }
 }

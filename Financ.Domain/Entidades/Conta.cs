@@ -60,13 +60,22 @@ namespace Financ.Domain.Entidades
         public void AtualizaConta(ContasUsuarios usuarios, string? titulo, TiposStatusContas? status)
         {
             ContasValidacao.Verifica(usuarios == null, MensagensBase.USUARIO_NAO_INFORMADO);
-            ContasValidacao.Verifica((usuarios!.Acesso == TiposAcessos.Visualizador), MensagensContas.ATUALIZA_CONTA_USUARIO_SEM_PERMISSAO);
+            ContasValidacao.Verifica((usuarios!.Acesso != TiposAcessos.Mestre), MensagensContas.ATUALIZA_CONTA_USUARIO_SEM_PERMISSAO);
 
             if (titulo != null)
                 ValidaTitulo(titulo);
 
             if (status is not null)
                 ValidaStatus(status.Value);
+        }
+
+        public void SairDaConta(ContasUsuarios contaUsuario)
+        {
+            contaUsuario.SairDaConta();
+            _contasUsuarios.Remove(contaUsuario);
+
+            if (ContaUsuarios.Count() == 0)
+                Status = TiposStatusContas.Deletado;
         }
         #region Linhas de credito Fase 3
         //private void ValidaFechamentoVencimento(int diaFechamento, int diaVencimento)

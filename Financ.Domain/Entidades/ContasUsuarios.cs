@@ -22,7 +22,7 @@ namespace Financ.Domain.Entidades
 
 
         public ContasUsuarios() { }
-        public ContasUsuarios(int id,Conta conta, string idUsuario, TiposAcessos acesso, TipoStatusContasUsuario? status = null)
+        public ContasUsuarios(int id, Conta conta, string idUsuario, TiposAcessos acesso, TipoStatusContasUsuario? status = null)
         {
             ContasUsuariosValidacao.Verifica(id <= 0, MensagensBase.ID_IGUAL_MENOR_ZERO);
             Id = id;
@@ -37,7 +37,7 @@ namespace Financ.Domain.Entidades
             if (!ValidaPermissoeNaConta(convite.Acesso))
             {
                 Acesso = TiposAcessos.Administrador;
-                convite.InsereObservacao($"{MensagensConvite.CONTA_JA_POSSUI_UM_USUARIO_MESTRES} { MensagensContasUsuarios.MAX_MESTRES_CONVERTE_PARA_ADMIN}");
+                convite.InsereObservacao($"{MensagensConvite.CONTA_JA_POSSUI_UM_USUARIO_MESTRES} {MensagensContasUsuarios.MAX_MESTRES_CONVERTE_PARA_ADMIN}");
             }
 
         }
@@ -70,7 +70,7 @@ namespace Financ.Domain.Entidades
             IdUsuario = idUsuario;
             DthrReg = DateTime.Now;
         }
-        public void AtualizaOutraContaUsuario(ContasUsuarios contasUsuarioRemetente,TiposAcessos? acessos, TipoStatusContasUsuario? status)
+        public void AtualizaOutraContaUsuario(ContasUsuarios contasUsuarioRemetente, TiposAcessos? acessos, TipoStatusContasUsuario? status)
         {
             ContasUsuariosValidacao.Verifica(contasUsuarioRemetente.IdUsuario == IdUsuario, MensagensContasUsuarios.ACESSO_NEGADO);
             ContasUsuariosValidacao.Verifica(contasUsuarioRemetente.Acesso != TiposAcessos.Mestre, MensagensContasUsuarios.ACESSO_NEGADO);
@@ -93,9 +93,14 @@ namespace Financ.Domain.Entidades
         public void SairDaConta()
         {
 
-            ContasUsuariosValidacao.Verifica(Acesso.Equals(TiposAcessos.Mestre) && Conta.ContaUsuarios.Any(x => !x.Acesso.Equals (TiposAcessos.Mestre) && !x.IdUsuario.Equals(IdUsuario)),MensagensContasUsuarios.UNICO_USUARIO_MESTRE_NA_CONTA); //Verifica se a conta possui mais usuários conectados a conta, e se o usuário é o único mestre, para evitar que a conta fique sem um usuário mestre.
-
-
+            ContasUsuariosValidacao.Verifica(
+                Acesso.Equals(TiposAcessos.Mestre)
+                && Conta.ContaUsuarios.Any(x => !x.Acesso.Equals(TiposAcessos.Mestre)
+                && !x.IdUsuario.Equals(IdUsuario))
+                && Conta.ContaUsuarios.Where(x => x.Acesso.Equals(TiposAcessos.Mestre)).Take(2).Count() == 1, 
+                MensagensContasUsuarios.UNICO_USUARIO_MESTRE_NA_CONTA); 
+            
+            //Verifica se a conta possui mais usuários conectados a conta, e se o usuário é o único mestre, para evitar que a conta fique sem um usuário mestre.
         }
         public bool ValidaPermissoeNaConta(TiposAcessos acessoDestinatario)
         {

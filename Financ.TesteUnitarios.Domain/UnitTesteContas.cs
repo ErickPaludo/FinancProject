@@ -78,14 +78,12 @@ public class ContaTests
         act.Should().Throw<Exception>();
     }
 
-    [Theory]
-    [InlineData(TiposAcessos.Administrador)]
-    [InlineData(TiposAcessos.Mestre)]
-    public void Deve_Atualizar_Titulo_Quando_Usuario_Tiver_Permissao(TiposAcessos acesso)
+    [Fact]
+    public void Deve_Atualizar_Titulo_Quando_Usuario_Tiver_Permissao()
     {
         var conta = new Conta("Conta Antiga");
 
-        var usuario = CriarContaUsuario(conta, NovoIdUsuario(), acesso);
+        var usuario = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
 
         conta.AtualizaConta(usuario, "Conta Nova", null);
 
@@ -97,7 +95,7 @@ public class ContaTests
     {
         var conta = new Conta("Conta Teste");
 
-        var usuario = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Administrador);
+        var usuario = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
 
 
         conta.AtualizaConta(usuario, null, TiposStatusContas.Inativo);
