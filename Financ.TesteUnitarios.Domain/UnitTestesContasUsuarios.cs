@@ -133,7 +133,7 @@ namespace Financ.TesteUnitarios.Domain
                 usuario.AtualizaOutraContaUsuario(usuario, TiposAcessos.Administrador, null);
 
             act.Should().Throw<ContasUsuariosValidacao>()
-                .WithMessage(MensagensContasUsuarios.ACESSO_NEGADO);
+                .WithMessage(MensagensContasUsuarios.USUARIO_TENTA_SE_ATUALIZAR);
         }
 
         [Fact]

@@ -22,6 +22,7 @@ namespace Financ.Domain.Validacoes.Mensagens
         public const string UNICO_USUARIO_MESTRE_NA_CONTA = "A conta possui apenas um usuário mestre, é nescessário elevar o nivel de acesso de outro colaborador antes de sair";
         public const string USUARIO_MESTRE_NAO_PODE_SER_REMOVIDO = "Não é possível remover um usuário mestre.";
         public const string USUARIO_TENTA_SE_EXPULSAR = "Não é possivel remover a si mesmo";
+        public const string USUARIO_TENTA_SE_ATUALIZAR = "Não é possivel atualizar a si mesmo";
 
     }
 }

@@ -72,11 +72,10 @@ namespace Financ.Domain.Entidades
         }
         public void AtualizaOutraContaUsuario(ContasUsuarios contasUsuarioRemetente, TiposAcessos? acessos, TipoStatusContasUsuario? status)
         {
-            ContasUsuariosValidacao.Verifica(contasUsuarioRemetente.IdUsuario == IdUsuario, MensagensContasUsuarios.ACESSO_NEGADO);
+            ContasUsuariosValidacao.Verifica(contasUsuarioRemetente == this, MensagensContasUsuarios.USUARIO_TENTA_SE_ATUALIZAR);
             ContasUsuariosValidacao.Verifica(contasUsuarioRemetente.Acesso != TiposAcessos.Mestre, MensagensContasUsuarios.ACESSO_NEGADO);
             ContasUsuariosValidacao.Verifica(contasUsuarioRemetente.Status != TipoStatusContasUsuario.Ativo, MensagensContasUsuarios.ACESSO_NEGADO_POR_STATUS);
             ContasUsuariosValidacao.Verifica(Acesso == TiposAcessos.Mestre, MensagensContasUsuarios.USUARIO_MESTRE_NAO_PODE_SER_ATUALIZADO);
-
 
             if (acessos.HasValue)
             {
