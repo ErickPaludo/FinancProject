@@ -30,53 +30,28 @@ namespace Financ.UI.Api.Controllers
             _mediator = mediator;
         }
 
-        [HttpPost("entrar_na_conta")]
-        public async Task<IActionResult> EntrarNaConta(int idConvite,bool aceito)
-        {
-            var usuarioConta = await _mediator.Send(new IncluiUsuarioContaCommand(idConvite,aceito, User.RetornaIdUsuario()));
-            return usuarioConta.RetornoAutomatico();
-        }
-
-        [HttpGet("retorna_usuarios_associados")]
+        [HttpGet]
         public async Task<IActionResult> RetornaUsuarosAssociados([FromQuery] FiltroUsuarioAssociado filtroConta)
         {
             var usuariosAssociados = await _mediator.Send(new RetornaUsuariosAssociadosQuery(User.RetornaIdUsuario(), filtroConta.IdConta, filtroConta.IdUsuario, filtroConta.NomeUsuario, filtroConta.Acesso, filtroConta.Status));
             return usuariosAssociados.RetornoAutomatico();
         }
 
-        [HttpPatch("altera_usuario_conta")]
-        public async Task<IActionResult> AlteraUsuarioConta(int idConta, string idUsuario, [FromBody] AtualizaContasUsuariosDTO contaUsuario)
+        [HttpPatch("{idConta}/{idUsuario}/alterar")]
+        public async Task<IActionResult> AlteraUsuarioConta([FromQuery]int idConta, [FromQuery] string idUsuario, [FromBody] AtualizaContasUsuariosDTO contaUsuario)
         {
             var usuarioAlterado = await _mediator.Send(new AtualizarContaUsuarioCommand(User.RetornaIdUsuario(), idUsuario, idConta, contaUsuario.Acesso, contaUsuario.Status));
             return usuarioAlterado.RetornoAutomatico();
         }
-
-        [HttpPost("convida_usuario")]
-        public async Task<IActionResult> ConvidaUsuario(CriaConviteDTO conviteDTO)
-        {
-            var convite = await _mediator.Send(new CriaConviteCommand(User.RetornaIdUsuario(), conviteDTO.EmailDestinatario, conviteDTO.IdConta, conviteDTO.Acesso));
-            return convite.RetornoAutomatico();
-        } 
-        [HttpGet("retorna_convites")]
-        public async Task<IActionResult> RetornaConvites(bool retornaConvitesRemetente)
-        {
-            var convite = await _mediator.Send(new RetornaConvitesQuery(User.RetornaIdUsuario(), retornaConvitesRemetente));
-            return convite.RetornoAutomatico();
-        }
-        [HttpPost("revogar_convite")]
-        public async Task<IActionResult> RevogarConvites(int idConvite)
-        {
-            var convite = await _mediator.Send(new RevogaConviteCommand(idConvite, User.RetornaIdUsuario()));
-            return convite.RetornoAutomatico();
-        }
-        [HttpPost("sair_conta")]
-        public async Task<IActionResult> SairDaConta(int idConta)
+       
+        [HttpPost("sair")]
+        public async Task<IActionResult> SairDaConta([FromBody]int idConta)
         {
             var convite = await _mediator.Send(new SairContaUsuarioCommand( User.RetornaIdUsuario(),idConta));
             return convite.RetornoAutomatico();
         }
 
-        [HttpPost("remover_contausuario")]
+        [HttpPost("expurgo")]
         public async Task<IActionResult> RemoveContaUsuario(RemoveContaUsuarioDTO contaUsuarioDTO)
         {
             var convite = await _mediator.Send(new RemoveContaUsuarioCommand(User.RetornaIdUsuario(),contaUsuarioDTO.idUsuarioDestinatario,contaUsuarioDTO.idConta));

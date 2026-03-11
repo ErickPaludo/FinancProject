@@ -19,9 +19,9 @@ namespace Financ.UI.Api.Controllers
         {
             _mediator = mediator;
         }
-       
-        [HttpPost]
-        public async Task<IActionResult> RetornaToken(ConectaUsuarioDTO usuario)
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(ConectaUsuarioDTO usuario)
         {
             var tokenAutenticacao = await _mediator.Send(new AutenticadoUsuarioCommand(usuario.Email, usuario.Senha));         
             return tokenAutenticacao.RetornoAutomatico();

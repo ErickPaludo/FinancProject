@@ -27,7 +27,7 @@ namespace Financ.UI.Api.Controllers
             var usuario = await _mediator.Send(new CadastraUsuarioCommand(usuarioDTO.Email, usuarioDTO.PrimeiroNome, usuarioDTO.SegundoNome, usuarioDTO.Senha, usuarioDTO.ConfirmarSenha));
             return usuario.RetornoAutomatico();
         }
-        [HttpGet("meus_dados")]
+        [HttpGet("me")]
         [Authorize]
         public async Task<IActionResult> MeusDados()
         {

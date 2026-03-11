@@ -26,20 +26,20 @@ namespace Financ.UI.Api.Controllers
             _mediator = mediator;
 
         }
-        [HttpPost("cadastrar")]
+        [HttpPost]
         public async Task<IActionResult> CadastrarContas(CadastrarContaDTO contaDTO)
         {
             var conta = await _mediator.Send(new CriarContaCommand(User.RetornaIdUsuario(), contaDTO.Titulo));
             return conta.RetornoAutomatico();
         }
-        [HttpGet("retorna_contas")]
+        [HttpGet]
         public async Task<IActionResult> RetornarContas([FromQuery] FiltroContaDTO? parametros)
         {
             var contasLista = await _mediator.Send(new RetornaContaQuery(User.RetornaIdUsuario(), parametros));
             return contasLista.RetornoAutomatico();
         }
 
-        [HttpPatch("atualiza_conta/{idContaUsuario}")]
+        [HttpPatch("{idContaUsuario}/atualiza")]
         public async Task<IActionResult> AtualizaConta(int idContaUsuario, AtualizaContaDTO contaDTO)
         {
 
