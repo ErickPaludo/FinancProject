@@ -89,7 +89,6 @@ namespace Financ.Domain.Entidades
                 Status = status.Value;
             }
         }
-
         public void SairDaConta()
         {
 
@@ -101,6 +100,14 @@ namespace Financ.Domain.Entidades
                 MensagensContasUsuarios.UNICO_USUARIO_MESTRE_NA_CONTA); 
             
             //Verifica se a conta possui mais usuários conectados a conta, e se o usuário é o único mestre, para evitar que a conta fique sem um usuário mestre.
+        }
+        public void RemoverUsuarioDaConta(ContasUsuarios contasUsuarioRemetente)
+        {
+            
+            ContasUsuariosValidacao.Verifica(contasUsuarioRemetente.Acesso != TiposAcessos.Mestre, MensagensContasUsuarios.ACESSO_NEGADO);
+            ContasUsuariosValidacao.Verifica(contasUsuarioRemetente == this, MensagensContasUsuarios.USUARIO_TENTA_SE_EXPULSAR);
+            ContasUsuariosValidacao.Verifica(contasUsuarioRemetente.Status != TipoStatusContasUsuario.Ativo, MensagensContasUsuarios.ACESSO_NEGADO_POR_STATUS);
+            ContasUsuariosValidacao.Verifica(Acesso == TiposAcessos.Mestre, MensagensContasUsuarios.USUARIO_MESTRE_NAO_PODE_SER_REMOVIDO);
         }
         public bool ValidaPermissoeNaConta(TiposAcessos acessoDestinatario)
         {

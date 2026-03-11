@@ -204,7 +204,7 @@ namespace Financ.TesteUnitarios.Domain
             var conta = CriarContaAtiva();
             var contaUsuario = CriarContaUsuario(conta, CriarUsuario(NovoIdUsuario()).IdUsuario);
 
-            Action act = () =>  contaUsuario.SairDaConta();
+            Action act = () => contaUsuario.SairDaConta();
             act.Should();
         }
 
@@ -215,7 +215,7 @@ namespace Financ.TesteUnitarios.Domain
         public void Usuario_Sai_Da_Conta_Com_Acesso_Inferior(TiposAcessos acesso)
         {
             var conta = CriarContaAtiva();
-            var contaUsuario = CriarContaUsuario(conta, CriarUsuario(NovoIdUsuario()).IdUsuario,acesso);
+            var contaUsuario = CriarContaUsuario(conta, CriarUsuario(NovoIdUsuario()).IdUsuario, acesso);
 
             Action act = () => contaUsuario.SairDaConta();
             act.Should();
@@ -229,10 +229,70 @@ namespace Financ.TesteUnitarios.Domain
         {
             var conta = CriarContaAtiva();
             var contaMestre = CriarContaUsuario(conta, CriarUsuario(NovoIdUsuario()).IdUsuario);
-            var contInferior = CriarContaUsuario(conta, CriarUsuario(NovoIdUsuario()).IdUsuario,acesso);
+            var contInferior = CriarContaUsuario(conta, CriarUsuario(NovoIdUsuario()).IdUsuario, acesso);
 
             Action act = () => contaMestre.SairDaConta();
             act.Should().Throw<ContasUsuariosValidacao>().WithMessage(MensagensContasUsuarios.UNICO_USUARIO_MESTRE_NA_CONTA);
+        }
+
+        [Theory]
+        [InlineData(TipoStatusContasUsuario.Inativo)]
+        [InlineData(TipoStatusContasUsuario.Bloqueado)]
+        public void Usuario_Mestre_Remove_Usuario_da_Conta_Sendo_Inativo(TipoStatusContasUsuario status)
+        {
+            var conta = CriarContaAtiva();
+
+            var usuarioNormal = new ContasUsuarios(1, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Mestre);
+            var usuarioMestre = new ContasUsuarios(2, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Mestre,status);
+
+            Action act = () =>
+                usuarioNormal.RemoverUsuarioDaConta(usuarioMestre);
+
+            act.Should().Throw<ContasUsuariosValidacao>()
+                .WithMessage(MensagensContasUsuarios.ACESSO_NEGADO_POR_STATUS);
+        }
+        [Theory]
+        [InlineData(TiposAcessos.Administrador)]
+        [InlineData(TiposAcessos.Visualizador)]
+        public void Usuarios_Sem_Permissao_Remove_Usuario(TiposAcessos acesso)
+        {
+            var conta = CriarContaAtiva();
+
+            var usuarioNormal = new ContasUsuarios(1, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Mestre);
+            var usuarioSemPermissao = new ContasUsuarios(2, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, acesso);
+
+            Action act = () =>
+                usuarioNormal.RemoverUsuarioDaConta(usuarioSemPermissao);
+
+            act.Should().Throw<ContasUsuariosValidacao>()
+                .WithMessage(MensagensContasUsuarios.ACESSO_NEGADO); 
+        }
+        [Fact]
+        public void Usuarios_Mestre_Remove_Mestre()
+        {
+            var conta = CriarContaAtiva();
+
+            var alvo = new ContasUsuarios(1, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Mestre);
+            var remetente = new ContasUsuarios(2, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Mestre);
+
+            Action act = () =>
+                alvo.RemoverUsuarioDaConta(remetente);
+
+            act.Should().Throw<ContasUsuariosValidacao>()
+                .WithMessage(MensagensContasUsuarios.USUARIO_MESTRE_NAO_PODE_SER_REMOVIDO);
+        }
+        [Fact]
+        public void Usuarios_Expulsa_A_Si_Mesmo()
+        {
+            var conta = CriarContaAtiva();
+
+            var remetente = new ContasUsuarios(2, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Mestre);
+
+            Action act = () =>
+                remetente.RemoverUsuarioDaConta(remetente);
+
+            act.Should().Throw<ContasUsuariosValidacao>()
+                .WithMessage(MensagensContasUsuarios.USUARIO_TENTA_SE_EXPULSAR);
         }
 
         #endregion

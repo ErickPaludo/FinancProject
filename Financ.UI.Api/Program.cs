@@ -1,6 +1,7 @@
 
 using Financ.Infra.IoC;
 using Financ.Ui.Api;
+using Financ.UI.Api.Middleware;
 
 namespace Financ.UI.Api
 {
@@ -37,6 +38,7 @@ namespace Financ.UI.Api
             builder.Services.AddControllers();
 
             var app = builder.Build();
+            app.UseMiddleware<MiddlewareErroInterno>();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

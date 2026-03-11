@@ -4,6 +4,7 @@ using Financ.Application.CQRS.Querys;
 using Financ.Application.DTOs.Autenticação.Post;
 using Financ.Application.DTOs.ContasUsuarios.Get.Filtros;
 using Financ.Application.DTOs.ContasUsuarios.Patch;
+using Financ.Application.DTOs.ContasUsuarios.Post;
 using Financ.Application.DTOs.Convites.Get;
 using Financ.Application.DTOs.Convites.Post;
 using Financ.Domain.Entidades;
@@ -72,6 +73,13 @@ namespace Financ.UI.Api.Controllers
         public async Task<IActionResult> SairDaConta(int idConta)
         {
             var convite = await _mediator.Send(new SairContaUsuarioCommand( User.RetornaIdUsuario(),idConta));
+            return convite.RetornoAutomatico();
+        }
+
+        [HttpPost("remover_contausuario")]
+        public async Task<IActionResult> RemoveContaUsuario(RemoveContaUsuarioDTO contaUsuarioDTO)
+        {
+            var convite = await _mediator.Send(new RemoveContaUsuarioCommand(User.RetornaIdUsuario(),contaUsuarioDTO.idUsuarioDestinatario,contaUsuarioDTO.idConta));
             return convite.RetornoAutomatico();
         }
     }
