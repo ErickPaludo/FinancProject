@@ -25,29 +25,24 @@ namespace Financ.Application.CQRS.Handler
         {
             try
             {
-                var contasUsuarios = await _unitOfWork.contasUsuariosRepositorio.BuscarPorCondicao(x => x.IdConta == request.idConta);
+                var conta = await _unitOfWork.contasRepositorio.BuscarContaComUsuarios(x => x.Id == request.idConta);
 
-                if (contasUsuarios.Count() == 0)
+                if (conta is null)
                     return Resultado<RetornaCadastroContasUsuariosDTO>.GeraFalha(Falha.NaoEncontrado("Conta não encontrada!"));
 
-                var contaUsuarioAlterado = contasUsuarios?.First(x => x.IdUsuario == request.idUsuarioAlterado);
+                var contaUsuarioDestinatario = conta.ContaUsuarios.FirstOrDefault(x => x.IdUsuario == request.idUsuarioAlterado);
+                if (contaUsuarioDestinatario is null)
+                    return Resultado<RetornaCadastroContasUsuariosDTO>.GeraFalha(Falha.NaoEncontrado("Usuário não encontrado."));
 
-                var contaUsuarioSolicitante = contasUsuarios?.First(x => x.IdUsuario == request.idUsuarioSolicitante);
+                var contaUsuarioRemetente = conta.ContaUsuarios.FirstOrDefault(x => x.IdUsuario == request.idUsuarioSolicitante);
+                if (contaUsuarioRemetente is null)
+                    return Resultado<RetornaCadastroContasUsuariosDTO>.GeraFalha(Falha.NaoEncontrado("Você não está cadastrado nessa conta."));
 
-                if (contaUsuarioAlterado is not null && contaUsuarioSolicitante is not null)
-                {
-                    if (contaUsuarioSolicitante.Acesso == TiposAcessos.Mestre)
-                    {
-                            contaUsuarioAlterado.AtualizaOutraContaUsuario(contaUsuarioSolicitante,request.acesso, request.status);
-                            _unitOfWork.contasUsuariosRepositorio.Atualiza(contaUsuarioAlterado);
-                            await _unitOfWork.Commit();
-                            return Resultado<RetornaCadastroContasUsuariosDTO>.GeraSucesso(ContasUsuariosMapper.ParaDTO(contaUsuarioAlterado)); 
-                    }
-                    return Resultado<RetornaCadastroContasUsuariosDTO>.GeraFalha(Falha.NaoEncontrado("Você precisa ser um usuário mestre para alterar outros usuários desta conta!"));
+                contaUsuarioDestinatario.AtualizaOutraContaUsuario(contaUsuarioRemetente, request.acesso, request.status);
+                _unitOfWork.contasUsuariosRepositorio.Atualiza(contaUsuarioDestinatario);
+                await _unitOfWork.Commit();
 
-                }
-
-                return Resultado<RetornaCadastroContasUsuariosDTO>.GeraFalha(Falha.NaoEncontrado("Conta ou usuário não encontrados!"));
+                return Resultado<RetornaCadastroContasUsuariosDTO>.GeraSucesso(ContasUsuariosMapper.ParaDTO(contaUsuarioDestinatario));
 
             }
             catch (ContasUsuariosValidacao ex)

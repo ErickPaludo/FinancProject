@@ -18,6 +18,6 @@ namespace Financ.Domain.Validacoes.Mensagens
         public const string CONVITE_EXPIRADO = "Convite expirado!";
         public const string USUARIO_REMETENTE_NAO_AUTORIZADO = "Você não é o usuário remetente!";
 
-        public const string LIMITE_USUARIOS_MESTRES = "O limite de usuários mestres foi atingido. ";
+        
     }
 }

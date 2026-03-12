@@ -12,5 +12,6 @@ namespace Financ.Domain.Validacoes.Mensagens
         public const string DATA_REGISTRO_INVALIDA = "Deve ser registrada a data atual, esta não pode ser manipulada.";
         public const string USUARIO_NAO_INFORMADO = "Usuário não informado!";
         public const string STATUS_INVALIDO = "Status inválido.";
+        public const string LIMITE_USUARIOS_MESTRES = "O limite de usuários mestres foi atingido. ";
     }
 }

@@ -70,17 +70,18 @@ namespace Financ.Domain.Entidades
             IdUsuario = idUsuario;
             DthrReg = DateTime.Now;
         }
-        public void AtualizaOutraContaUsuario(ContasUsuarios contasUsuarioRemetente, TiposAcessos? acessos, TipoStatusContasUsuario? status)
+        public void AtualizaOutraContaUsuario(ContasUsuarios contasUsuarioRemetente, TiposAcessos? acesso, TipoStatusContasUsuario? status)
         {
             ContasUsuariosValidacao.Verifica(contasUsuarioRemetente == this, MensagensContasUsuarios.USUARIO_TENTA_SE_ATUALIZAR);
             ContasUsuariosValidacao.Verifica(contasUsuarioRemetente.Acesso != TiposAcessos.Mestre, MensagensContasUsuarios.ACESSO_NEGADO);
             ContasUsuariosValidacao.Verifica(contasUsuarioRemetente.Status != TipoStatusContasUsuario.Ativo, MensagensContasUsuarios.ACESSO_NEGADO_POR_STATUS);
             ContasUsuariosValidacao.Verifica(Acesso == TiposAcessos.Mestre, MensagensContasUsuarios.USUARIO_MESTRE_NAO_PODE_SER_ATUALIZADO);
 
-            if (acessos.HasValue)
+            if (acesso.HasValue)
             {
-                ContasUsuariosValidacao.Verifica(!Enum.IsDefined(typeof(TiposAcessos), acessos.Value), MensagensContasUsuarios.ACESSO_INVALIDO);
-                Acesso = acessos.Value;
+                ContasUsuariosValidacao.Verifica(!ValidaPermissoeNaConta(acesso.Value), MensagensBase.LIMITE_USUARIOS_MESTRES);
+                ContasUsuariosValidacao.Verifica(!Enum.IsDefined(typeof(TiposAcessos), acesso.Value), MensagensContasUsuarios.ACESSO_INVALIDO);
+                Acesso = acesso.Value;
             }
             if (status.HasValue)
             {
@@ -95,14 +96,13 @@ namespace Financ.Domain.Entidades
                 Acesso.Equals(TiposAcessos.Mestre)
                 && Conta.ContaUsuarios.Any(x => !x.Acesso.Equals(TiposAcessos.Mestre)
                 && !x.IdUsuario.Equals(IdUsuario))
-                && Conta.ContaUsuarios.Where(x => x.Acesso.Equals(TiposAcessos.Mestre)).Take(2).Count() == 1, 
-                MensagensContasUsuarios.UNICO_USUARIO_MESTRE_NA_CONTA); 
-            
+                && Conta.ContaUsuarios.Where(x => x.Acesso.Equals(TiposAcessos.Mestre)).Take(2).Count() == 1,
+                MensagensContasUsuarios.UNICO_USUARIO_MESTRE_NA_CONTA);
+
             //Verifica se a conta possui mais usuários conectados a conta, e se o usuário é o único mestre, para evitar que a conta fique sem um usuário mestre.
         }
         public void RemoverUsuarioDaConta(ContasUsuarios contasUsuarioRemetente)
         {
-            
             ContasUsuariosValidacao.Verifica(contasUsuarioRemetente.Acesso != TiposAcessos.Mestre, MensagensContasUsuarios.ACESSO_NEGADO);
             ContasUsuariosValidacao.Verifica(contasUsuarioRemetente == this, MensagensContasUsuarios.USUARIO_TENTA_SE_EXPULSAR);
             ContasUsuariosValidacao.Verifica(contasUsuarioRemetente.Status != TipoStatusContasUsuario.Ativo, MensagensContasUsuarios.ACESSO_NEGADO_POR_STATUS);

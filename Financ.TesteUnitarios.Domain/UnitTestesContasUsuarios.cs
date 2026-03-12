@@ -182,12 +182,35 @@ namespace Financ.TesteUnitarios.Domain
         }
 
         [Fact]
+        public void Atualiza_Para_Mestre_Limite_Maximo()
+        {
+            var conta = CriarContaAtiva();
+
+            var usuarioMestre = new ContasUsuarios(1, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Mestre);
+            var alvo = new ContasUsuarios(1, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Administrador);
+            var remetente = new ContasUsuarios(2, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Mestre);
+
+            conta.AddUsuario(usuarioMestre);
+            conta.AddUsuario(alvo);
+            conta.AddUsuario(remetente);
+
+            Action act = () =>
+                alvo.AtualizaOutraContaUsuario(remetente, TiposAcessos.Mestre, null);
+
+            act.Should().Throw<ContasUsuariosValidacao>()
+                .WithMessage(MensagensBase.LIMITE_USUARIOS_MESTRES);
+        }
+
+        [Fact]
         public void Atualiza_FluxoValido_DeveAtualizarAcessoEStatus()
         {
             var conta = CriarContaAtiva();
             //1, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Visualizador
             var alvo = new ContasUsuarios(1, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Visualizador);
             var remetente = new ContasUsuarios(1, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Mestre);
+            conta.AddUsuario(alvo);
+            conta.AddUsuario(remetente);
+
 
             alvo.AtualizaOutraContaUsuario(
                 remetente,
@@ -274,6 +297,9 @@ namespace Financ.TesteUnitarios.Domain
 
             var alvo = new ContasUsuarios(1, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Mestre);
             var remetente = new ContasUsuarios(2, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Mestre);
+
+            conta.AddUsuario(alvo);
+            conta.AddUsuario(remetente);
 
             Action act = () =>
                 alvo.RemoverUsuarioDaConta(remetente);

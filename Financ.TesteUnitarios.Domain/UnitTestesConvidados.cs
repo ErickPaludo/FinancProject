@@ -149,7 +149,7 @@ namespace Financ.TesteUnitarios.Domain
 
             // Assert
             action.Should().Throw<ConvitesValidacao>()
-                .WithMessage(MensagensConvite.LIMITE_USUARIOS_MESTRES);
+                .WithMessage(MensagensBase.LIMITE_USUARIOS_MESTRES);
         }
     }
 }
