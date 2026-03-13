@@ -11,20 +11,30 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 using Financ.Infra.Data.Identity;
 using Microsoft.AspNetCore.Identity;
 using Financ.Domain.Interfaces.Autenticação;
-using Financ.Application.CQRS.Handler;
 using Financ.Application.Comun.Resultado;
-using Financ.Application.CQRS.Commands;
-using Financ.Application.CQRS.Querys;
 using Financ.Application.DTOs.Autenticação.Get;
 using Financ.Application.DTOs.Contas.Get;
 using Financ.Application.DTOs.ContasUsuarios.Get;
 using Financ.Application.DTOs.Usuarios.Get;
 using Financ.Application.DTOs.ContasUsuarios.Post;
 using Financ.Application.DTOs.Convites.Get;
+using Financ.Application.CQRS.Contas_.Commands;
+using Financ.Application.CQRS.Contas_Commands;
+using Financ.Application.CQRS.Contas_.Querys;
+using Financ.Application.CQRS.Contas_.Handler;
+using Financ.Application.CQRS.Contas_Usuarios.Commands;
+using Financ.Application.CQRS.Contas_Usuarios.Querys;
+using Financ.Application.CQRS.Contas_Usuarios.Handler;
+using Financ.Application.CQRS.Usuarios.Commands;
+using Financ.Application.CQRS.Usuarios.Handler;
+using Financ.Application.CQRS.UsuarioAutenticação.Commands;
+using Financ.Application.CQRS.Usuarios.Querys;
+using Financ.Application.CQRS.UsuarioAutenticação.Handler;
+using Financ.Application.CQRS.Convites_.Commands;
+using Financ.Application.CQRS.Convites_.Handler;
 
 
 namespace Financ.Infra.IoC
