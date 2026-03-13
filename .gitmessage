@@ -4,7 +4,7 @@
 # Domain        -> Entidades e regras de negócio
 # Application   -> Casos de uso / Commands / Queries
 # Api           -> Controllers / Endpoints
-# Infra         -> Banco, repositórios, serviços externos
+# Data         -> Banco, repositórios, serviços externos
 # IOc           -> Configuração de dependências
 
 # Tipos:
@@ -22,5 +22,5 @@
 # Exemplos válidos:
 # [Application][Feat][1.0.0.0][1] - adiciona login
 # [Domain][Test][1.0.0.0][1] - adiciona testes da entidade User
-# [Infra][Fix][1.0.0.0][1] - corrige conexão com banco
+# [Data][Fix][1.0.0.0][1] - corrige conexão com banco
 # [Api][Feat][1.0.0.0][1] - adiciona endpoint de autenticação
