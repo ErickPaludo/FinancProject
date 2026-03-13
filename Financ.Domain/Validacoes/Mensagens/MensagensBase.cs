@@ -13,5 +13,7 @@ namespace Financ.Domain.Validacoes.Mensagens
         public const string USUARIO_NAO_INFORMADO = "Usuário não informado!";
         public const string STATUS_INVALIDO = "Status inválido.";
         public const string LIMITE_USUARIOS_MESTRES = "O limite de usuários mestres foi atingido. ";
+        public const string USUARIO_INATIVO_NAO_PODE_SER_ATUALIZADO = "O usuário não está ativo!";
+
     }
 }

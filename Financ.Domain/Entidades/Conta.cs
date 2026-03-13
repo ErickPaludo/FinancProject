@@ -13,18 +13,14 @@ namespace Financ.Domain.Entidades
     {
         public string Titulo { get; private set; }
         public TiposStatusContas Status { get; private set; }
-
         public TiposContas TipoConta { get; private set; }
-
         private readonly List<ContasUsuarios> _contasUsuarios = new();
         public IReadOnlyCollection<ContasUsuarios> ContaUsuarios => _contasUsuarios;
-
         private readonly List<Convites> _convites = new();
         public IReadOnlyCollection<Convites> Convites => _convites;
         private Conta() { }
 
         public void AddUsuario(ContasUsuarios usuario) => _contasUsuarios.Add(usuario);
-
         public Conta(string titulo)
         {
             ValidaTitulo(titulo);
@@ -34,7 +30,7 @@ namespace Financ.Domain.Entidades
         {
             ValidaTitulo(titulo);
             ContaPadrao();
-            
+
             ContasValidacao.Verifica(id <= 0, MensagensBase.ID_IGUAL_MENOR_ZERO);
             Id = id;
         }
@@ -43,30 +39,30 @@ namespace Financ.Domain.Entidades
             Status = TiposStatusContas.Ativo;
             TipoConta = TiposContas.Corrente;
             DthrReg = DateTime.Now;
-          //  ContasUsuariosVinculados = new List<ContasUsuarios>();
         }
-      
+
         private void ValidaTitulo(string titulo)
         {
             ContasValidacao.Verifica(string.IsNullOrWhiteSpace(titulo), MensagensContas.TITULO_OBRIGATORIO);
             ContasValidacao.Verifica(titulo.Length < 3 || titulo.Length > 100, MensagensContas.TITULO_TAMANHO_INVALIDO);
             Titulo = titulo;
         }
-        private void ValidaStatus(TiposStatusContas status)
+        private void ValidaStatusConta(TiposStatusContas status)
         {
             ContasValidacao.Verifica(!Enum.IsDefined(typeof(TiposStatusContas), status), MensagensBase.STATUS_INVALIDO);
             Status = status;
         }
-        public void AtualizaConta(ContasUsuarios usuarios, string? titulo, TiposStatusContas? status)
+        public void AtualizaConta(ContasUsuarios usuario, string? titulo, TiposStatusContas? status)
         {
-            ContasValidacao.Verifica(usuarios == null, MensagensBase.USUARIO_NAO_INFORMADO);
-            ContasValidacao.Verifica((usuarios!.Acesso != TiposAcessos.Mestre), MensagensContas.ATUALIZA_CONTA_USUARIO_SEM_PERMISSAO);
+            ContasValidacao.Verifica(usuario is null || usuario.Conta != this,MensagensContasUsuarios.USUARIO_NAO_PERTENCE_A_CONTA);
+            ContasValidacao.Verifica(!usuario!.Status.Equals(TipoStatusContasUsuario.Ativo), MensagensBase.USUARIO_INATIVO_NAO_PODE_SER_ATUALIZADO);
+            ContasValidacao.Verifica((usuario!.Acesso != TiposAcessos.Mestre), MensagensContas.ATUALIZA_CONTA_USUARIO_SEM_PERMISSAO);
 
             if (titulo != null)
                 ValidaTitulo(titulo);
 
             if (status is not null)
-                ValidaStatus(status.Value);
+                ValidaStatusConta(status.Value);
         }
 
         public void SairDaConta(ContasUsuarios contaUsuario)
