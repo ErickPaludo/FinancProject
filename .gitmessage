@@ -23,4 +23,5 @@
 # [Application][Feat][1.0.0.0][1] - adiciona login
 # [Domain][Test][1.0.0.0][1] - adiciona testes da entidade User
 # [Data][Fix][1.0.0.0][1] - corrige conexão com banco
+# [IOc][Fix][1.0.0.0][1] - Injeta caso de uso
 # [Api][Feat][1.0.0.0][1] - adiciona endpoint de autenticação
