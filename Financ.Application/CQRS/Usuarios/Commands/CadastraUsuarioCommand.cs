@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Financ.Application.CQRS.Commands
+namespace Financ.Application.CQRS.Usuarios.Commands
 {
     public class CadastraUsuarioCommand : IRequest<Resultado<string>>
     {

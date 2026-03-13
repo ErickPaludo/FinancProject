@@ -1,5 +1,5 @@
 ﻿using Financ.Application.Comun.Resultado;
-using Financ.Application.CQRS.Commands;
+using Financ.Application.CQRS.UsuarioAutenticação.Commands;
 using Financ.Application.DTOs.Autenticação.Get;
 using Financ.Application.Mapeamento;
 using Financ.Domain.Interfaces.Autenticação;
@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Financ.Application.CQRS.Handler
+namespace Financ.Application.CQRS.UsuarioAutenticação.Handler
 {
     public class AutenticadoUsuarioHandler : IRequestHandler<AutenticadoUsuarioCommand, Resultado<RetornaTokenDTO>>
     {

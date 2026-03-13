@@ -1,5 +1,5 @@
 ﻿using Financ.Application.Comun.Resultado;
-using Financ.Application.CQRS.Querys;
+using Financ.Application.CQRS.Usuarios.Querys;
 using Financ.Application.DTOs.Usuarios.Get;
 using Financ.Application.Mapeamento;
 using Financ.Domain.Interfaces.Autenticação;
@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Financ.Application.CQRS.Handler
+namespace Financ.Application.CQRS.Usuarios.Handler
 {
     public class RetornaUsuarioHandler : IRequestHandler<RetornaUsuarioPorIdQuery, Resultado<RetornaUsuarioDTO>>
     {

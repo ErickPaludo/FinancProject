@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Financ.Application.CQRS.Commands
+namespace Financ.Application.CQRS.UsuarioAutenticação.Commands
 {
     public class AutenticadoUsuarioCommand : IRequest<Resultado<RetornaTokenDTO>>
     {

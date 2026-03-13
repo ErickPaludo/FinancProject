@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Financ.Application.CQRS.Querys
+namespace Financ.Application.CQRS.Usuarios.Querys
 {
     public class RetornaUsuarioPorIdQuery : IRequest<Resultado<RetornaUsuarioDTO>>
     {
