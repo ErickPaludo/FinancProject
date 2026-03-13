@@ -1,4 +1,4 @@
-[Camada][Tipo][Versão] - Mensagem
+[Camada][Tipo][Versão][Fase] - Mensagem
 
 # Camadas válidas:
 # Domain        -> Entidades e regras de negócio
@@ -14,10 +14,13 @@
 
 # Versão:
 # Utilize formato semântico simples
-# Exemplo: 1.0.0
+# Exemplo: 1.0.0.0
+
+# Fase:
+# 1/2/3/4
 
 # Exemplos válidos:
-# [Application][Feat][1.0.0] - adiciona login
-# [Domain][Test][1.0.0] - adiciona testes da entidade User
-# [Infra][Fix][1.0.0] - corrige conexão com banco
-# [Api][Feat][1.0.0] - adiciona endpoint de autenticação
+# [Application][Feat][1.0.0.0][1] - adiciona login
+# [Domain][Test][1.0.0.0][1] - adiciona testes da entidade User
+# [Infra][Fix][1.0.0.0][1] - corrige conexão com banco
+# [Api][Feat][1.0.0.0][1] - adiciona endpoint de autenticação
