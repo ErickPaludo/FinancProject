@@ -43,8 +43,8 @@ namespace Financ.UI.Api.Controllers
             return usuarioAlterado.RetornoAutomatico();
         }
        
-        [HttpPost("sair")]
-        public async Task<IActionResult> SairDaConta([FromBody]int idConta)
+        [HttpPost("{idConta}/sair")]
+        public async Task<IActionResult> SairDaConta([FromRoute]int idConta)
         {
             var convite = await _mediator.Send(new SairContaUsuarioCommand( User.RetornaIdUsuario(),idConta));
             return convite.RetornoAutomatico();

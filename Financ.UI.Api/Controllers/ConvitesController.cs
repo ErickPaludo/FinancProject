@@ -41,7 +41,7 @@ namespace Financ.UI.Api.Controllers
         [HttpPost("entrar")]
         public async Task<IActionResult> EntrarNaConta(int idConvite, bool aceito)
         {
-            var usuarioConta = await _mediator.Send(new IncluiUsuarioContaCommand(idConvite, aceito, User.RetornaIdUsuario()));
+            var usuarioConta = await _mediator.Send(new AceitaConviteCommand(idConvite, aceito, User.RetornaIdUsuario()));
             return usuarioConta.RetornoAutomatico();
         }
     }
