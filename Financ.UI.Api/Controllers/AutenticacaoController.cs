@@ -1,5 +1,5 @@
 ﻿using Financ.Application.Comun.Resultado;
-using Financ.Application.CQRS.Commands;
+using Financ.Application.CQRS.UsuarioAutenticação.Commands;
 using Financ.Application.DTOs.Autenticação.Get;
 using Financ.Application.DTOs.Autenticação.Post;
 using Financ.Domain.Interfaces.Autenticação;

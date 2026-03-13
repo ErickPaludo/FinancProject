@@ -1,5 +1,6 @@
-﻿using Financ.Application.CQRS.Commands;
-using Financ.Application.CQRS.Query;
+﻿using Financ.Application.CQRS.Contas_Usuarios.Commands;
+using Financ.Application.CQRS.Convites_.Commands;
+using Financ.Application.CQRS.Convites_.Query;
 using Financ.Application.DTOs.Convites.Post;
 using Financ.UI.Api.Extensao;
 using Microsoft.AspNetCore.Authorization;

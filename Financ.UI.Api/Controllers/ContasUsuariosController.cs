@@ -1,6 +1,5 @@
-﻿using Financ.Application.CQRS.Commands;
-using Financ.Application.CQRS.Query;
-using Financ.Application.CQRS.Querys;
+﻿using Financ.Application.CQRS.Contas_Usuarios.Commands;
+using Financ.Application.CQRS.Contas_Usuarios.Querys;
 using Financ.Application.DTOs.Autenticação.Post;
 using Financ.Application.DTOs.ContasUsuarios.Get.Filtros;
 using Financ.Application.DTOs.ContasUsuarios.Patch;

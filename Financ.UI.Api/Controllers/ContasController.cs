@@ -1,6 +1,7 @@
 using Financ.Application.Comun.Resultado;
-using Financ.Application.CQRS.Commands;
-using Financ.Application.CQRS.Querys;
+using Financ.Application.CQRS.Contas_.Commands;
+using Financ.Application.CQRS.Contas_.Querys;
+using Financ.Application.CQRS.Contas_Commands;
 using Financ.Application.DTOs.Contas.Get;
 using Financ.Application.DTOs.Contas.Get.Filtros;
 using Financ.Application.DTOs.Contas.Ptch;
