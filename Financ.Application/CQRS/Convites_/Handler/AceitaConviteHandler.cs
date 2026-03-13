@@ -1,5 +1,5 @@
 ﻿using Financ.Application.Comun.Resultado;
-using Financ.Application.CQRS.Contas_Usuarios.Commands;
+using Financ.Application.CQRS.Convites_.Commands;
 using Financ.Application.DTOs.ContasUsuarios.Get;
 using Financ.Application.DTOs.ContasUsuarios.Post;
 using Financ.Application.Mapeamento;
@@ -16,18 +16,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Financ.Application.CQRS.Contas_Usuarios.Handler
+namespace Financ.Application.CQRS.Convites_.Handler
 {
-    public class IncluirUsuarioContaHandler : IRequestHandler<IncluiUsuarioContaCommand, Resultado<RetornaPostCadastroDTO>>
+    public class AceitaConviteHandler : IRequestHandler<AceitaConviteCommand, Resultado<RetornaPostCadastroDTO>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUsuariosIdentityServicos _usuariosServico;
-        public IncluirUsuarioContaHandler(IUnitOfWork unitOfWork, IUsuariosIdentityServicos usuariosServico)
+        public AceitaConviteHandler(IUnitOfWork unitOfWork, IUsuariosIdentityServicos usuariosServico)
         {
             _unitOfWork = unitOfWork;
             _usuariosServico = usuariosServico;
         }
-        public async Task<Resultado<RetornaPostCadastroDTO>> Handle(IncluiUsuarioContaCommand request, CancellationToken cancellationToken)
+        public async Task<Resultado<RetornaPostCadastroDTO>> Handle(AceitaConviteCommand request, CancellationToken cancellationToken)
         {
             try
             {

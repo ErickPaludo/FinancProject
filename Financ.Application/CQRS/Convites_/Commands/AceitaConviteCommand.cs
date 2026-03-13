@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Financ.Application.CQRS.Contas_Usuarios.Commands
+namespace Financ.Application.CQRS.Convites_.Commands
 {
-    public record IncluiUsuarioContaCommand(int IdConvite,bool aceito, string IdUsuario) : IRequest<Resultado<RetornaPostCadastroDTO>>;
+    public record AceitaConviteCommand(int IdConvite,bool aceito, string IdUsuario) : IRequest<Resultado<RetornaPostCadastroDTO>>;
 }
