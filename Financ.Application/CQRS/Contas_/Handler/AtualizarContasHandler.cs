@@ -25,20 +25,16 @@ namespace Financ.Application.CQRS.Contas_.Handler
         {
             try
             {
+                var conta = await _unitOfWork.contasRepositorio.BuscarPeloId<int>(request.IdConta);
+                if (conta is null)
+                    return Resultado<RetornaContasDTO>.GeraFalha(Falha.NaoEncontrado("Conta não encontrada."));
+
                 if (await _unitOfWork.contasRepositorio.BuscarObjetoUnico(x => x.Id == request.IdConta) == null)
                     return Resultado<RetornaContasDTO>.GeraFalha(Falha.NaoEncontrado("Conta ou usuário inválidos."));
 
                 var contaUsuario = await _unitOfWork.contasUsuariosRepositorio.BuscarObjetoUnico(x => x.IdConta == request.IdConta && x.IdUsuario == request.IdUsuario);
-
-                if (contaUsuario == null)
-                    return Resultado<RetornaContasDTO>.GeraFalha(Falha.ErroOperacional("O Usuário não pertence a está conta!"));
-
-                if (!contaUsuario.Status.Equals(TipoStatusContasUsuario.Ativo))
-                    return Resultado<RetornaContasDTO>.GeraFalha(Falha.ErroOperacional($"Não foi possível concluir a operação pois seu usuário está {contaUsuario.Status.ToString()}!"));
-
-                var conta = await _unitOfWork.contasRepositorio.BuscarPeloId<int>(contaUsuario.IdConta);
-                if (conta == null)
-                    return Resultado<RetornaContasDTO>.GeraFalha(Falha.NaoEncontrado("Conta não encontrada."));
+                //if (contaUsuario is null)
+                //    return Resultado<RetornaContasDTO>.GeraFalha(Falha.ErroOperacional("O Usuário não pertence a está conta!"));
 
                 conta.AtualizaConta(contaUsuario, request.Titulo,request.Status);
 

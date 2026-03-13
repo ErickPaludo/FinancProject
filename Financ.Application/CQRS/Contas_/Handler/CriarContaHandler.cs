@@ -31,12 +31,9 @@ namespace Financ.Application.CQRS.Contas_.Handler
             try
             {
                 Conta conta = new Conta(request.Titulo);
-                Usuario usuario = await _usuariosServico.ObtemUsuario(request.IdUsuario);
-                ContasUsuarios contaUsuario = new ContasUsuarios(conta, usuario);
-               // conta.ContasUsuariosVinculados!.Add(contaUsuario);
+                ContasUsuarios contaUsuario = new ContasUsuarios(conta, request.IdUsuario);
 
                 await _unitOfWork.contasUsuariosRepositorio.Adicionar(contaUsuario); //Cria a conta e a conta usuario pois os objetos estão linkados
-              //  conta.AddUsuario(contaUsuario);
                 await _unitOfWork.Commit();
 
                 return Resultado<RetornaContasDTO>.GeraSucesso(ContaMapper.ParaDTO(conta));

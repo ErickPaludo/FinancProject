@@ -2,6 +2,7 @@
 using Financ.Application.CQRS.Contas_.Querys;
 using Financ.Application.DTOs.Contas.Get;
 using Financ.Application.DTOs.Contas.Get.Filtros;
+using Financ.Application.Mapeamento;
 using Financ.Domain.Entidades;
 using Financ.Domain.Enums;
 using Financ.Domain.Interfaces;
@@ -26,21 +27,12 @@ namespace Financ.Application.CQRS.Contas_.Handler
         {
            var contasUsuarios = await ContasUsuariosSelecionadas(request);
 
-
             if (contasUsuarios.Count() == 0)
                 return Resultado<List<RetornaContasDTO>>.GeraFalha(Falha.NaoEncontrado("Nenhuma conta foi encontrada!"));
 
             List<RetornaContasDTO> listaContas = new List<RetornaContasDTO>();
-            foreach (var conta in contasUsuarios)
-            {
-                if (conta.Conta is null)
-                {
-                    return Resultado<List<RetornaContasDTO>>.GeraFalha(Falha.NaoEncontrado("Conta não encontrada!"));
-                }
-                listaContas.Add(new RetornaContasDTO(conta.Conta.Id, conta.Conta.Titulo!, conta.Conta.Status));
-            }
 
-            return Resultado<List<RetornaContasDTO>>.GeraSucesso(listaContas);
+            return Resultado<List<RetornaContasDTO>>.GeraSucesso(ContasUsuariosMapper.ParaDTO(contasUsuarios));
         }
         private async Task<IEnumerable<ContasUsuarios>> ContasUsuariosSelecionadas(RetornaContaQuery filtros)
         {
