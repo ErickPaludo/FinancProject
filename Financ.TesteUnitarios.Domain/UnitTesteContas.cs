@@ -7,16 +7,19 @@ namespace Financ.TesteUnitarios.Domain
 {
     public class ContaTests
     {
-        #region Construtor
-        private ContasUsuarios CriarContaUsuario(Conta conta, string idUsuario, TiposAcessos acesso)
+        private ContasUsuarios CriarContaUsuario(Conta conta, string idUsuario, TiposAcessos acesso, TipoStatusContasUsuario status = TipoStatusContasUsuario.Ativo)
                 => new ContasUsuarios(
                     1,
                     conta,
                     idUsuario,
-                    acesso);
+                    acesso,
+                    status);
 
         private string NovoIdUsuario() => Guid.NewGuid().ToString();
 
+        #region Construtor
+
+        // Testes de Sucesso
         [Fact]
         public void Deve_Criar_Conta_Valida()
         {
@@ -27,6 +30,7 @@ namespace Financ.TesteUnitarios.Domain
             conta.TipoConta.Should().Be(TiposContas.Corrente);
         }
 
+        // Testes de Erro
         [Fact]
         public void Deve_Lancar_Excecao_Quando_Id_Menor_Igual_Zero()
         {
@@ -57,29 +61,7 @@ namespace Financ.TesteUnitarios.Domain
 
         #region AtualizaConta
 
-        [Fact]
-        public void Deve_Lancar_Excecao_Quando_Usuario_Nulo()
-        {
-            var conta = new Conta("Conta Teste");
-
-            Action act = () => conta.AtualizaConta(null!, "Novo Titulo", null);
-
-            act.Should().Throw<Exception>();
-        }
-
-        [Fact]
-        public void Deve_Lancar_Excecao_Quando_Usuario_For_Visualizador()
-        {
-            var conta = new Conta("Conta Teste");
-
-            var usuario = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Visualizador);
-
-
-            Action act = () => conta.AtualizaConta(usuario, "Novo Titulo", null);
-
-            act.Should().Throw<Exception>();
-        }
-
+        // Testes de Sucesso
         [Fact]
         public void Deve_Atualizar_Titulo_Quando_Usuario_Tiver_Permissao()
         {
@@ -103,6 +85,108 @@ namespace Financ.TesteUnitarios.Domain
             conta.AtualizaConta(usuario, null, TiposStatusContas.Inativo);
 
             conta.Status.Should().Be(TiposStatusContas.Inativo);
+        }
+
+        [Fact]
+        public void Nao_Deve_Alterar_Nada_Quando_Titulo_E_Status_Nulos()
+        {
+            var conta = new Conta("Conta Teste");
+
+            var usuario = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
+
+            conta.AtualizaConta(usuario, null, null);
+
+            conta.Titulo.Should().Be("Conta Teste");
+            conta.Status.Should().Be(TiposStatusContas.Ativo);
+        }
+
+        [Fact]
+        public void Deve_Atualizar_Titulo_E_Status_Juntos()
+        {
+            var conta = new Conta("Conta Antiga");
+
+            var usuario = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
+
+            conta.AtualizaConta(usuario, "Conta Nova", TiposStatusContas.Inativo);
+
+            conta.Titulo.Should().Be("Conta Nova");
+            conta.Status.Should().Be(TiposStatusContas.Inativo);
+        }
+
+        // Testes de Erro
+        [Fact]
+        public void Deve_Lancar_Excecao_Quando_Usuario_Nulo()
+        {
+            var conta = new Conta("Conta Teste");
+
+            Action act = () => conta.AtualizaConta(null!, "Novo Titulo", null);
+
+            act.Should().Throw<Exception>();
+        }
+
+        [Fact]
+        public void Deve_Lancar_Excecao_Quando_Usuario_For_Visualizador()
+        {
+            var conta = new Conta("Conta Teste");
+
+            var usuario = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Visualizador);
+
+
+            Action act = () => conta.AtualizaConta(usuario, "Novo Titulo", null);
+
+            act.Should().Throw<Exception>();
+        }
+
+        [Theory]
+        [InlineData(TipoStatusContasUsuario.Inativo)]
+        [InlineData(TipoStatusContasUsuario.Bloqueado)]
+        public void Deve_Lancar_Excecao_Quando_Usuario_Nao_For_Ativo(TipoStatusContasUsuario status)
+        {
+            var conta = new Conta("Conta Teste");
+
+            var usuario = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre, status);
+
+
+            Action act = () => conta.AtualizaConta(usuario, "Novo Titulo", null);
+
+            act.Should().Throw<Exception>();
+        }
+
+        [Fact]
+        public void Deve_Lancar_Excecao_Quando_Usuario_Pertencer_A_Otra_Conta()
+        {
+            var conta1 = new Conta("Conta 1");
+            var conta2 = new Conta("Conta 2");
+
+            var usuario = CriarContaUsuario(conta2, NovoIdUsuario(), TiposAcessos.Mestre);
+
+            Action act = () => conta1.AtualizaConta(usuario, "Novo Titulo", null);
+
+            act.Should().Throw<Exception>();
+        }
+
+        [Fact]
+        public void Deve_Lancar_Excecao_Quando_Titulo_Invalido_Na_Atualizacao()
+        {
+            var conta = new Conta("Conta Teste");
+
+            var usuario = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
+
+            Action act = () => conta.AtualizaConta(usuario, "", null);
+
+            act.Should().Throw<Exception>();
+        }
+
+        [Fact]
+        public void Deve_Lancar_Excecao_Quando_Usuario_For_Administrador()
+        {
+            var conta = new Conta("Conta Teste");
+
+            var usuario = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Administrador);
+
+            Action act = () => conta.AtualizaConta(usuario, "Novo Titulo", null);
+
+            act.Should().Throw<Exception>();
         }
 
         #endregion
