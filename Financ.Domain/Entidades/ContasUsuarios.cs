@@ -42,19 +42,20 @@ namespace Financ.Domain.Entidades
 
         }
 
-        public ContasUsuarios(Conta conta, Usuario usuario)
+        public ContasUsuarios(Conta conta, string idUasuario)
         {
-            ValidaContasUsuarios(conta, usuario.IdUsuario);
+            ValidaContasUsuarios(conta, idUasuario);
             Status = TipoStatusContasUsuario.Ativo;
             Acesso = TiposAcessos.Mestre;
         }
         private void ValidaEnums(TiposAcessos acesso, TipoStatusContasUsuario? status)
         {
+
+            ContasUsuariosValidacao.Verifica(!Enum.IsDefined(typeof(TiposAcessos), acesso), MensagensContasUsuarios.ACESSO_INVALIDO);
             Acesso = acesso;
             if (status.HasValue)
             {
                 ContasUsuariosValidacao.Verifica(!Enum.IsDefined(typeof(TipoStatusContasUsuario), status), MensagensBase.STATUS_INVALIDO);
-                ContasUsuariosValidacao.Verifica(!Enum.IsDefined(typeof(TiposAcessos), acesso), MensagensContasUsuarios.ACESSO_INVALIDO);
                 Status = status.Value;
             }
             else
@@ -70,11 +71,10 @@ namespace Financ.Domain.Entidades
             IdUsuario = idUsuario;
             DthrReg = DateTime.Now;
         }
-        public void AtualizaOutraContaUsuario(ContasUsuarios contasUsuarioRemetente, TiposAcessos? acesso, TipoStatusContasUsuario? status)
+        public void AtualizaOutraContaUsuario(ContasUsuarios? contasUsuarioRemetente, TiposAcessos? acesso, TipoStatusContasUsuario? status)
         {
+            ValidaUsuarioRemetenteMestreAtivoDaConta(contasUsuarioRemetente);
             ContasUsuariosValidacao.Verifica(contasUsuarioRemetente == this, MensagensContasUsuarios.USUARIO_TENTA_SE_ATUALIZAR);
-            ContasUsuariosValidacao.Verifica(contasUsuarioRemetente.Acesso != TiposAcessos.Mestre, MensagensContasUsuarios.ACESSO_NEGADO);
-            ContasUsuariosValidacao.Verifica(contasUsuarioRemetente.Status != TipoStatusContasUsuario.Ativo, MensagensContasUsuarios.ACESSO_NEGADO_POR_STATUS);
             ContasUsuariosValidacao.Verifica(Acesso == TiposAcessos.Mestre, MensagensContasUsuarios.USUARIO_MESTRE_NAO_PODE_SER_ATUALIZADO);
 
             if (acesso.HasValue)
@@ -91,7 +91,6 @@ namespace Financ.Domain.Entidades
         }
         public void SairDaConta()
         {
-
             ContasUsuariosValidacao.Verifica(
                 Acesso.Equals(TiposAcessos.Mestre)
                 && Conta.ContaUsuarios.Any(x => !x.Acesso.Equals(TiposAcessos.Mestre)
@@ -100,13 +99,38 @@ namespace Financ.Domain.Entidades
                 MensagensContasUsuarios.UNICO_USUARIO_MESTRE_NA_CONTA);
 
             //Verifica se a conta possui mais usuários conectados a conta, e se o usuário é o único mestre, para evitar que a conta fique sem um usuário mestre.
+
+            ContasUsuariosValidacao.Verifica(Conta.Convites.Any(x => DateTime.Now <= x.Expiracao && x.Aceito is null && x.IdUsuarioRemetente.Equals(IdUsuario)),MensagensContasUsuarios.USUARIO_POSSUI_CONVITES_EM_ANDAMENTO);
+
         }
-        public void RemoverUsuarioDaConta(ContasUsuarios contasUsuarioRemetente)
+        public void RemoverUsuarioDaConta(ContasUsuarios? contasUsuarioRemetente)
         {
-            ContasUsuariosValidacao.Verifica(contasUsuarioRemetente.Acesso != TiposAcessos.Mestre, MensagensContasUsuarios.ACESSO_NEGADO);
+            ValidaUsuarioRemetenteMestreAtivoDaConta(contasUsuarioRemetente);
             ContasUsuariosValidacao.Verifica(contasUsuarioRemetente == this, MensagensContasUsuarios.USUARIO_TENTA_SE_EXPULSAR);
-            ContasUsuariosValidacao.Verifica(contasUsuarioRemetente.Status != TipoStatusContasUsuario.Ativo, MensagensContasUsuarios.ACESSO_NEGADO_POR_STATUS);
             ContasUsuariosValidacao.Verifica(Acesso == TiposAcessos.Mestre, MensagensContasUsuarios.USUARIO_MESTRE_NAO_PODE_SER_REMOVIDO);
+        }
+        private void ValidaUsuarioRemetenteMestreAtivoDaConta(ContasUsuarios? usuario)
+        {
+            ValidaUsuarioPertenceConta(usuario);
+            ValidaUsuarioMestreAtivo(usuario!);
+        }
+
+        private void ValidaUsuarioPertenceConta(ContasUsuarios? usuario)
+        {
+            ContasUsuariosValidacao.Verifica(
+                usuario is null || usuario.Conta != Conta,
+                MensagensContasUsuarios.USUARIO_NAO_PERTENCE_A_CONTA);
+        }
+
+        private void ValidaUsuarioMestreAtivo(ContasUsuarios usuario)
+        {
+            ContasUsuariosValidacao.Verifica(
+                usuario.Acesso != TiposAcessos.Mestre,
+                MensagensContasUsuarios.ACESSO_NEGADO);
+
+            ContasUsuariosValidacao.Verifica(
+                usuario.Status != TipoStatusContasUsuario.Ativo,
+                MensagensContasUsuarios.ACESSO_NEGADO_POR_STATUS);
         }
         public bool ValidaPermissoeNaConta(TiposAcessos acessoDestinatario)
         {

@@ -65,9 +65,11 @@ namespace Financ.Domain.Entidades
                 ValidaStatusConta(status.Value);
         }
 
-        public void SairDaConta(ContasUsuarios contaUsuario)
+        public void SairDaConta(ContasUsuarios? contaUsuario)
         {
-            contaUsuario.SairDaConta();
+            ContasValidacao.Verifica(contaUsuario is null || contaUsuario.Conta != this, MensagensContasUsuarios.USUARIO_NAO_PERTENCE_A_CONTA);
+
+            contaUsuario!.SairDaConta();
             _contasUsuarios.Remove(contaUsuario);
 
             if (ContaUsuarios.Count() == 0)
