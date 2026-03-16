@@ -28,6 +28,9 @@ namespace Financ.Domain.Entidades
             Id = id;
             ValidaContasUsuarios(conta, idUsuario);
             ValidaEnums(acesso, status);
+            Status = status.HasValue ? status.Value : TipoStatusContasUsuario.Ativo;
+            Acesso = acesso;
+
         }
         public ContasUsuarios(Convites convite)
         {
@@ -39,6 +42,12 @@ namespace Financ.Domain.Entidades
                 Acesso = TiposAcessos.Administrador;
                 convite.InsereObservacao($"{MensagensConvite.CONTA_JA_POSSUI_UM_USUARIO_MESTRES} {MensagensContasUsuarios.MAX_MESTRES_CONVERTE_PARA_ADMIN}");
             }
+            else
+            {
+                Acesso = convite.Acesso;
+            }
+
+            Status = TipoStatusContasUsuario.Ativo;
 
         }
 
@@ -48,18 +57,14 @@ namespace Financ.Domain.Entidades
             Status = TipoStatusContasUsuario.Ativo;
             Acesso = TiposAcessos.Mestre;
         }
-        private void ValidaEnums(TiposAcessos acesso, TipoStatusContasUsuario? status)
+        private void ValidaEnums(TiposAcessos? acesso, TipoStatusContasUsuario? status)
         {
 
-            ContasUsuariosValidacao.Verifica(!Enum.IsDefined(typeof(TiposAcessos), acesso), MensagensContasUsuarios.ACESSO_INVALIDO);
-            Acesso = acesso;
             if (status.HasValue)
-            {
                 ContasUsuariosValidacao.Verifica(!Enum.IsDefined(typeof(TipoStatusContasUsuario), status), MensagensBase.STATUS_INVALIDO);
-                Status = status.Value;
-            }
-            else
-                Status = TipoStatusContasUsuario.Ativo;
+           
+            if (acesso.HasValue)
+                ContasUsuariosValidacao.Verifica(!Enum.IsDefined(typeof(TiposAcessos), acesso), MensagensContasUsuarios.ACESSO_INVALIDO);
         }
         private void ValidaContasUsuarios(Conta conta, string idUsuario)
         {
@@ -77,15 +82,18 @@ namespace Financ.Domain.Entidades
             ContasUsuariosValidacao.Verifica(contasUsuarioRemetente == this, MensagensContasUsuarios.USUARIO_TENTA_SE_ATUALIZAR);
             ContasUsuariosValidacao.Verifica(Acesso == TiposAcessos.Mestre, MensagensContasUsuarios.USUARIO_MESTRE_NAO_PODE_SER_ATUALIZADO);
 
+            ValidaEnums(acesso, status);
+
+            if (acesso.HasValue && status.HasValue)
+                ContasUsuariosValidacao.Verifica(acesso.Value.Equals(TiposAcessos.Mestre) && !status.Value.Equals(TipoStatusContasUsuario.Ativo), MensagensContasUsuarios.ATUALIZA_PARA_USUARIO_MESTRE_DIFERENTE_DE_ATIVO);
+
             if (acesso.HasValue)
             {
                 ContasUsuariosValidacao.Verifica(!ValidaPermissoeNaConta(acesso.Value), MensagensBase.LIMITE_USUARIOS_MESTRES);
-                ContasUsuariosValidacao.Verifica(!Enum.IsDefined(typeof(TiposAcessos), acesso.Value), MensagensContasUsuarios.ACESSO_INVALIDO);
                 Acesso = acesso.Value;
             }
             if (status.HasValue)
             {
-                ContasUsuariosValidacao.Verifica(!Enum.IsDefined(typeof(TipoStatusContasUsuario), status.Value), MensagensBase.STATUS_INVALIDO);
                 Status = status.Value;
             }
         }
@@ -100,7 +108,7 @@ namespace Financ.Domain.Entidades
 
             //Verifica se a conta possui mais usuários conectados a conta, e se o usuário é o único mestre, para evitar que a conta fique sem um usuário mestre.
 
-            ContasUsuariosValidacao.Verifica(Conta.Convites.Any(x => DateTime.Now <= x.Expiracao && x.Aceito is null && x.IdUsuarioRemetente.Equals(IdUsuario)),MensagensContasUsuarios.USUARIO_POSSUI_CONVITES_EM_ANDAMENTO);
+            ContasUsuariosValidacao.Verifica(Conta.Convites.Any(x => DateTime.Now <= x.Expiracao && x.Aceito is null && x.IdUsuarioRemetente.Equals(IdUsuario)), MensagensContasUsuarios.USUARIO_POSSUI_CONVITES_EM_ANDAMENTO);
 
         }
         public void RemoverUsuarioDaConta(ContasUsuarios? contasUsuarioRemetente)

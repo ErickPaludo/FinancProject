@@ -21,6 +21,7 @@ namespace Financ.Domain.Entidades
         private Conta() { }
 
         public void AddUsuario(ContasUsuarios usuario) => _contasUsuarios.Add(usuario);
+        public void AddConvite(Convites convite) => _convites.Add(convite);
         public Conta(string titulo)
         {
             ValidaTitulo(titulo);
@@ -52,6 +53,7 @@ namespace Financ.Domain.Entidades
             ContasValidacao.Verifica(!Enum.IsDefined(typeof(TiposStatusContas), status), MensagensBase.STATUS_INVALIDO);
             Status = status;
         }
+
         public void AtualizaConta(ContasUsuarios usuario, string? titulo, TiposStatusContas? status)
         {
             ContasValidacao.Verifica(usuario is null || usuario.Conta != this,MensagensContasUsuarios.USUARIO_NAO_PERTENCE_A_CONTA);
