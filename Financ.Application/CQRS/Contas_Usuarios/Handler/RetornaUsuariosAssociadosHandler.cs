@@ -54,7 +54,6 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
 
                     return Resultado<List<RetornaUsuariosAssociadosDTO>>.GeraSucesso(listaUsuarios);
                 }
-                return Resultado<List<RetornaUsuariosAssociadosDTO>>.GeraFalha(Falha.NaoEncontrado("Somente você está associado a está conta!"));
             }
             return Resultado<List<RetornaUsuariosAssociadosDTO>>.GeraFalha(Falha.NaoEncontrado("Conta não encontrada!"));
         }

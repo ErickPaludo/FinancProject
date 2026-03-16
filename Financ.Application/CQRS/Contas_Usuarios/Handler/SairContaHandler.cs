@@ -34,12 +34,9 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
 
                 ContasUsuarios? contaUsuario = conta.ContaUsuarios.FirstOrDefault(x => x.IdUsuario.Equals(request.idUsuario));
 
-                if (contaUsuario is null)
-                    return Resultado<string>.GeraFalha(Falha.NaoEncontrado("Usuário não encontrado na conta."));
-
                 conta.SairDaConta(contaUsuario);
 
-                _unitOfWork.contasUsuariosRepositorio.Delete(contaUsuario);
+                _unitOfWork.contasUsuariosRepositorio.Delete(contaUsuario!);
                 _unitOfWork.contasRepositorio.Atualiza(conta);
 
                 await _unitOfWork.Commit();
@@ -49,6 +46,10 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
             catch (ContasUsuariosValidacao contasUsuariosExcessao)
             {
                 return Resultado<string>.GeraFalha(Falha.ErroOperacional(contasUsuariosExcessao.Message));
+            }
+            catch (ContasValidacao contasExcessao)
+            {
+                return Resultado<string>.GeraFalha(Falha.ErroOperacional(contasExcessao.Message));
             }
         }
     }

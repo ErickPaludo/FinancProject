@@ -31,10 +31,6 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
                     return Resultado<string>.GeraFalha(Falha.NaoEncontrado("A conta informada não existe ou já foi removida."));
 
                 ContasUsuarios? contaUsuarioRemetente = conta.ContaUsuarios.FirstOrDefault(x => x.IdUsuario.Equals(request.idUsuarioRemetente));
-
-                if (contaUsuarioRemetente is null)
-                    return Resultado<string>.GeraFalha(Falha.NaoEncontrado("O usuário remetente não pertence a conta informada."));
-
                 ContasUsuarios? contaUsuarioDestinatario = conta.ContaUsuarios.FirstOrDefault(x => x.IdUsuario.Equals(request.idUsuarioDestinatario));
 
                 if (contaUsuarioDestinatario is null)
@@ -42,7 +38,7 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
 
                 contaUsuarioDestinatario.RemoverUsuarioDaConta(contaUsuarioRemetente);
                 _unitOfWork.contasUsuariosRepositorio.Delete(contaUsuarioDestinatario);
-
+                await _unitOfWork.Commit();
                 return Resultado<string>.GeraSucesso("Usuário removido da conta com sucesso!");
             }
             catch (ContasUsuariosValidacao contasUsuariosExcessao)

@@ -2,6 +2,7 @@
 using Financ.Application.CQRS.Contas_Usuarios.Commands;
 using Financ.Application.DTOs.ContasUsuarios.Get;
 using Financ.Application.Mapeamento;
+using Financ.Domain.Entidades;
 using Financ.Domain.Enums;
 using Financ.Domain.Interfaces;
 using Financ.Domain.Validacoes;
@@ -25,18 +26,16 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
         {
             try
             {
-                var conta = await _unitOfWork.contasRepositorio.BuscarContaComUsuarios(x => x.Id == request.idConta);
+                Conta? conta = await _unitOfWork.contasRepositorio.BuscarContaComUsuarios(x => x.Id == request.idConta);
 
                 if (conta is null)
                     return Resultado<RetornaCadastroContasUsuariosDTO>.GeraFalha(Falha.NaoEncontrado("Conta não encontrada!"));
 
-                var contaUsuarioDestinatario = conta.ContaUsuarios.FirstOrDefault(x => x.IdUsuario == request.idUsuarioAlterado);
+                ContasUsuarios? contaUsuarioDestinatario = conta.ContaUsuarios.FirstOrDefault(x => x.IdUsuario == request.idUsuarioAlterado);
                 if (contaUsuarioDestinatario is null)
                     return Resultado<RetornaCadastroContasUsuariosDTO>.GeraFalha(Falha.NaoEncontrado("Usuário não encontrado."));
 
                 var contaUsuarioRemetente = conta.ContaUsuarios.FirstOrDefault(x => x.IdUsuario == request.idUsuarioSolicitante);
-                if (contaUsuarioRemetente is null)
-                    return Resultado<RetornaCadastroContasUsuariosDTO>.GeraFalha(Falha.NaoEncontrado("Você não está cadastrado nessa conta."));
 
                 contaUsuarioDestinatario.AtualizaOutraContaUsuario(contaUsuarioRemetente, request.acesso, request.status);
                 _unitOfWork.contasUsuariosRepositorio.Atualiza(contaUsuarioDestinatario);

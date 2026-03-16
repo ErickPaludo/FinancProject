@@ -1,4 +1,5 @@
-﻿using Financ.Application.DTOs.ContasUsuarios.Get;
+﻿using Financ.Application.DTOs.Contas.Get;
+using Financ.Application.DTOs.ContasUsuarios.Get;
 using Financ.Application.DTOs.ContasUsuarios.Post;
 using Financ.Domain.Entidades;
 using System;
@@ -19,6 +20,15 @@ namespace Financ.Application.Mapeamento
                           usuario.Email,
                           contaUsuario.Acesso,
                           contaUsuario.Status);
+        public static List<RetornaContasDTO> ParaDTO(IEnumerable<ContasUsuarios> contasUsuarios)
+        {
+            List<RetornaContasDTO> listaContas = new List<RetornaContasDTO>();
+            foreach (var contaUsuario in contasUsuarios)
+            {
+                listaContas.Add(new RetornaContasDTO(contaUsuario.Conta!.Id, contaUsuario.Conta.Titulo!, contaUsuario.Conta.Status));
+            }
+            return listaContas;
+        }
         public static RetornaCadastroContasUsuariosDTO ParaDTO(ContasUsuarios contaUsuario) =>
             new RetornaCadastroContasUsuariosDTO(
                           contaUsuario.IdConta,
