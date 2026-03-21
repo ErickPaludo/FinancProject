@@ -27,7 +27,7 @@ namespace Financ.UI.Api.Controllers
             return convite.RetornoAutomatico();
         }
         [HttpGet]
-        public async Task<IActionResult> RetornaConvites([FromQuery]bool remetente)
+        public async Task<IActionResult> RetornaConvites(bool remetente = false)
         {
             var convite = await _mediator.Send(new RetornaConvitesQuery(User.RetornaIdUsuario(), remetente));
             return convite.RetornoAutomatico();
