@@ -8,16 +8,21 @@ namespace Financ.Domain.Validacoes.Mensagens
 {
     public static class MensagensConvite
     {
-        public const string USUARIO_REMETENTE_INVALIDO = "O usuário remetente deve ser informado";
-        public const string USUARIO_DESTINATARIO_INVALIDO = "O usuário destinatário deve ser informado";
-        public const string USUARIO_SEM_PERMISSAO = "Você não pode convidar um usuário, pois não é um usuário mestre.";
-        public const string USUARIO_CONTA_REMETENTE_INATIVO = "Seu usuário não está ativo nesta conta.";
-        public const string CONTA_JA_POSSUI_UM_USUARIO_MESTRES= "A conta já possui um usuário com acesso mestre.";
-       
-        public const string CONVITE_JA_VIZUALIZADO = "O convite já foi ";
-        public const string CONVITE_EXPIRADO = "Convite expirado!";
-        public const string USUARIO_REMETENTE_NAO_AUTORIZADO = "Você não é o usuário remetente!";
+        public const string USUARIO_REMETENTE_INVALIDO = "O usuário remetente é obrigatório.";
+        public const string USUARIO_DESTINATARIO_INVALIDO = "O usuário destinatário é obrigatório.";
 
-        
+        public const string USUARIO_SEM_PERMISSAO = "Você não tem permissão para convidar usuários.";
+        public const string USUARIO_CONTA_REMETENTE_INATIVO = "Seu usuário está inativo nesta conta.";
+        public const string CONTA_JA_POSSUI_UM_USUARIO_MESTRES = "A conta já possui um usuário com acesso mestre.";
+
+        public const string CONVITE_JA_VISUALIZADO = "Este convite já foi visualizado.";
+        public const string CONVITE_EXPIRADO = "O convite expirou.";
+        public const string USUARIO_REMETENTE_NAO_AUTORIZADO = "Você não é o remetente deste convite.";
+
+        public const string USUARIO_DESTINATARIO_NAO_ENCONTRADO = "Usuário destinatário não encontrado.";
+        public const string USUARIO_REMETENTE_NAO_ENCONTRADO = "Usuário remetente não encontrado.";
+
+        public const string CONVITE_EM_ANDAMENTO = "Já existe um convite pendente para este usuário.";
+        public const string USUARIO_JA_PERTENCE_A_CONTA = "Usuário já está cadastrado nesta conta.";
     }
 }

@@ -9,7 +9,6 @@ namespace Financ.Domain.Enums
     public enum TiposStatusContas
     {
         Ativo,
-        Inativo,
-        Deletado
+        Inativo
     }
 }

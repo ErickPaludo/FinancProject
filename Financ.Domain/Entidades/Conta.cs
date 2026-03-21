@@ -56,14 +56,14 @@ namespace Financ.Domain.Entidades
 
         public void AtualizaConta(ContasUsuarios usuario, string? titulo, TiposStatusContas? status)
         {
-            ContasValidacao.Verifica(usuario is null || usuario.Conta != this,MensagensContasUsuarios.USUARIO_NAO_PERTENCE_A_CONTA);
+            ContasValidacao.Verifica(usuario is null || usuario.Conta != this, MensagensContasUsuarios.USUARIO_NAO_PERTENCE_A_CONTA);
             ContasValidacao.Verifica(!usuario!.Status.Equals(TipoStatusContasUsuario.Ativo), MensagensBase.USUARIO_INATIVO_NAO_PODE_SER_ATUALIZADO);
             ContasValidacao.Verifica((usuario!.Acesso != TiposAcessos.Mestre), MensagensContas.ATUALIZA_CONTA_USUARIO_SEM_PERMISSAO);
 
             if (titulo != null)
                 ValidaTitulo(titulo);
 
-            if (status is not null)
+            if (status.HasValue)
                 ValidaStatusConta(status.Value);
         }
 
@@ -75,7 +75,18 @@ namespace Financ.Domain.Entidades
             _contasUsuarios.Remove(contaUsuario);
 
             if (ContaUsuarios.Count() == 0)
-                Status = TiposStatusContas.Deletado;
+                Status = TiposStatusContas.Inativo;
+        }
+
+        public bool ConviteEmAndamento(string idUsuario)
+        {
+            return Convites.Any(x => x.IdUsuarioDestinatario == idUsuario
+            && DateTime.Now <= x.Expiracao 
+            && x.Aceito == null);
+        }
+        public bool UsuarioPertenceConta(string idUsuario)
+        {
+            return ContaUsuarios.Any(x => x.IdUsuario == idUsuario);
         }
         #region Linhas de credito Fase 3
         //private void ValidaFechamentoVencimento(int diaFechamento, int diaVencimento)
