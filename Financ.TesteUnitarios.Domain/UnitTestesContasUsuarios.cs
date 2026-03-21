@@ -19,7 +19,7 @@ namespace Financ.TesteUnitarios.Domain
 
         private string NovoIdUsuario() => Guid.NewGuid().ToString();
 
-        private Convites CriarConvite(TiposAcessos aceso, ContasUsuarios usuarioRemetente, string idUsuarioDestinatario)
+        private Convites CriarConvite(TiposAcessos aceso, ContasUsuarios usuarioRemetente, Usuario idUsuarioDestinatario)
             => new Convites(aceso, usuarioRemetente, idUsuarioDestinatario);
 
         private ContasUsuarios CriarContaUsuario(Conta conta, string idUsuario, TiposAcessos acesso = TiposAcessos.Mestre, TipoStatusContasUsuario status = TipoStatusContasUsuario.Ativo)
@@ -67,7 +67,7 @@ namespace Financ.TesteUnitarios.Domain
             var conta = CriarContaAtiva();
             var mestre1 = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
 
-            var convite = new Convites(TiposAcessos.Mestre, mestre1, NovoIdUsuario());
+            var convite = new Convites(TiposAcessos.Mestre, mestre1, CriarUsuario(NovoIdUsuario()));
 
             var mestre2 = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
 
@@ -107,7 +107,7 @@ namespace Financ.TesteUnitarios.Domain
         {
             var conta = new Conta("Conta Teste");
             var usuarioRemetente = CriarContaUsuario(conta, NovoIdUsuario());
-            var usuarioDestinatario = CriarUsuario(NovoIdUsuario()).IdUsuario;
+            var usuarioDestinatario = CriarUsuario(NovoIdUsuario());
             var convite = new Convites(TiposAcessos.Mestre, usuarioRemetente, usuarioDestinatario);
 
             // Simula a conta se tornando inativa ANTES da criação do ContasUsuarios pelo convite
@@ -367,7 +367,7 @@ namespace Financ.TesteUnitarios.Domain
             var conta = CriarContaAtiva();
             var mestre1 = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
             var mestre2 = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
-            var convidado = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Administrador).IdUsuario;
+            var convidado = CriarUsuario(NovoIdUsuario());
 
             Convites convite = CriarConvite(TiposAcessos.Administrador, mestre2 ,convidado);
 
