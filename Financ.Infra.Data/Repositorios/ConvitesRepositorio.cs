@@ -26,7 +26,7 @@ namespace Financ.Infra.Data.Repositorios
 
         public async Task<Convites> BuscarConviteComConta(Expression<Func<Convites, bool>> predicado)
         {
-            return await _contexto.Convites.Include(c => c.Conta).ThenInclude(c => c.ContaUsuarios).FirstOrDefaultAsync(predicado);
+            return await _contexto.Convites.Include(c => c.Conta).ThenInclude(c => c.ContaUsuarios).Where(x => x.Aceito == null && x.Expiracao >= DateTime.Now).FirstOrDefaultAsync(predicado);
         }
     }
 }
