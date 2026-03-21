@@ -36,8 +36,8 @@ namespace Financ.TesteUnitarios.Domain
         {
             var conta = CriarContaAtiva();
             var usuarioRemetente = CriarUsuario(Guid.NewGuid().ToString());
-            var usuarioDestinatario = CriarUsuario(Guid.NewGuid().ToString()).IdUsuario;
-            var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuarioRemetente.IdUsuario);
+            var usuarioDestinatario = CriarUsuario(Guid.NewGuid().ToString()).Id;
+            var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuarioRemetente.Id);
 
             Action action = () => new Convites(
                 TiposAcessos.Administrador,
@@ -52,12 +52,12 @@ namespace Financ.TesteUnitarios.Domain
         {
             var conta = CriarContaAtiva();
             var usuarioRemetente = CriarUsuario(Guid.NewGuid().ToString());
-            var usuarioDestinatario = CriarUsuario(Guid.NewGuid().ToString()).IdUsuario;
+            var usuarioDestinatario = CriarUsuario(Guid.NewGuid().ToString()).Id;
 
             var contaUsuarioRemetente = new ContasUsuarios(
                 1,
                 conta,
-                usuarioRemetente.IdUsuario,
+                usuarioRemetente.Id,
                 TiposAcessos.Administrador);
 
             Action action = () => new Convites(
@@ -75,8 +75,8 @@ namespace Financ.TesteUnitarios.Domain
             var conta = new Conta(1, "Conta Teste");
 
             var usuarioRemetente = CriarUsuario(Guid.NewGuid().ToString());
-            var usuarioDestinatario = CriarUsuario(Guid.NewGuid().ToString()).IdUsuario;
-            var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuarioRemetente.IdUsuario);
+            var usuarioDestinatario = CriarUsuario(Guid.NewGuid().ToString()).Id;
+            var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuarioRemetente.Id);
 
             conta.AtualizaConta(CriarContaUsuarioMestre(conta, Guid.NewGuid().ToString()), null, TiposStatusContas.Inativo); // ajuste se necessário
             Action action = () => new Convites(
@@ -96,8 +96,8 @@ namespace Financ.TesteUnitarios.Domain
             var conta = new Conta(1, "Conta Teste");
 
             var usuarioRemetente = CriarUsuario(Guid.NewGuid().ToString());
-            var usuarioDestinatario = CriarUsuario(Guid.NewGuid().ToString()).IdUsuario;
-            var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuarioRemetente.IdUsuario,status);
+            var usuarioDestinatario = CriarUsuario(Guid.NewGuid().ToString()).Id;
+            var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuarioRemetente.Id,status);
 
             Action action = () => new Convites(
                 TiposAcessos.Administrador,
@@ -114,8 +114,8 @@ namespace Financ.TesteUnitarios.Domain
         {
             var conta = CriarContaAtiva();
             var usuarioRemetente = CriarUsuario(Guid.NewGuid().ToString());
-            var usuarioDestinatario = CriarUsuario(Guid.NewGuid().ToString()).IdUsuario;
-            var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuarioRemetente.IdUsuario);
+            var usuarioDestinatario = CriarUsuario(Guid.NewGuid().ToString()).Id;
+            var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuarioRemetente.Id);
 
             var convite = new Convites(
                 TiposAcessos.Administrador,
@@ -132,9 +132,9 @@ namespace Financ.TesteUnitarios.Domain
         {
             var conta = CriarContaAtiva();
 
-            var usuario1 = CriarUsuario(Guid.NewGuid().ToString()).IdUsuario;
-            var usuario2 = CriarUsuario(Guid.NewGuid().ToString()).IdUsuario;
-            var usuario3 = CriarUsuario(Guid.NewGuid().ToString()).IdUsuario;
+            var usuario1 = CriarUsuario(Guid.NewGuid().ToString()).Id;
+            var usuario2 = CriarUsuario(Guid.NewGuid().ToString()).Id;
+            var usuario3 = CriarUsuario(Guid.NewGuid().ToString()).Id;
 
             // Adiciona dois usuários mestre à conta
 

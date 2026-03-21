@@ -19,6 +19,7 @@ namespace Financ.UI.Api.Extensao
             {
                 400 => new BadRequestObjectResult(resultado.Falha.Mensagem),
                 404 => new NotFoundObjectResult(resultado.Falha.Mensagem),
+                401 => new UnauthorizedObjectResult(resultado.Falha.Mensagem),
                 _ => new ObjectResult(resultado.Falha.Mensagem) { StatusCode = 500 }
             };
         }

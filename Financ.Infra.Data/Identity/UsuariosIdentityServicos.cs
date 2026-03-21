@@ -47,7 +47,7 @@ namespace Financ.Infra.Data.Identity
         {
             var usuario = _gerenciaUsuarios.FindByIdAsync(idUsuario.ToString()).Result;
 
-            return new Usuario(idUsuario, usuario!.PrimeiroNome, usuario.SegundoNome, usuario.Email!);
+            return new Usuario(idUsuario, usuario!.PrimeiroNome, usuario.SegundoNome, usuario.Email!,"","","",123);
         }
     }
 }

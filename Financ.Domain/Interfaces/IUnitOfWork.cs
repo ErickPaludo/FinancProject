@@ -12,6 +12,7 @@ namespace Financ.Domain.Interfaces
         IContasRepositorio contasRepositorio { get; }
         IContasUsuariosRepositorio contasUsuariosRepositorio { get; }
         IConvitesRepostorio convitesRepostorio { get; }
+        IUsuariosRepositorio usuariosRepostorio { get; }
         Task Commit();
     }
 }

@@ -12,7 +12,7 @@ namespace Financ.Application.Mapeamento
     {
         public static RetornaUsuarioDTO ParaDTO(Usuario usuario) => new RetornaUsuarioDTO
         {
-            Id = usuario.IdUsuario,
+            Id = usuario.Id,
             PrimeiroNome = usuario.PrimeiroNome,
             SegundoNome = usuario.SegundoNome,
             NomeCompleto = usuario.NomeCompleto,

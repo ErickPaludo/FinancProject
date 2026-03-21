@@ -62,7 +62,7 @@ namespace Financ.Application.CQRS.Convites_.Handler
 
                 Usuario usuarioDestinatario = await _usuarioIdentity.ObtemUsuario(idUsuarioDestinatario);
 
-                Convites convite = new Convites(request.acesso, contaUsuarioRemetente, usuarioDestinatario.IdUsuario);
+                Convites convite = new Convites(request.acesso, contaUsuarioRemetente, usuarioDestinatario.Id);
                 await _unitOfWork.convitesRepostorio.Adicionar(convite);
                 await _unitOfWork.Commit();
 

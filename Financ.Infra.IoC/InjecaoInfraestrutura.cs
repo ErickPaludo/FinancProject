@@ -28,6 +28,7 @@ namespace Financ.Infra.IoC
             services.AddScoped<IConvitesLeituraRepositorio, ConvitesLeituraRepositorio>();
             services.AddScoped<IContasRepositorio, ContasRepositorio>();
             services.AddScoped<IContasUsuariosRepositorio, ContasUsuariosRepositorio>();
+            services.AddScoped<IUsuariosRepositorio, UsuariosRepositorio>();
 
         }
     }

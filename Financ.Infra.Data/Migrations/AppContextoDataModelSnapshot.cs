@@ -127,6 +127,45 @@ namespace Financ.Infra.Data.Migrations
                     b.ToTable("fnc_convites", (string)null);
                 });
 
+            modelBuilder.Entity("Financ.Domain.Entidades.Usuario", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("ExpirationRefresh")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("HashPass")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PrimeiroNome")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RefreshToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Revoke")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Salt")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SegundoNome")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("fnc_usuarios", (string)null);
+                });
+
             modelBuilder.Entity("Financ.Infra.Data.Identity.UsuarioIdentity", b =>
                 {
                     b.Property<string>("Id")

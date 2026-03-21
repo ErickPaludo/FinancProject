@@ -13,24 +13,33 @@ namespace Financ.Domain.Entidades
     public class Usuario : IUsuarioIdentity
     {
         [Key]
-        public string IdUsuario { get; private set; }
+        public string Id { get; private set; }
+        public string Email { get; private set; }
         public string PrimeiroNome { get; private set; }
         public string SegundoNome { get; private set; }
-        public string Email { get; private set; }
+        public string Salt { get; set; }
+        public string HashPass { get; set; }
+        public string? RefreshToken { get; set; }
+        public long? ExpirationRefresh { get; set; }
+        public bool Revoke { get; set; } = false;
 
-        public Usuario(string idUsuario, string primeiroNome, string segundoNome, string email)
+        private Usuario() { }
+        public Usuario(string idUsuario, string primeiroNome, string segundoNome, string email, string salt, string hashPass, string RefreshToken, long expirationRefresh)
         {
             UsuariosValidacoes.Verifica(string.IsNullOrEmpty(idUsuario), MensagensBase.USUARIO_NAO_INFORMADO);
             VerificaNome(primeiroNome, segundoNome);
             VerificaEmail(email);
 
-            IdUsuario = idUsuario;
+            Id = idUsuario;
         }
 
-        public Usuario(string primeiroNome, string segundoNome, string email)
+        public Usuario(string primeiroNome, string segundoNome, string email, string salt, string hashPass)
         {
             VerificaNome(primeiroNome, segundoNome);
             VerificaEmail(email);
+            Id = Guid.NewGuid().ToString();
+            Salt = salt;
+            HashPass = hashPass;
         }
 
         public string NomeCompleto => $"{PrimeiroNome} {SegundoNome}".Trim();
@@ -48,7 +57,7 @@ namespace Financ.Domain.Entidades
 
             PrimeiroNome = primeiroNome;
             SegundoNome = segundoNome;
-        }  
+        }
         private void VerificaEmail(string email)
         {
             UsuariosValidacoes.Verifica(string.IsNullOrWhiteSpace(email), MensagensUsuarios.EMAIL_OBRIGATORIO);
@@ -56,5 +65,11 @@ namespace Financ.Domain.Entidades
             UsuariosValidacoes.Verifica(email.Length < 6, MensagensUsuarios.EMAIL_MINIMO);
             Email = email;
         }
+        public void AtualizaRefreshToken(string refreshToken, long expirationRefresh)
+        {
+            RefreshToken = refreshToken;
+            ExpirationRefresh = expirationRefresh;
+        }
+
     }
 }

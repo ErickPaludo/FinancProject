@@ -43,7 +43,7 @@ namespace Financ.TesteUnitarios.Domain
         {
             var conta = CriarContaAtiva();
 
-            var usuario = new ContasUsuarios(1, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Administrador);
+            var usuario = new ContasUsuarios(1, conta, CriarUsuario(NovoIdUsuario()).Id, TiposAcessos.Administrador);
 
             usuario.Status.Should().Be(TipoStatusContasUsuario.Ativo);
             usuario.Acesso.Should().Be(TiposAcessos.Administrador);
@@ -53,7 +53,7 @@ namespace Financ.TesteUnitarios.Domain
         public void Construtor_ComUsuario_DeveCriarComoMestre()
         {
             var conta = CriarContaAtiva();
-            var usuario = CriarUsuario(NovoIdUsuario()).IdUsuario;
+            var usuario = CriarUsuario(NovoIdUsuario()).Id;
 
             var contasUsuario = new ContasUsuarios(conta, usuario);
 
@@ -96,7 +96,7 @@ namespace Financ.TesteUnitarios.Domain
         public void Construtor_ComContaNula_DeveLancarExcecao()
         {
             Action act = () =>
-                new ContasUsuarios(1, null, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Administrador);
+                new ContasUsuarios(1, null, CriarUsuario(NovoIdUsuario()).Id, TiposAcessos.Administrador);
 
             act.Should().Throw<ContasUsuariosValidacao>()
                 .WithMessage(MensagensContasUsuarios.CONTA_NAO_PODE_SER_NULA);
@@ -107,7 +107,7 @@ namespace Financ.TesteUnitarios.Domain
         {
             var conta = new Conta("Conta Teste");
             var usuarioRemetente = CriarContaUsuario(conta, NovoIdUsuario());
-            var usuarioDestinatario = CriarUsuario(NovoIdUsuario()).IdUsuario;
+            var usuarioDestinatario = CriarUsuario(NovoIdUsuario()).Id;
             var convite = new Convites(TiposAcessos.Mestre, usuarioRemetente, usuarioDestinatario);
 
             // Simula a conta se tornando inativa ANTES da criação do ContasUsuarios pelo convite
@@ -171,8 +171,8 @@ namespace Financ.TesteUnitarios.Domain
         public void Atualiza_FluxoValido_DeveAtualizarAcessoEStatus()
         {
             var conta = CriarContaAtiva();
-            var alvo = new ContasUsuarios(1, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Visualizador);
-            var remetente = new ContasUsuarios(2, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Mestre);
+            var alvo = new ContasUsuarios(1, conta, CriarUsuario(NovoIdUsuario()).Id, TiposAcessos.Visualizador);
+            var remetente = new ContasUsuarios(2, conta, CriarUsuario(NovoIdUsuario()).Id, TiposAcessos.Mestre);
             conta.AddUsuario(alvo);
             conta.AddUsuario(remetente);
 
@@ -189,8 +189,8 @@ namespace Financ.TesteUnitarios.Domain
         public void Atualiza_ApenasAcesso_DeveAtualizarCorretamente()
         {
             var conta = CriarContaAtiva();
-            var alvo = new ContasUsuarios(1, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Visualizador);
-            var remetente = new ContasUsuarios(2, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Mestre);
+            var alvo = new ContasUsuarios(1, conta, CriarUsuario(NovoIdUsuario()).Id, TiposAcessos.Visualizador);
+            var remetente = new ContasUsuarios(2, conta, CriarUsuario(NovoIdUsuario()).Id, TiposAcessos.Mestre);
             conta.AddUsuario(alvo);
             conta.AddUsuario(remetente);
 
@@ -204,8 +204,8 @@ namespace Financ.TesteUnitarios.Domain
         public void Atualiza_ApenasStatus_DeveAtualizarCorretamente()
         {
             var conta = CriarContaAtiva();
-            var alvo = new ContasUsuarios(1, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Visualizador);
-            var remetente = new ContasUsuarios(2, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Mestre);
+            var alvo = new ContasUsuarios(1, conta, CriarUsuario(NovoIdUsuario()).Id, TiposAcessos.Visualizador);
+            var remetente = new ContasUsuarios(2, conta, CriarUsuario(NovoIdUsuario()).Id, TiposAcessos.Mestre);
             conta.AddUsuario(alvo);
             conta.AddUsuario(remetente);
 
@@ -220,7 +220,7 @@ namespace Financ.TesteUnitarios.Domain
         public void Atualiza_DeveFalhar_SeRemetenteForOMesmoUsuario()
         {
             var conta = CriarContaAtiva();
-            var usuario = new ContasUsuarios(1, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Mestre);
+            var usuario = new ContasUsuarios(1, conta, CriarUsuario(NovoIdUsuario()).Id, TiposAcessos.Mestre);
 
             Action act = () =>
                 usuario.AtualizaOutraContaUsuario(usuario, TiposAcessos.Administrador, null);
@@ -234,8 +234,8 @@ namespace Financ.TesteUnitarios.Domain
         {
             var conta = CriarContaAtiva();
 
-            var alvo = new ContasUsuarios(1, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Visualizador);
-            var remetente = new ContasUsuarios(2, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Administrador);
+            var alvo = new ContasUsuarios(1, conta, CriarUsuario(NovoIdUsuario()).Id, TiposAcessos.Visualizador);
+            var remetente = new ContasUsuarios(2, conta, CriarUsuario(NovoIdUsuario()).Id, TiposAcessos.Administrador);
             conta.AddUsuario(alvo);
             conta.AddUsuario(remetente);
 
@@ -251,8 +251,8 @@ namespace Financ.TesteUnitarios.Domain
         {
             var conta = CriarContaAtiva();
 
-            var alvo = new ContasUsuarios(1, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Visualizador);
-            var remetente = new ContasUsuarios(2, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Mestre, TipoStatusContasUsuario.Inativo);
+            var alvo = new ContasUsuarios(1, conta, CriarUsuario(NovoIdUsuario()).Id, TiposAcessos.Visualizador);
+            var remetente = new ContasUsuarios(2, conta, CriarUsuario(NovoIdUsuario()).Id, TiposAcessos.Mestre, TipoStatusContasUsuario.Inativo);
             conta.AddUsuario(alvo);
             conta.AddUsuario(remetente);
 
@@ -268,8 +268,8 @@ namespace Financ.TesteUnitarios.Domain
         {
             var conta = CriarContaAtiva();
 
-            var alvo = new ContasUsuarios(1, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Mestre);
-            var remetente = new ContasUsuarios(2, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Mestre);
+            var alvo = new ContasUsuarios(1, conta, CriarUsuario(NovoIdUsuario()).Id, TiposAcessos.Mestre);
+            var remetente = new ContasUsuarios(2, conta, CriarUsuario(NovoIdUsuario()).Id, TiposAcessos.Mestre);
             conta.AddUsuario(alvo);
             conta.AddUsuario(remetente);
 

@@ -26,5 +26,11 @@ namespace Financ.UI.Api.Controllers
             var tokenAutenticacao = await _mediator.Send(new AutenticadoUsuarioCommand(usuario.Email, usuario.Senha));         
             return tokenAutenticacao.RetornoAutomatico();
         }
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh([FromHeader]string refreshToken)
+        {
+            var tokenAutenticacao = await _mediator.Send(new RefreshTokenCommand(refreshToken));
+            return tokenAutenticacao.RetornoAutomatico();
+        }
     }
 }

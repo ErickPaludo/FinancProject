@@ -16,7 +16,7 @@ namespace Financ.Infra.Data.Contexto
         public DbSet<Conta> Contas { get; set; }
         public DbSet<ContasUsuarios> ContasUsuarios { get; set; }
         public DbSet<Convites> Convites { get; set; }
-
+        public DbSet<Usuario> Usuarios { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
