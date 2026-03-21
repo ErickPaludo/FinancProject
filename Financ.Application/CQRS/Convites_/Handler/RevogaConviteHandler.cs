@@ -24,8 +24,7 @@ namespace Financ.Application.CQRS.Convites_.Handler
 
         public async Task<Resultado<string>> Handle(RevogaConviteCommand request, CancellationToken cancellationToken)
         {
-            var convite = await _unitOfWork.convitesRepostorio.BuscarObjetoUnico(x => x.IdUsuarioRemetente.Equals(request.idRemetente) && x.Id == request.idConvite && x.Expiracao >=
-            DateTime.Now);
+            var convite = await _unitOfWork.convitesRepostorio.BuscarConviteComConta(x => x.IdUsuarioRemetente.Equals(request.idRemetente) && x.Id == request.idConvite);
 
             if (convite is null)
                 return Resultado<string>.GeraFalha(Falha.NaoEncontrado("Convite não encontrado!"));

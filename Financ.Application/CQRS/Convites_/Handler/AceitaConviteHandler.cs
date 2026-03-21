@@ -31,13 +31,10 @@ namespace Financ.Application.CQRS.Convites_.Handler
         {
             try
             {
-                var convite = await _unitOfWork.convitesRepostorio.BuscarConviteComConta(x => x.Id == request.IdConvite && x.IdUsuarioDestinatario.Equals(request.IdUsuario) && x.Aceito == null && x.Expiracao >= DateTime.Now);
+                var convite = await _unitOfWork.convitesRepostorio.BuscarConviteComConta(x => x.Id == request.IdConvite && x.IdUsuarioDestinatario.Equals(request.IdUsuario));
 
                 if (convite is null)
                     return Resultado<RetornaPostCadastroDTO>.GeraFalha(Falha.NaoEncontrado("Convite não encontrado!"));
-
-                if (convite.Conta.ContaUsuarios.Any(x => x.IdUsuario == request.IdUsuario && x.IdConta == convite.IdConta))
-                    return Resultado<RetornaPostCadastroDTO>.GeraFalha(Falha.ErroOperacional("Usuário já está cadastrado nesta conta!"));
 
                 convite.AceitaConvite(request.aceito);
 

@@ -42,7 +42,7 @@ namespace Financ.Application.CQRS.Contas_.Handler
             var possuiFiltros = filtros.Filtros != null;
 
             var contasUsuario = await _unitOfWork.contasUsuariosRepositorio.ObterContasDoUsuario(
-                x => x.IdUsuario == filtros.IdUsuario && x.Conta!.Status != TiposStatusContas.Deletado
+                x => x.IdUsuario == filtros.IdUsuario 
                 && (!possuiFiltros || (
                     (!filtroId.HasValue || x.IdConta == filtroId.Value) &&
                     (string.IsNullOrEmpty(filtroTitulo) || x.Conta!.Titulo!.Contains(filtroTitulo)) &&
