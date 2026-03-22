@@ -17,6 +17,7 @@ namespace Financ.Domain.Entidades
         public string IdUsuario { get; private set; }
         public TiposAcessos Acesso { get; private set; }
         public TipoStatusContasUsuario Status { get; protected set; }
+        public DateTime? Expiracao { get; private set; }
 
         public Conta Conta { get; private set; }
 
@@ -49,6 +50,10 @@ namespace Financ.Domain.Entidades
 
             Status = TipoStatusContasUsuario.Ativo;
 
+            if (convite.ExpiracaoContaUsuario.HasValue)
+            {
+                Expiracao = DateTime.Now.AddMinutes(convite.ExpiracaoContaUsuario.Value);
+            }
         }
 
         public ContasUsuarios(Conta conta, string idUasuario)
@@ -62,7 +67,7 @@ namespace Financ.Domain.Entidades
 
             if (status.HasValue)
                 ContasUsuariosValidacao.Verifica(!Enum.IsDefined(typeof(TipoStatusContasUsuario), status), MensagensBase.STATUS_INVALIDO);
-           
+
             if (acesso.HasValue)
                 ContasUsuariosValidacao.Verifica(!Enum.IsDefined(typeof(TiposAcessos), acesso), MensagensContasUsuarios.ACESSO_INVALIDO);
         }
@@ -76,7 +81,7 @@ namespace Financ.Domain.Entidades
             IdUsuario = idUsuario;
             DthrReg = DateTime.Now;
         }
-        public void AtualizaOutraContaUsuario(ContasUsuarios? contasUsuarioRemetente, TiposAcessos? acesso, TipoStatusContasUsuario? status)
+        public void AtualizaOutraContaUsuario(ContasUsuarios? contasUsuarioRemetente, TiposAcessos? acesso, TipoStatusContasUsuario? status,int? expiracao = null, bool? expirado = null)
         {
             ValidaUsuarioRemetenteMestreAtivoDaConta(contasUsuarioRemetente);
             ContasUsuariosValidacao.Verifica(contasUsuarioRemetente == this, MensagensContasUsuarios.USUARIO_TENTA_SE_ATUALIZAR);
@@ -85,17 +90,36 @@ namespace Financ.Domain.Entidades
             ValidaEnums(acesso, status);
 
             if (acesso.HasValue && status.HasValue)
+            {
                 ContasUsuariosValidacao.Verifica(acesso.Value.Equals(TiposAcessos.Mestre) && !status.Value.Equals(TipoStatusContasUsuario.Ativo), MensagensContasUsuarios.ATUALIZA_PARA_USUARIO_MESTRE_DIFERENTE_DE_ATIVO);
+            }
 
             if (acesso.HasValue)
             {
                 ContasUsuariosValidacao.Verifica(!ValidaPermissoeNaConta(acesso.Value), MensagensBase.LIMITE_USUARIOS_MESTRES);
                 Acesso = acesso.Value;
             }
+
             if (status.HasValue)
-            {
                 Status = status.Value;
+
+            bool usuarioMestre = ExpiracaoPorAcesso(Acesso);
+
+            if (expiracao.HasValue)
+                ContasUsuariosValidacao.Verifica(usuarioMestre, MensagensContasUsuarios.MESTRE_NAO_POSSUI_TEMPO_LIMITE);
+
+            if(expirado.HasValue && expirado.Value)
+                ContasUsuariosValidacao.Verifica(usuarioMestre, MensagensContasUsuarios.MESTRE_NAO_POSSUI_TEMPO_LIMITE);
+
+            if (expiracao.HasValue)
+            {
+                ContasUsuariosValidacao.Verifica(ValidaExpiracao(expiracao.Value), MensagensContasUsuarios.TEMPO_MIN_EXPIRACAO);
+                Expiracao = DateTime.Now.AddMinutes(expiracao.Value);
             }
+
+            if(expirado.HasValue)
+                Expiracao = expirado.Value ? DateTime.Now.AddMinutes(-20) : null;
+
         }
         public void SairDaConta()
         {
@@ -144,6 +168,18 @@ namespace Financ.Domain.Entidades
         {
             return !(acessoDestinatario.Equals(TiposAcessos.Mestre) && Conta.ContaUsuarios.Where(x => x.Acesso.Equals(TiposAcessos.Mestre) && x.Status.Equals(TipoStatusContasUsuario.Ativo)).Take(2).Count() == 2);
         }
+        public bool ValidaTempoExpiracaoUsuarioMestre(TiposAcessos acesso)
+        {
+            return TiposAcessos.Mestre.Equals(acesso) ;
+        }
 
+        public bool ExpiracaoPorAcesso(TiposAcessos acesso)
+        {
+            return acesso.Equals(TiposAcessos.Mestre);
+        }
+        public bool ValidaExpiracao(int minutos)
+        {
+            return minutos < 15;
+        }
     }
 }

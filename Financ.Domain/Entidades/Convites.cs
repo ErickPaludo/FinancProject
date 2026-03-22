@@ -20,6 +20,8 @@ namespace Financ.Domain.Entidades
         public int IdConta { get; private set; }
         public TiposAcessos Acesso { get; private set; }
         public bool? Aceito { get; private set; }
+        public int? ExpiracaoContaUsuario { get; private set; }
+
         public DateTime DataEnvio { get; private set; }
         public DateTime Expiracao { get; private set; }
         public string? Observacao { get; private set; }
@@ -27,7 +29,7 @@ namespace Financ.Domain.Entidades
         public Conta Conta { get; private set; }
 
         private Convites() { }
-        public Convites(TiposAcessos acesso, ContasUsuarios? usuarioRemetente, Usuario? usuairoDestinatario)
+        public Convites(TiposAcessos acesso, ContasUsuarios? usuarioRemetente, Usuario? usuairoDestinatario, int? expiracaoContaUsuario = null)
         {
             ConvitesValidacao.Verifica(!Enum.IsDefined(typeof(TiposAcessos), acesso), MensagensContasUsuarios.ACESSO_INVALIDO);
 
@@ -42,6 +44,12 @@ namespace Financ.Domain.Entidades
             ConvitesValidacao.Verifica(usuarioRemetente.Conta.UsuarioPertenceConta(usuairoDestinatario!.IdUsuario), MensagensConvite.USUARIO_JA_PERTENCE_A_CONTA);
             ConvitesValidacao.Verifica(usuarioRemetente.Conta.ConviteEmAndamento(usuairoDestinatario!.IdUsuario), MensagensConvite.CONVITE_EM_ANDAMENTO);
 
+            if (expiracaoContaUsuario.HasValue)
+            {
+                ConvitesValidacao.Verifica(usuarioRemetente.ExpiracaoPorAcesso(acesso), MensagensContasUsuarios.MESTRE_NAO_POSSUI_TEMPO_LIMITE);
+                ConvitesValidacao.Verifica(usuarioRemetente.ValidaExpiracao(expiracaoContaUsuario.Value), MensagensContasUsuarios.TEMPO_MIN_EXPIRACAO);
+            }
+
             IdUsuarioRemetente = usuarioRemetente.IdUsuario;
             IdUsuarioDestinatario = usuairoDestinatario!.IdUsuario;
             DataEnvio = DateTime.Now;
@@ -49,8 +57,9 @@ namespace Financ.Domain.Entidades
             Acesso = acesso;
             Expiracao = DateTime.Now.AddDays(7);
             Conta = usuarioRemetente.Conta;
+            ExpiracaoContaUsuario = expiracaoContaUsuario;
         }
-   
+
         private void ValidaConviteAtivo(bool? aceito)
         {
             if (Aceito.HasValue)
@@ -74,5 +83,6 @@ namespace Financ.Domain.Entidades
             ConvitesValidacao.Verifica(IdUsuarioRemetente != idUsuarioRemetente, MensagensConvite.CONVITE_EXPIRADO);
             ValidaConviteAtivo(Aceito);
         }
+
     }
 }

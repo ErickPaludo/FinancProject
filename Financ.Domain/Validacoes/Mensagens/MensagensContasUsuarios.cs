@@ -25,6 +25,9 @@ namespace Financ.Domain.Validacoes.Mensagens
         public const string USUARIO_NAO_PERTENCE_A_CONTA = "Usuário não pertence a esta conta!";
         public const string USUARIO_POSSUI_CONVITES_EM_ANDAMENTO = "Não é possível sair da conta, pois existem convites em andamento.";
         public const string ATUALIZA_PARA_USUARIO_MESTRE_DIFERENTE_DE_ATIVO = "Usuário mestre deve sempre possuir o status ativo.";
+        public const string MESTRE_NAO_POSSUI_TEMPO_LIMITE = "Usuarios mestres não podem possuir tempo limite.";
+        public const string TEMPO_MIN_EXPIRACAO = "Tempo mínimo de expiração é de 15 minutos.";
+
 
     }
 }
