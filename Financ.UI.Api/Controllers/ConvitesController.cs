@@ -23,7 +23,7 @@ namespace Financ.UI.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> ConvidaUsuario(CriaConviteDTO conviteDTO)
         {
-            var convite = await _mediator.Send(new CriaConviteCommand(User.RetornaIdUsuario(), conviteDTO.EmailDestinatario, conviteDTO.IdConta, conviteDTO.Acesso));
+            var convite = await _mediator.Send(new CriaConviteCommand(User.RetornaIdUsuario(), conviteDTO.EmailDestinatario, conviteDTO.IdConta, conviteDTO.Acesso, conviteDTO.expiracaoContaUsuario));
             return convite.RetornoAutomatico();
         }
         [HttpGet]
