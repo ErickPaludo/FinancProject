@@ -10,5 +10,5 @@ using System.Threading.Tasks;
 
 namespace Financ.Application.CQRS.Convites_.Commands
 {
-    public record CriaConviteCommand(string idRemetente,string emailDestinatario,int idConta,TiposAcessos acesso) : IRequest<Resultado<GetCriaConviteDTO>>;
+    public record CriaConviteCommand(string idRemetente,string emailDestinatario,int idConta,TiposAcessos acesso, int? expiracaoContaUsuario) : IRequest<Resultado<GetCriaConviteDTO>>;
 }

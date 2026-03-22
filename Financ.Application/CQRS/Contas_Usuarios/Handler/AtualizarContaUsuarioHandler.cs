@@ -37,7 +37,7 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
 
                 var contaUsuarioRemetente = conta.ContaUsuarios.FirstOrDefault(x => x.IdUsuario == request.idUsuarioSolicitante);
 
-                contaUsuarioDestinatario.AtualizaOutraContaUsuario(contaUsuarioRemetente, request.acesso, request.status);
+                contaUsuarioDestinatario.AtualizaOutraContaUsuario(contaUsuarioRemetente, request.acesso, request.status,request.expiracao,request.expirado);
                 _unitOfWork.contasUsuariosRepositorio.Atualiza(contaUsuarioDestinatario);
                 await _unitOfWork.Commit();
 

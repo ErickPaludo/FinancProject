@@ -7,5 +7,5 @@ using System.Threading.Tasks;
 
 namespace Financ.Application.DTOs.ContasUsuarios.Get
 {
-    public record RetornaUsuariosAssociadosDTO(string IdUsuario,string Nome,string Email,TiposAcessos Permissao, TipoStatusContasUsuario Status);
+    public record RetornaUsuariosAssociadosDTO(string IdUsuario,string Nome,string Email,TiposAcessos Permissao, TipoStatusContasUsuario Status,DateTime? Expiracao,bool? Expirado);
 }

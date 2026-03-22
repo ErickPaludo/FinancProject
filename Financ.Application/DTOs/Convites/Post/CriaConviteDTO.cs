@@ -15,5 +15,6 @@ namespace Financ.Application.DTOs.Convites.Post
         [EmailAddress]
         public string EmailDestinatario { get; set; }
         public TiposAcessos Acesso { get; set; }
+        public int? expiracaoContaUsuario { get; set; }
     }
 }

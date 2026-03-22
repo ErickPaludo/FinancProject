@@ -19,7 +19,9 @@ namespace Financ.Application.Mapeamento
                           usuario.NomeCompleto,
                           usuario.Email,
                           contaUsuario.Acesso,
-                          contaUsuario.Status);
+                          contaUsuario.Status,
+                          contaUsuario.Expiracao,
+                          contaUsuario.Expiracao.HasValue && contaUsuario.Expiracao < DateTime.Now);
         public static List<RetornaContasDTO> ParaDTO(IEnumerable<ContasUsuarios> contasUsuarios)
         {
             List<RetornaContasDTO> listaContas = new List<RetornaContasDTO>();
