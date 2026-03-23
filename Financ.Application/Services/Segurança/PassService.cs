@@ -1,4 +1,5 @@
-﻿using Financ.Application.Interfaces;
+﻿using Financ.Application.Configurações;
+using Financ.Application.Interfaces;
 using Konscious.Security.Cryptography;
 using Microsoft.Extensions.Options;
 using System;
@@ -8,7 +9,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Financ.Application.Services
+namespace Financ.Application.Services.Segurança
 {
     public class PassService : IPassService
     {

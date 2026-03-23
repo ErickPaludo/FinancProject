@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Financ.Application
+namespace Financ.Application.Configurações
 {
     public class PassConfig
     {

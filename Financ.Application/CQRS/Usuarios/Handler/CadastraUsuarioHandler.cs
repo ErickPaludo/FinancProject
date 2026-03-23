@@ -4,7 +4,6 @@ using Financ.Application.Interfaces;
 using Financ.Application.Services;
 using Financ.Domain.Entidades;
 using Financ.Domain.Interfaces;
-using Financ.Domain.Interfaces.Autenticação;
 using Financ.Domain.Interfaces.Repositorios;
 using Financ.Domain.Validacoes;
 using NetDevPack.SimpleMediator;
@@ -20,7 +19,7 @@ namespace Financ.Application.CQRS.Usuarios.Handler
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IPassService _passService;
-        public CadastraUsuarioHandler(IUnitOfWork unitOfWork, IAutenticacao autenticacao, IPassService passService)
+        public CadastraUsuarioHandler(IUnitOfWork unitOfWork, IPassService passService)
         {
             _unitOfWork = unitOfWork;
             _passService = passService;

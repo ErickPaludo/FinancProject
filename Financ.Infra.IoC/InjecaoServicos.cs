@@ -11,9 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Financ.Infra.Data.Identity;
 using Microsoft.AspNetCore.Identity;
-using Financ.Domain.Interfaces.Autenticação;
 using Financ.Application.Comun.Resultado;
 using Financ.Application.DTOs.Autenticação.Get;
 using Financ.Application.DTOs.Contas.Get;
@@ -43,7 +41,6 @@ namespace Financ.Infra.IoC
     {
         public static void ConfigurarInjecaoServicos(this IServiceCollection services)
         {
-            services.AddScoped<IUsuariosIdentityServicos, UsuariosIdentityServicos>();
 
             services.AddScoped<IRequestHandler<CriarContaCommand, Resultado<RetornaContasDTO>>, CriarContaHandler>();
             services.AddScoped<IRequestHandler<AtualizarContaCommand, Resultado<RetornaContasDTO>>, AtualizarContasHandler>();
@@ -61,9 +58,6 @@ namespace Financ.Infra.IoC
             
             services.AddScoped<IRequestHandler<CriaConviteCommand, Resultado<GetCriaConviteDTO>>, CriaConviteHandler>();
 
-            services.AddIdentity<UsuarioIdentity, IdentityRole>()
-           .AddEntityFrameworkStores<AppContextoData>()
-           .AddDefaultTokenProviders();
         }
     }
 }

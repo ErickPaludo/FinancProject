@@ -1,8 +1,9 @@
-﻿using Financ.Application.CQRS.Usuarios.Commands;
+﻿using Financ.Application.CQRS.UsuarioAutenticação.Commands;
+using Financ.Application.CQRS.UsuarioAutenticação.Handler;
+using Financ.Application.CQRS.Usuarios.Commands;
 using Financ.Application.CQRS.Usuarios.Querys;
 using Financ.Application.DTOs.Usuarios.Post;
 using Financ.Domain.Entidades;
-using Financ.Domain.Interfaces.Autenticação;
 using Financ.UI.Api.Extensao;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -32,6 +33,14 @@ namespace Financ.UI.Api.Controllers
         public async Task<IActionResult> MeusDados()
         {
             var usuario = await _mediator.Send(new RetornaUsuarioPorIdQuery(User.RetornaIdUsuario()));
+            return usuario.RetornoAutomatico();
+        }
+
+        [HttpPost("alterar_senha")]
+        [Authorize]
+        public async Task<IActionResult> AlterarSenha([FromBody]AlterarSenhaDTO senhaDTO)
+        {
+            var usuario = await _mediator.Send(new AlterarSenhaCommand(User.RetornaIdUsuario(),senhaDTO.senhaAntiga,senhaDTO.senhaNova));
             return usuario.RetornoAutomatico();
         }
     }

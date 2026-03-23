@@ -2,7 +2,6 @@
 using Financ.Application.CQRS.Contas_Usuarios.Commands;
 using Financ.Domain.Entidades;
 using Financ.Domain.Interfaces;
-using Financ.Domain.Interfaces.Autenticação;
 using Financ.Domain.Validacoes;
 using NetDevPack.SimpleMediator;
 using System;

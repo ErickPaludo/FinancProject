@@ -20,6 +20,7 @@ namespace Financ.Infra.Data
         private IContasUsuariosRepositorio _contasUsuariosRepositorio;
         private IConvitesRepostorio _convitesRepostorio;
         private IUsuariosRepositorio _usuariosRepostorio;
+        private IAutenticacoesRepositorio _autenticacoesRepositorio;
 
         private readonly IConfiguration _configuration;
         public UnitOfWork(AppContextoData contexto,IConfiguration configuration)
@@ -31,6 +32,7 @@ namespace Financ.Infra.Data
         public IContasUsuariosRepositorio contasUsuariosRepositorio { get { return _contasUsuariosRepositorio = _contasUsuariosRepositorio ?? new ContasUsuariosRepositorio(_contexto); } }
         public IConvitesRepostorio convitesRepostorio { get { return _convitesRepostorio = _convitesRepostorio ?? new ConvitesRepositorio(_contexto); } }  
         public IUsuariosRepositorio usuariosRepostorio { get { return _usuariosRepostorio = _usuariosRepostorio ?? new UsuariosRepositorio(_contexto); } }
+        public IAutenticacoesRepositorio autenticacoesRepositorio { get { return _autenticacoesRepositorio = _autenticacoesRepositorio ?? new AutenticacoesRepositorio(_contexto); } }
 
         public async Task Commit()
         {

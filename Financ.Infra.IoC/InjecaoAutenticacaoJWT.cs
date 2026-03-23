@@ -1,11 +1,9 @@
-﻿using Financ.Application;
+﻿using Financ.Application.Configurações;
 using Financ.Application.Interfaces;
-using Financ.Application.Services;
+using Financ.Application.Services.Autenticação;
 using Financ.Domain.Interfaces;
-using Financ.Domain.Interfaces.Autenticação;
 using Financ.Domain.Interfaces.Repositorios;
 using Financ.Infra.Data;
-using Financ.Infra.Data.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -27,11 +25,8 @@ namespace Financ.Infra.IoC
            IConfiguration configuration)
         {
             services.Configure<TokenConfig>(configuration.GetSection("TokenJWT"));
-            services.Configure<PassConfig>(configuration.GetSection("Auth"));
 
-            services.AddScoped<IAutenticacao, Autenticacao>();
             services.AddScoped<ITokenService, TokenService>();
-            services.AddScoped<IPassService, PassService>();
 
             services.AddAuthentication(options =>
             {
@@ -59,11 +54,11 @@ namespace Financ.Infra.IoC
                         var sid = context.Principal.FindFirst("sid")?.Value;
 
                         var repo = context.HttpContext.RequestServices
-                            .GetRequiredService<IUsuariosRepositorio>();
+                            .GetRequiredService<IAutenticacoesRepositorio>();
 
-                        var usuario = await repo.BuscarObjetoUnico(x => x.Id == userId);
+                        var usuario = await repo.BuscarObjetoUnico(x => x.IdUsuario == userId);
 
-                        if (usuario == null || usuario.RefreshToken != sid)
+                        if (usuario == null || usuario.RefreshToken != sid || usuario.Revoke)
                         {
                             context.Fail("Sessão inválida");
                         }

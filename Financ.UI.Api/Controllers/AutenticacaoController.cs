@@ -2,8 +2,9 @@
 using Financ.Application.CQRS.UsuarioAutenticação.Commands;
 using Financ.Application.DTOs.Autenticação.Get;
 using Financ.Application.DTOs.Autenticação.Post;
-using Financ.Domain.Interfaces.Autenticação;
+using Financ.Domain.Validacoes;
 using Financ.UI.Api.Extensao;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NetDevPack.SimpleMediator;
@@ -30,6 +31,13 @@ namespace Financ.UI.Api.Controllers
         public async Task<IActionResult> Refresh([FromHeader]string refreshToken)
         {
             var tokenAutenticacao = await _mediator.Send(new RefreshTokenCommand(refreshToken));
+            return tokenAutenticacao.RetornoAutomatico();
+        }
+        [HttpPost("revoke")]
+        [Authorize]
+        public async Task<IActionResult> Revoke()
+        {
+            var tokenAutenticacao = await _mediator.Send(new RevokeCommand(User.RetornaIdUsuario()));
             return tokenAutenticacao.RetornoAutomatico();
         }
     }

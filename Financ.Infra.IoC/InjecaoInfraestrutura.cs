@@ -29,6 +29,7 @@ namespace Financ.Infra.IoC
             services.AddScoped<IContasRepositorio, ContasRepositorio>();
             services.AddScoped<IContasUsuariosRepositorio, ContasUsuariosRepositorio>();
             services.AddScoped<IUsuariosRepositorio, UsuariosRepositorio>();
+            services.AddScoped<IAutenticacoesRepositorio, AutenticacoesRepositorio>();
 
         }
     }

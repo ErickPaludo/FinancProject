@@ -25,14 +25,15 @@ namespace Financ.Application.CQRS.UsuarioAutenticação.Handler
         }
         public async Task<Resultado<RetornaTokenDTO>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
         {
-            Usuario? usuario = await _unitOfWork.usuariosRepostorio.BuscarObjetoUnico(x => x.RefreshToken!.Equals(request.refreshToken));
+            Autenticacao? auth = await _unitOfWork.autenticacoesRepositorio.BuscarAuthComUsuarios(x => x.RefreshToken!.Equals(request.refreshToken));
 
-            if (string.IsNullOrEmpty(request.refreshToken) || usuario is null || usuario.RefreshToken is null)
+            if (string.IsNullOrEmpty(request.refreshToken) || auth is null || auth.RefreshToken is null)
                 return Resultado<RetornaTokenDTO>.GeraFalha(Falha.NaoAutorizado("Refresh token invalido"));
 
-            var refreshTokenDto = _tokenService.RefreshToken(usuario!, request.refreshToken);
-            usuario.AtualizaRefreshToken(refreshTokenDto.RefreshToken,Utilitarios.DateTimeInUnixTimestamp(refreshTokenDto.Expiracao));
-            _unitOfWork.usuariosRepostorio.Atualiza(usuario);
+            var refreshTokenDto = _tokenService.RefreshToken(auth!, request.refreshToken);
+
+            auth.AtualizaRefreshToken(refreshTokenDto.RefreshToken, Utilitarios.DateTimeInUnixTimestamp(refreshTokenDto.Expiracao));
+            _unitOfWork.autenticacoesRepositorio.Atualiza(auth);
             await _unitOfWork.Commit();
             return Resultado<RetornaTokenDTO>.GeraSucesso(refreshTokenDto);
         }

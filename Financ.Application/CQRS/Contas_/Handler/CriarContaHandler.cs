@@ -5,7 +5,6 @@ using Financ.Application.DTOs.ContasUsuarios.Get;
 using Financ.Application.Mapeamento;
 using Financ.Domain.Entidades;
 using Financ.Domain.Interfaces;
-using Financ.Domain.Interfaces.Autenticação;
 using Financ.Domain.Validacoes;
 using NetDevPack.SimpleMediator;
 using System;
@@ -19,12 +18,10 @@ namespace Financ.Application.CQRS.Contas_.Handler
     public class CriarContaHandler : IRequestHandler<CriarContaCommand, Resultado<RetornaContasDTO>>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IUsuariosIdentityServicos _usuariosServico;
 
-        public CriarContaHandler(IUnitOfWork unitOfWork, IUsuariosIdentityServicos usuariosServico)
+        public CriarContaHandler(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _usuariosServico = usuariosServico;
         }
         public async Task<Resultado<RetornaContasDTO>> Handle(CriarContaCommand request, CancellationToken cancellationToken)
         {

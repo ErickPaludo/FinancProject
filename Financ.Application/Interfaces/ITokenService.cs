@@ -16,6 +16,6 @@ namespace Financ.Application.Interfaces
 
         void ValidaToken(string token);
 
-        RetornaTokenDTO RefreshToken(Usuario usuario, string antigoRefreshToken);
+        RetornaTokenDTO RefreshToken(Autenticacao autenticacao, string antigoRefreshToken);
     }
 }

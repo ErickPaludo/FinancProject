@@ -1,5 +1,4 @@
 ﻿using Financ.Domain.Enums;
-using Financ.Domain.Interfaces.InterfaceEntidades;
 using Financ.Domain.Validacoes;
 using Financ.Domain.Validacoes.Mensagens;
 using System;
@@ -17,6 +16,8 @@ namespace Financ.Domain.Entidades
         public string IdUsuario { get; private set; }
         public TiposAcessos Acesso { get; private set; }
         public TipoStatusContasUsuario Status { get; protected set; }
+
+        public Usuario Usuario { get; private set; }
 
         public Conta Conta { get; private set; }
 

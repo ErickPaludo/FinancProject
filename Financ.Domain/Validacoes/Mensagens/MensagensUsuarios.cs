@@ -20,5 +20,8 @@ namespace Financ.Domain.Validacoes.Mensagens
         public const string EMAIL_OBRIGATORIO = "O email do usuário é obrigatório.";
         public const string EMAIL_MINIMO = "O email não deve possuir menos do que 6 caracteres";
         public const string EMAIL_MAXIMO = "O email não deve possuir mais do que 256 caracteres";
+
+        public const string MESMA_SENHA = "Senhas identicas.";
+        public const string SENHA_VAZIA = "Obrigatório informar uma senha.";
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Financ.Domain.Entidades;
-using Financ.Infra.Data.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -17,7 +16,6 @@ namespace Financ.Infra.Data.ConfiguracaoTabelas
             builder.ToTable("fnc_usuarios");
 
             builder.HasKey(e => e.Id);
-
         }
     }
 }

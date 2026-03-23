@@ -1,6 +1,5 @@
 ﻿using Financ.Application.Comun.Resultado;
 using Financ.Application.DTOs.Convites.Get;
-using Financ.Domain.Interfaces.Autenticação;
 using Financ.Domain.Interfaces;
 using NetDevPack.SimpleMediator;
 using System;
@@ -18,12 +17,10 @@ namespace Financ.Application.CQRS.Convites_.Handler
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IConvitesLeituraRepositorio _convitesLeituraRepositorio;
-        private readonly IUsuariosIdentityServicos _usuarioIdentity;
 
-        public RetornaConvitesHandler(IUnitOfWork unitOfWork, IUsuariosIdentityServicos usuarioIdentity, IConvitesLeituraRepositorio convitesLeituraRepositorio)
+        public RetornaConvitesHandler(IUnitOfWork unitOfWork, IConvitesLeituraRepositorio convitesLeituraRepositorio)
         {
             _unitOfWork = unitOfWork;
-            _usuarioIdentity = usuarioIdentity;
             _convitesLeituraRepositorio = convitesLeituraRepositorio;
         }
 

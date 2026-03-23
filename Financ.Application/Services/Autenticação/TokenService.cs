@@ -1,4 +1,5 @@
-﻿using Financ.Application.DTOs.Autenticação.Get;
+﻿using Financ.Application.Configurações;
+using Financ.Application.DTOs.Autenticação.Get;
 using Financ.Application.Interfaces;
 using Financ.Domain.Entidades;
 using Microsoft.Extensions.Options;
@@ -13,7 +14,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Financ.Application.Services
+namespace Financ.Application.Services.Autenticação
 {
     public class TokenService : ITokenService
     {
@@ -28,22 +29,23 @@ namespace Financ.Application.Services
         {
             DateTime expiration = GeraExpiracao();
 
-            var handler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(_tokenConfig.SecretKeyJWT);
+            JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
 
-            var refreshToken = GeraRefreshToken();
+            byte[] key = Encoding.UTF8.GetBytes(_tokenConfig.SecretKeyJWT);
 
-            var token = new JwtSecurityToken(
-                claims: new[]
+            string refreshToken = GeraRefreshToken();
+
+            var claims = new[]
                 {
                  new Claim(JwtRegisteredClaimNames.Sub, idUsuario),
                  new Claim(JwtRegisteredClaimNames.Email, email),
                  new Claim("sid",refreshToken)
-                },
-                expires: expiration,
-                signingCredentials: new SigningCredentials(
-                    new SymmetricSecurityKey(key),
-                    SecurityAlgorithms.HmacSha256)
+                };
+
+            JwtSecurityToken token = new JwtSecurityToken(
+                claims: claims, 
+                expires: expiration, 
+                signingCredentials: new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
             );
 
             var tokenString = handler.WriteToken(token);
@@ -55,45 +57,6 @@ namespace Financ.Application.Services
                 RefreshToken = refreshToken,
                 ExpiracaoRefresh = DateTime.UtcNow.AddDays(_tokenConfig.ExpitacaoRefreshTokenDias),
             }; 
-
-            byte[] headerBytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new
-            {
-                alg = "HS256",
-                typ = "JWT"
-            }));
-            byte[] payloadBytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new
-            {
-                sub = idUsuario,
-                email = email,
-                exp = Utilitarios.DateTimeInUnixTimestamp(expiration),
-            }));
-
-            string data = Utilitarios.Concatena(
-                new List<object> {
-                    { Utilitarios.Base64UrlEncode(headerBytes) },
-                    { Utilitarios.Base64UrlEncode(payloadBytes) }
-                }, '.');
-
-            byte[] databytes = Encoding.UTF8.GetBytes(data);
-
-            var assinatura = CriaAssinatura(databytes);
-
-            //string token = Utilitarios.Concatena(
-            //    new List<object> {
-            //    { Utilitarios.Base64UrlEncode(headerBytes) },
-            //    { Utilitarios.Base64UrlEncode(payloadBytes) },
-            //    { assinatura } },
-            //    '.');
-
-            RetornaTokenDTO tokenDTO = new RetornaTokenDTO
-            {
-                Token = "",//token,
-                Expiracao = expiration,
-                RefreshToken = GeraRefreshToken(),
-                ExpiracaoRefresh = DateTime.UtcNow.AddDays(_tokenConfig.ExpitacaoRefreshTokenDias),
-            };
-
-            return tokenDTO;
         }
         public string GeraRefreshToken()
         {
@@ -140,11 +103,11 @@ namespace Financ.Application.Services
             if (Utilitarios.UnixTimestampInDateTime(expirationRefresh) < DateTime.UtcNow)
                 throw new Exception("Refresh Token expirado.");
         }
-        public RetornaTokenDTO RefreshToken(Usuario usuario ,string antigoRefreshToken)
+        public RetornaTokenDTO RefreshToken(Autenticacao autenticacao ,string antigoRefreshToken)
         {
-            ValidaRefresh(antigoRefreshToken, usuario!.RefreshToken!,usuario.ExpirationRefresh!.Value);
+            ValidaRefresh(antigoRefreshToken, autenticacao!.RefreshToken!, autenticacao.ExpirationRefresh!.Value);
 
-            return GeraToken(usuario.Id, usuario.Email);
+            return GeraToken(autenticacao.IdUsuario, autenticacao.Usuario.Email);
         }
     }
 }

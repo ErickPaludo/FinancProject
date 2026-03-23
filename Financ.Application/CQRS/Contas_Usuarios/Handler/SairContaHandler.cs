@@ -3,7 +3,6 @@ using Financ.Application.CQRS.Contas_Usuarios.Commands;
 using Financ.Application.DTOs.ContasUsuarios.Post;
 using Financ.Domain.Entidades;
 using Financ.Domain.Interfaces;
-using Financ.Domain.Interfaces.Autenticação;
 using Financ.Domain.Validacoes;
 using NetDevPack.SimpleMediator;
 using System;
@@ -17,11 +16,9 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
     public class SairContaHandler : IRequestHandler<SairContaUsuarioCommand, Resultado<string>>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IUsuariosIdentityServicos _usuarioServicos;
-        public SairContaHandler(IUnitOfWork unitOfWork, IUsuariosIdentityServicos usuarioServicos)
+        public SairContaHandler(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _usuarioServicos = usuarioServicos;
         }
         public async Task<Resultado<string>> Handle(SairContaUsuarioCommand request, CancellationToken cancellationToken)
         {

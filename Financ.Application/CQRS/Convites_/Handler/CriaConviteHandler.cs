@@ -5,8 +5,6 @@ using Financ.Application.Mapeamento;
 using Financ.Domain.Entidades;
 using Financ.Domain.Enums;
 using Financ.Domain.Interfaces;
-using Financ.Domain.Interfaces.Autenticação;
-using Financ.Domain.Interfaces.InterfaceEntidades;
 using Financ.Domain.Validacoes;
 using NetDevPack.SimpleMediator;
 using System;
@@ -20,18 +18,16 @@ namespace Financ.Application.CQRS.Convites_.Handler
     public class CriaConviteHandler : IRequestHandler<CriaConviteCommand, Resultado<GetCriaConviteDTO>>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IUsuariosIdentityServicos _usuarioIdentity;
-        public CriaConviteHandler(IUnitOfWork unitOfWork, IUsuariosIdentityServicos usuarioIdentity)
+        public CriaConviteHandler(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _usuarioIdentity = usuarioIdentity;
         }
         public async Task<Resultado<GetCriaConviteDTO>> Handle(CriaConviteCommand request, CancellationToken cancellationToken)
         {
             try
             {
-                var idUsuarioDestinatario = await _usuarioIdentity.ObtemIdUsuario(request.emailDestinatario!);
-                if (string.IsNullOrEmpty(idUsuarioDestinatario))
+                Usuario? usuario = await _unitOfWork.usuariosRepostorio.BuscarObjetoUnico(x => x.Email == request.emailDestinatario!);
+                if (usuario is null)
                        return Resultado<GetCriaConviteDTO>.GeraFalha(Falha.NaoEncontrado("Usuário destinatário do convite não existe."));
                 
                 var conta = await _unitOfWork.contasRepositorio.BuscarContaComUsuarios(x => x.Id == request.idConta);
@@ -45,24 +41,16 @@ namespace Financ.Application.CQRS.Convites_.Handler
                 if (contaUsuarioRemetente is null)
                     return Resultado<GetCriaConviteDTO>.GeraFalha(Falha.NaoEncontrado("Você não está associado a está conta."));
                 
-                bool usuarioAssociado = contaUsuario.Any(x => x.IdUsuario == idUsuarioDestinatario);
+                bool usuarioAssociado = contaUsuario.Any(x => x.IdUsuario == usuario.Id);
                 if (usuarioAssociado)
                     return Resultado<GetCriaConviteDTO>.GeraFalha(Falha.ErroOperacional("Usuário já pertence a está conta"));  
 
-                bool usuarioPossuiConvite = (conta.Convites.Any(
-                x => x.IdConta == request.idConta &&
-                x.IdUsuarioDestinatario == idUsuarioDestinatario &&
-            //    x.IdUsuarioRemetente == request.idRemetente &&
-                DateTime.Now <= x.Expiracao &&
-                x.Aceito == null));
+              
                 
 
-                if(usuarioPossuiConvite)
-                    return Resultado<GetCriaConviteDTO>.GeraFalha(Falha.ErroOperacional("Já existe um convite em andamento."));
+               
 
-                Usuario usuarioDestinatario = await _usuarioIdentity.ObtemUsuario(idUsuarioDestinatario);
-
-                Convites convite = new Convites(request.acesso, contaUsuarioRemetente, usuarioDestinatario.Id);
+                Convites convite = new Convites(request.acesso, contaUsuarioRemetente, "");
                 await _unitOfWork.convitesRepostorio.Adicionar(convite);
                 await _unitOfWork.Commit();
 

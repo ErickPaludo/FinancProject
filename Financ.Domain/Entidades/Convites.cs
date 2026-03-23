@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Financ.Domain.Interfaces.InterfaceEntidades;
 using System.Globalization;
 
 namespace Financ.Domain.Entidades

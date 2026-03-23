@@ -6,8 +6,6 @@ using Financ.Application.Mapeamento;
 using Financ.Domain.Entidades;
 using Financ.Domain.Enums;
 using Financ.Domain.Interfaces;
-using Financ.Domain.Interfaces.Autenticação;
-using Financ.Domain.Interfaces.InterfaceEntidades;
 using Financ.Domain.Validacoes;
 using NetDevPack.SimpleMediator;
 using System;
@@ -21,11 +19,9 @@ namespace Financ.Application.CQRS.Convites_.Handler
     public class AceitaConviteHandler : IRequestHandler<AceitaConviteCommand, Resultado<RetornaPostCadastroDTO>>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IUsuariosIdentityServicos _usuariosServico;
-        public AceitaConviteHandler(IUnitOfWork unitOfWork, IUsuariosIdentityServicos usuariosServico)
+        public AceitaConviteHandler(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _usuariosServico = usuariosServico;
         }
         public async Task<Resultado<RetornaPostCadastroDTO>> Handle(AceitaConviteCommand request, CancellationToken cancellationToken)
         {

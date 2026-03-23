@@ -6,7 +6,6 @@ using Financ.Application.DTOs.Contas.Get;
 using Financ.Application.DTOs.Contas.Get.Filtros;
 using Financ.Application.DTOs.Contas.Ptch;
 using Financ.Domain.Entidades;
-using Financ.Domain.Interfaces.Autenticação;
 using Financ.UI.Api.Extensao;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
