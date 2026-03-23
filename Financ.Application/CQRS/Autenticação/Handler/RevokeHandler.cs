@@ -1,5 +1,5 @@
 ﻿using Financ.Application.Comun.Resultado;
-using Financ.Application.CQRS.UsuarioAutenticação.Commands;
+using Financ.Application.CQRS.Autenticação.Commands;
 using Financ.Application.Interfaces;
 using Financ.Domain.Entidades;
 using Financ.Domain.Interfaces;
@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Financ.Application.CQRS.UsuarioAutenticação.Handler
+namespace Financ.Application.CQRS.Autenticação.Handler
 {
     public class RevokeHandler : IRequestHandler<RevokeCommand, Resultado<string>>
     {

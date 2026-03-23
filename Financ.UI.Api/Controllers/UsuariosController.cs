@@ -1,5 +1,4 @@
-﻿using Financ.Application.CQRS.UsuarioAutenticação.Commands;
-using Financ.Application.CQRS.UsuarioAutenticação.Handler;
+﻿using Financ.Application.CQRS.Segurança.Commands;
 using Financ.Application.CQRS.Usuarios.Commands;
 using Financ.Application.CQRS.Usuarios.Querys;
 using Financ.Application.DTOs.Usuarios.Post;

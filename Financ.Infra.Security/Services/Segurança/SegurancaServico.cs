@@ -1,5 +1,7 @@
-﻿using Financ.Application.Configurações;
-using Financ.Application.Interfaces;
+﻿using Financ.Application.Interfaces;
+using Financ.Application.Interfaces.Segurança;
+using Financ.Infra.Security.Configurações.Segurança;
+using Financ.Infra.Security.Uteis.Segurança;
 using Konscious.Security.Cryptography;
 using Microsoft.Extensions.Options;
 using System;
@@ -11,17 +13,17 @@ using System.Threading.Tasks;
 
 namespace Financ.Application.Services.Segurança
 {
-    public class PassService : IPassService
+    public class SegurancaServico : ISegurancaServico
     {
-        private readonly PassConfig _passConfig;
-        public PassService(IOptions<PassConfig> passConfig)
+        private readonly SegurancaConfig _segurancaConfig;
+        public SegurancaServico(IOptions<SegurancaConfig> segurancaConfig)
         {
-            _passConfig = passConfig.Value;
+            _segurancaConfig = segurancaConfig.Value;
         }
-        public PassArgon CriaPassArgon(string senha,string? salt = null)
+        public (string salt, string hash) CriaPassArgon(string senha,string? salt = null)
         {
             byte[] senhaBytes = Encoding.UTF8.GetBytes(senha);
-            byte[] saltBytes = salt is null ? Utilitarios.GeraBytesAleatorios(32) : Convert.FromBase64String(salt);
+            byte[] saltBytes = salt is null ? UtilSeguranca.GeraBytesAleatorios(32) : Convert.FromBase64String(salt);
 
             var cripto = new Argon2id(senhaBytes)
             {
@@ -29,21 +31,21 @@ namespace Financ.Application.Services.Segurança
                 MemorySize = 8192,
                 Iterations = 80,
                 Salt = saltBytes,
-                KnownSecret =  Utilitarios.ConverteParaBytes(_passConfig.Pepper)
+                KnownSecret = UtilSeguranca.ConverteParaBytes(_segurancaConfig.Pepper)
             };
 
             var hash = cripto.GetBytes(32);
             string hashBase = Convert.ToBase64String(hash);
             string saltBase = Convert.ToBase64String(saltBytes);
 
-            return new PassArgon(saltBase, hashBase);
+            return (saltBase, hashBase);
         }
 
         public bool ValidaPassArgon(string senhaBanco, string senha,string salt)
         {
            return CryptographicOperations.FixedTimeEquals(
-               Utilitarios.ConverteParaBytes(senhaBanco),
-               Utilitarios.ConverteParaBytes(CriaPassArgon(senha, salt).Hash)
+               UtilSeguranca.ConverteParaBytes(senhaBanco),
+               UtilSeguranca.ConverteParaBytes(CriaPassArgon(senha, salt).hash)
             );
         } 
     }

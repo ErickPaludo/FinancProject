@@ -11,7 +11,6 @@ namespace Financ.Domain.Entidades
 {
     public class Usuario
     {
-        [Key]
         public string Id { get; private set; }
         public string Email { get; private set; }
         public string PrimeiroNome { get; private set; }
@@ -34,6 +33,10 @@ namespace Financ.Domain.Entidades
             VerificaNome(primeiroNome, segundoNome);
             VerificaEmail(email);
             Id = Guid.NewGuid().ToString();
+
+            UsuariosValidacoes.Verifica(string.IsNullOrWhiteSpace(salt), MensagensUsuarios.MESMA_SENHA);
+            UsuariosValidacoes.Verifica(string.IsNullOrWhiteSpace(hashPass), MensagensUsuarios.MESMA_SENHA);
+
             Salt = salt;
             HashPass = hashPass;
         }

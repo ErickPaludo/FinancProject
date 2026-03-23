@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Financ.Application.Interfaces
+namespace Financ.Application.Interfaces.Convites
 {
     public interface IConvitesLeituraRepositorio
     {

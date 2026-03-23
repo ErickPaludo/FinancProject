@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Financ.Application.Configurações
+namespace Financ.Infra.Security.Configurações.Segurança
 {
-    public class PassConfig
+    public class SegurancaConfig
     {
         public string Pepper { get; set; }
     }

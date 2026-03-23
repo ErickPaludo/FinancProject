@@ -1,9 +1,9 @@
-﻿using Financ.Application.Configurações;
-using Financ.Application.Interfaces;
+﻿using Financ.Application.Interfaces.Autenticação;
 using Financ.Application.Services.Autenticação;
 using Financ.Domain.Interfaces;
 using Financ.Domain.Interfaces.Repositorios;
 using Financ.Infra.Data;
+using Financ.Infra.Security.Configurações.Autenticação;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -24,9 +24,9 @@ namespace Financ.Infra.IoC
         public static IServiceCollection ConfigurarInjecaoAutenticaoJWT(this IServiceCollection services,
            IConfiguration configuration)
         {
-            services.Configure<TokenConfig>(configuration.GetSection("TokenJWT"));
+            services.Configure<AutenticaoConfig>(configuration.GetSection("TokenJWT"));
 
-            services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IAutenticacaoServico, AutenticacaoServico>();
 
             services.AddAuthentication(options =>
             {

@@ -9,7 +9,6 @@ namespace Financ.Domain.Entidades
 {
     public class Autenticacao
     {
-        [Key]
         public string IdSession { get; private set; }
         public string IdUsuario { get; private set; }
         public string? RefreshToken { get; private set; }
@@ -22,6 +21,7 @@ namespace Financ.Domain.Entidades
 
         public Autenticacao(string idUsuario, string refreshToken, long expirationRefresh)
         {
+            IdSession = Guid.NewGuid().ToString();
             IdUsuario = idUsuario;
             RefreshToken = refreshToken;
             ExpirationRefresh = expirationRefresh;

@@ -1,7 +1,6 @@
 ﻿using Financ.Application.Comun.Resultado;
 using Financ.Application.CQRS.Usuarios.Commands;
-using Financ.Application.Interfaces;
-using Financ.Application.Services;
+using Financ.Application.Interfaces.Segurança;
 using Financ.Domain.Entidades;
 using Financ.Domain.Interfaces;
 using Financ.Domain.Interfaces.Repositorios;
@@ -18,8 +17,8 @@ namespace Financ.Application.CQRS.Usuarios.Handler
     public class CadastraUsuarioHandler : IRequestHandler<CadastraUsuarioCommand, Resultado<string>>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IPassService _passService;
-        public CadastraUsuarioHandler(IUnitOfWork unitOfWork, IPassService passService)
+        private readonly ISegurancaServico _passService;
+        public CadastraUsuarioHandler(IUnitOfWork unitOfWork, ISegurancaServico passService)
         {
             _unitOfWork = unitOfWork;
             _passService = passService;
@@ -30,7 +29,7 @@ namespace Financ.Application.CQRS.Usuarios.Handler
             {
                 var converteSenha = _passService.CriaPassArgon(request.Senha);
 
-                Usuario usuario = new Usuario(request.PrimeiroNome, request.SegundoNome, request.Email, converteSenha.Salt, converteSenha.Hash);
+                Usuario usuario = new Usuario(request.PrimeiroNome, request.SegundoNome, request.Email, converteSenha.salt, converteSenha.hash);
 
                 if (!await _unitOfWork.usuariosRepostorio.ExisteId(x => x.Email.Equals(request.Email)))
                 {

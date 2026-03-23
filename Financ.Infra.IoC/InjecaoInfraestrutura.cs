@@ -1,4 +1,4 @@
-﻿using Financ.Application.Interfaces;
+﻿using Financ.Application.Interfaces.Convites;
 using Financ.Domain.Interfaces;
 using Financ.Domain.Interfaces.Repositorios;
 using Financ.Infra.Data;

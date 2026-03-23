@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Financ.Application.CQRS.UsuarioAutenticação.Commands
+namespace Financ.Application.CQRS.Segurança.Commands
 {
-    public record RevokeCommand(string idUsuario) : IRequest<Resultado<string>>;
+    public record class AlterarSenhaCommand(string idUsuario, string senhaAntiga, string senhaNova) : IRequest<Resultado<string>>;  
 }

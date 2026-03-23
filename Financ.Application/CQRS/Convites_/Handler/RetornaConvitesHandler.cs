@@ -7,9 +7,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Financ.Application.Interfaces;
 using Financ.Application.Mapeamento;
 using Financ.Application.CQRS.Convites_.Query;
+using Financ.Application.Interfaces.Convites;
 
 namespace Financ.Application.CQRS.Convites_.Handler
 {

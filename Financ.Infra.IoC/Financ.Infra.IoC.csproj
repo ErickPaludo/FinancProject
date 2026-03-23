@@ -28,6 +28,7 @@
     <ProjectReference Include="..\Financ.Application\Financ.Application.csproj" />
     <ProjectReference Include="..\Financ.Domain\Financ.Domain.csproj" />
     <ProjectReference Include="..\Financ.Infra.Data\Financ.Infra.Data.csproj" />
+    <ProjectReference Include="..\Financ.Infra.Security\Financ.Infra.Security.csproj" />
   </ItemGroup>
 
 </Project>

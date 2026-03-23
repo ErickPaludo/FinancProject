@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Financ.Application.CQRS.UsuarioAutenticação.Commands
+namespace Financ.Application.CQRS.Autenticação.Commands
 {
     public record RefreshTokenCommand(string refreshToken) : IRequest<Resultado<RetornaTokenDTO>>;
 }

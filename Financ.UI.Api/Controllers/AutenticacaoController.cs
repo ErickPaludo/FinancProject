@@ -1,5 +1,5 @@
 ﻿using Financ.Application.Comun.Resultado;
-using Financ.Application.CQRS.UsuarioAutenticação.Commands;
+using Financ.Application.CQRS.Autenticação.Commands;
 using Financ.Application.DTOs.Autenticação.Get;
 using Financ.Application.DTOs.Autenticação.Post;
 using Financ.Domain.Validacoes;
@@ -24,7 +24,7 @@ namespace Financ.UI.Api.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(ConectaUsuarioDTO usuario)
         {
-            var tokenAutenticacao = await _mediator.Send(new AutenticadoUsuarioCommand(usuario.Email, usuario.Senha));         
+            var tokenAutenticacao = await _mediator.Send(new AutenticacaoCommand(usuario.Email, usuario.Senha));         
             return tokenAutenticacao.RetornoAutomatico();
         }
         [HttpPost("refresh")]

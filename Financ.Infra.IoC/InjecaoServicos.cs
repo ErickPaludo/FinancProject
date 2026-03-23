@@ -28,11 +28,11 @@ using Financ.Application.CQRS.Contas_Usuarios.Querys;
 using Financ.Application.CQRS.Contas_Usuarios.Handler;
 using Financ.Application.CQRS.Usuarios.Commands;
 using Financ.Application.CQRS.Usuarios.Handler;
-using Financ.Application.CQRS.UsuarioAutenticação.Commands;
 using Financ.Application.CQRS.Usuarios.Querys;
-using Financ.Application.CQRS.UsuarioAutenticação.Handler;
 using Financ.Application.CQRS.Convites_.Commands;
 using Financ.Application.CQRS.Convites_.Handler;
+using Financ.Application.CQRS.Autenticação.Handler;
+using Financ.Application.CQRS.Autenticação.Commands;
 
 
 namespace Financ.Infra.IoC
@@ -53,7 +53,7 @@ namespace Financ.Infra.IoC
 
             // 3. Contexto de Usuários e Autenticação
             services.AddScoped<IRequestHandler<CadastraUsuarioCommand, Resultado<string>>, CadastraUsuarioHandler>();
-            services.AddScoped<IRequestHandler<AutenticadoUsuarioCommand, Resultado<RetornaTokenDTO>>, AutenticadoUsuarioHandler>();
+            services.AddScoped<IRequestHandler<AutenticacaoCommand, Resultado<RetornaTokenDTO>>, AutenticacaoHandler>();
             services.AddScoped<IRequestHandler<RetornaUsuarioPorIdQuery, Resultado<RetornaUsuarioDTO>>, RetornaUsuarioHandler>();
             
             services.AddScoped<IRequestHandler<CriaConviteCommand, Resultado<GetCriaConviteDTO>>, CriaConviteHandler>();

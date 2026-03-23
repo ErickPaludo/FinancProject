@@ -14,6 +14,7 @@ namespace Financ.Infra.Data.ConfiguracaoTabelas
         public void Configure(EntityTypeBuilder<Autenticacao> builder)
         {
             builder.ToTable("fnc_autenticacao");
+            builder.HasKey(e => e.IdSession);
 
             builder.HasOne(a => a.Usuario)
                    .WithMany()

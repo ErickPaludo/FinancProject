@@ -1,8 +1,7 @@
 ﻿using Financ.Application.Comun.Resultado;
-using Financ.Application.CQRS.UsuarioAutenticação.Commands;
+using Financ.Application.CQRS.Autenticação.Commands;
 using Financ.Application.DTOs.Autenticação.Get;
-using Financ.Application.Interfaces;
-using Financ.Application.Services;
+using Financ.Application.Interfaces.Autenticação;
 using Financ.Domain.Entidades;
 using Financ.Domain.Interfaces;
 using NetDevPack.SimpleMediator;
@@ -12,13 +11,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Financ.Application.CQRS.UsuarioAutenticação.Handler
+namespace Financ.Application.CQRS.Autenticação.Handler
 {
     public class RefreshTokenHandler : IRequestHandler<RefreshTokenCommand, Resultado<RetornaTokenDTO>>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly ITokenService _tokenService;
-        public RefreshTokenHandler(IUnitOfWork unitOfWork, ITokenService tokenService)
+        private readonly IAutenticacaoServico _tokenService;
+        public RefreshTokenHandler(IUnitOfWork unitOfWork, IAutenticacaoServico tokenService)
         {
             _unitOfWork = unitOfWork;
             _tokenService = tokenService;
@@ -30,12 +29,18 @@ namespace Financ.Application.CQRS.UsuarioAutenticação.Handler
             if (string.IsNullOrEmpty(request.refreshToken) || auth is null || auth.RefreshToken is null)
                 return Resultado<RetornaTokenDTO>.GeraFalha(Falha.NaoAutorizado("Refresh token invalido"));
 
-            var refreshTokenDto = _tokenService.RefreshToken(auth!, request.refreshToken);
+            var refreshToken = _tokenService.RefreshToken(auth!, request.refreshToken);
 
-            auth.AtualizaRefreshToken(refreshTokenDto.RefreshToken, Utilitarios.DateTimeInUnixTimestamp(refreshTokenDto.Expiracao));
+            auth.AtualizaRefreshToken(refreshToken.refreshToken, refreshToken.expirationRefreshToken);
             _unitOfWork.autenticacoesRepositorio.Atualiza(auth);
             await _unitOfWork.Commit();
-            return Resultado<RetornaTokenDTO>.GeraSucesso(refreshTokenDto);
+            return Resultado<RetornaTokenDTO>.GeraSucesso(new RetornaTokenDTO
+            {
+                Expiracao = refreshToken.expirationTokenFormatado,
+                ExpiracaoRefresh = refreshToken.expirationRefreshTokenFormatado,
+                RefreshToken = refreshToken.refreshToken,
+                Token = refreshToken.token,
+            });
         }
     }
 }

@@ -1,7 +1,11 @@
-﻿using Financ.Application.Configurações;
-using Financ.Application.DTOs.Autenticação.Get;
+﻿using Financ.Application.DTOs.Autenticação.Get;
 using Financ.Application.Interfaces;
+using Financ.Application.Interfaces.Autenticação;
+using Financ.Application.Modelos.Autenticação;
 using Financ.Domain.Entidades;
+using Financ.Infra.Security.Configurações.Autenticação;
+using Financ.Infra.Security.Uteis.Autenticação;
+using Financ.Infra.Security.Uteis.Segurança;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
@@ -16,22 +20,22 @@ using System.Threading.Tasks;
 
 namespace Financ.Application.Services.Autenticação
 {
-    public class TokenService : ITokenService
+    public class AutenticacaoServico : IAutenticacaoServico
     {
-        private readonly TokenConfig _tokenConfig;
-        public TokenService(IOptions<TokenConfig> tokenConfig)
+        private readonly AutenticaoConfig _autenticacaoConfig;
+        public AutenticacaoServico(IOptions<AutenticaoConfig> autenticacaoConfig)
         {
-            _tokenConfig = tokenConfig.Value;
+            _autenticacaoConfig = autenticacaoConfig.Value;
         }
-        private DateTime GeraExpiracao() => DateTime.UtcNow.AddMinutes(_tokenConfig.ExpiracaoEmMinutos);
+        private DateTime GeraExpiracao() => DateTime.UtcNow.AddMinutes(_autenticacaoConfig.ExpiracaoEmMinutos);
 
-        public RetornaTokenDTO GeraToken(string idUsuario, string email)
+        public ResultadoToken GeraToken(string idUsuario, string email)
         {
             DateTime expiration = GeraExpiracao();
 
             JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
 
-            byte[] key = Encoding.UTF8.GetBytes(_tokenConfig.SecretKeyJWT);
+            byte[] key = Encoding.UTF8.GetBytes(_autenticacaoConfig.SecretKeyJWT);
 
             string refreshToken = GeraRefreshToken();
 
@@ -50,28 +54,16 @@ namespace Financ.Application.Services.Autenticação
 
             var tokenString = handler.WriteToken(token);
 
-            return new RetornaTokenDTO
-            {
-                Token = tokenString,
-                Expiracao = expiration,
-                RefreshToken = refreshToken,
-                ExpiracaoRefresh = DateTime.UtcNow.AddDays(_tokenConfig.ExpitacaoRefreshTokenDias),
-            }; 
-        }
-        public string GeraRefreshToken()
-        {
-            string refresh = Utilitarios.GeraBase64Aleatorios(32);
+            DateTime expirationRefreshToken = DateTime.UtcNow.AddDays(_autenticacaoConfig.ExpitacaoRefreshTokenDias);
 
-         //   _tokenConfig.RefreshToken = refresh;
-         //   _tokenConfig.RxpirationRefresh = Utilitarios.DateTimeInUnixTimestamp(DateTime.UtcNow.AddDays(_tokenConfig.ExpitacaoRefreshTokenDias));
-
-            return refresh;
+            return new ResultadoToken(tokenString,expiration, refreshToken, UtilAutenticacao.DateTimeInUnixTimestamp(expirationRefreshToken), expirationRefreshToken);
         }
+        public string GeraRefreshToken() => UtilSeguranca.GeraBase64Aleatorios(32);
         private string CriaAssinatura(byte[] data)
         {
-            using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(_tokenConfig.SecretKeyJWT));
+            using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(_autenticacaoConfig.SecretKeyJWT));
             byte[] hash = hmac.ComputeHash(data);
-            return Utilitarios.Base64UrlEncode(hash);
+            return UtilAutenticacao.Base64UrlEncode(hash);
         }
         public void ValidaToken(string token)
         {
@@ -87,7 +79,7 @@ namespace Financ.Application.Services.Autenticação
             if (jwtExpiration is null)
                 throw new Exception("Token sem data de expiração.");
 
-            if (Utilitarios.UnixTimestampInDateTime(Convert.ToInt64(jwtExpiration.Value)) < DateTime.UtcNow)
+            if (UtilAutenticacao.UnixTimestampInDateTime(Convert.ToInt64(jwtExpiration.Value)) < DateTime.UtcNow)
                 throw new Exception("Token expirado.");
 
             string headerPayload = $"{jwt.RawHeader}.{jwt.RawPayload}";
@@ -100,10 +92,10 @@ namespace Financ.Application.Services.Autenticação
             if (!antigoRefreshToken.Equals(novoRefreshToken))
                 throw new Exception("Refresh Token inválido.");
 
-            if (Utilitarios.UnixTimestampInDateTime(expirationRefresh) < DateTime.UtcNow)
+            if (UtilAutenticacao.UnixTimestampInDateTime(expirationRefresh) < DateTime.UtcNow)
                 throw new Exception("Refresh Token expirado.");
         }
-        public RetornaTokenDTO RefreshToken(Autenticacao autenticacao ,string antigoRefreshToken)
+        public ResultadoToken RefreshToken(Autenticacao autenticacao ,string antigoRefreshToken)
         {
             ValidaRefresh(antigoRefreshToken, autenticacao!.RefreshToken!, autenticacao.ExpirationRefresh!.Value);
 

@@ -7,14 +7,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Financ.Application.CQRS.UsuarioAutenticação.Commands
+namespace Financ.Application.CQRS.Autenticação.Commands
 {
-    public class AutenticadoUsuarioCommand : IRequest<Resultado<RetornaTokenDTO>>
+    public class AutenticacaoCommand : IRequest<Resultado<RetornaTokenDTO>>
     {
         public string Email { get; set; }
         public string Senha { get; set; }
 
-        public AutenticadoUsuarioCommand(string email, string senha)
+        public AutenticacaoCommand(string email, string senha)
         {
             Email = email;
             Senha = senha;

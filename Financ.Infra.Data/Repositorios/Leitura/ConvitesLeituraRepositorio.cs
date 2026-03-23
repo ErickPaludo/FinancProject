@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using Financ.Application.Interfaces;
+using Financ.Application.Interfaces.Convites;
 using Financ.Application.Leitura.Convite;
 using Financ.Domain.Entidades;
 using Microsoft.Data.SqlClient;

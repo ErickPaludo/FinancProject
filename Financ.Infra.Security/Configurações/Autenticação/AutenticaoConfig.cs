@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Financ.Application.Configurações
+namespace Financ.Infra.Security.Configurações.Autenticação
 {
-    public class TokenConfig
+    public class AutenticaoConfig
     {
         public string SecretKeyJWT { get; set; }
         public int ExpiracaoEmMinutos { get; set; }

@@ -1,6 +1,6 @@
-﻿using Financ.Application.Configurações;
-using Financ.Application.Interfaces;
+﻿using Financ.Application.Interfaces.Segurança;
 using Financ.Application.Services.Segurança;
+using Financ.Infra.Security.Configurações.Segurança;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -16,8 +16,8 @@ namespace Financ.Infra.IoC
         public static void ConfigurarInjecaoPassword(this IServiceCollection services,
            IConfiguration configuration)
         {
-            services.Configure<PassConfig>(configuration.GetSection("Auth"));
-            services.AddScoped<IPassService, PassService>();
+            services.Configure<SegurancaConfig>(configuration.GetSection("Auth"));
+            services.AddScoped<ISegurancaServico, SegurancaServico>();
         }
     }
 }
