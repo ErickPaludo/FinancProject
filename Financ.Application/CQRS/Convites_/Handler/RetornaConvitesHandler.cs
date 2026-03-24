@@ -1,6 +1,5 @@
 ﻿using Financ.Application.Comun.Resultado;
 using Financ.Application.DTOs.Convites.Get;
-using Financ.Domain.Interfaces.Autenticação;
 using Financ.Domain.Interfaces;
 using NetDevPack.SimpleMediator;
 using System;
@@ -8,35 +7,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Financ.Application.Interfaces;
 using Financ.Application.Mapeamento;
 using Financ.Application.CQRS.Convites_.Query;
+using Financ.Domain.Entidades;
 
 namespace Financ.Application.CQRS.Convites_.Handler
 {
     public class RetornaConvitesHandler : IRequestHandler<RetornaConvitesQuery, Resultado<List<GetRetornaConvitesDTO>>>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IConvitesLeituraRepositorio _convitesLeituraRepositorio;
-        private readonly IUsuariosIdentityServicos _usuarioIdentity;
 
-        public RetornaConvitesHandler(IUnitOfWork unitOfWork, IUsuariosIdentityServicos usuarioIdentity, IConvitesLeituraRepositorio convitesLeituraRepositorio)
+        public RetornaConvitesHandler(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _usuarioIdentity = usuarioIdentity;
-            _convitesLeituraRepositorio = convitesLeituraRepositorio;
         }
 
         public async Task<Resultado<List<GetRetornaConvitesDTO>>> Handle(RetornaConvitesQuery request, CancellationToken cancellationToken)
         {
-            var convites = await _convitesLeituraRepositorio.RetornoConvites(request.IdUsuario, request.RetornaConvitesRemetente);
+            IEnumerable<Convites?> convites = await _unitOfWork.convitesRepostorio.ObterConviteComRemetenteDestinatarioEContaAsync(request.RetornaConvitesRemetente ? r => r.IdUsuarioRemetente.Equals(request.IdUsuario) : d => d.IdUsuarioDestinatario.Equals(request.IdUsuario));
 
-            var convitesDTO = ConvitesMapper.ParaDTO(convites);
-
-            if (convitesDTO.Count() == 0)
+            if(!convites.Any())
                 return Resultado<List<GetRetornaConvitesDTO>>.GeraFalha(Falha.NaoEncontrado("Nenhum convite foi encontrado!"));
 
-            return Resultado<List<GetRetornaConvitesDTO>>.GeraSucesso(convitesDTO);
+             return Resultado<List<GetRetornaConvitesDTO>>.GeraSucesso(ConvitesMapper.ParaDTO(convites));
         }
     }
 }

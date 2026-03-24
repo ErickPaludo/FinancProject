@@ -2,8 +2,8 @@
 using Financ.Application.CQRS.Contas_Usuarios.Querys;
 using Financ.Application.DTOs.ContasUsuarios.Get;
 using Financ.Application.Mapeamento;
+using Financ.Domain.Entidades;
 using Financ.Domain.Interfaces;
-using Financ.Domain.Interfaces.Autenticação;
 using NetDevPack.SimpleMediator;
 using System;
 using System.Collections.Generic;
@@ -16,12 +16,10 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
     public class RetornaUsuariosAssociadosHandler : IRequestHandler<RetornaUsuariosAssociadosQuery, Resultado<List<RetornaUsuariosAssociadosDTO>>>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IUsuariosIdentityServicos _usuarioServicos;
 
-        public RetornaUsuariosAssociadosHandler(IUnitOfWork unitOfWork, IUsuariosIdentityServicos usuarioServicos)
+        public RetornaUsuariosAssociadosHandler(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _usuarioServicos = usuarioServicos;
         }
 
         public async Task<Resultado<List<RetornaUsuariosAssociadosDTO>>> Handle(RetornaUsuariosAssociadosQuery request, CancellationToken cancellationToken)
@@ -45,7 +43,7 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
                     List<RetornaUsuariosAssociadosDTO> listaUsuarios = new List<RetornaUsuariosAssociadosDTO>();
                     foreach (var conta in contaUsuarios)
                     {
-                        var usuario = _usuarioServicos.ObtemUsuario(conta.IdUsuario).Result;
+                        Usuario? usuario = await _unitOfWork.usuariosRepostorio.BuscarObjetoUnico(x => x.Id.Equals(conta.IdUsuario));
                         listaUsuarios.Add(ContasUsuariosMapper.ParaDTO(conta,usuario));
                     }
 

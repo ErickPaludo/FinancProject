@@ -5,8 +5,6 @@ using Financ.Application.Mapeamento;
 using Financ.Domain.Entidades;
 using Financ.Domain.Enums;
 using Financ.Domain.Interfaces;
-using Financ.Domain.Interfaces.Autenticação;
-using Financ.Domain.Interfaces.InterfaceEntidades;
 using Financ.Domain.Validacoes;
 using NetDevPack.SimpleMediator;
 using System;
@@ -20,19 +18,17 @@ namespace Financ.Application.CQRS.Convites_.Handler
     public class CriaConviteHandler : IRequestHandler<CriaConviteCommand, Resultado<GetCriaConviteDTO>>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IUsuariosIdentityServicos _usuarioIdentity;
-        public CriaConviteHandler(IUnitOfWork unitOfWork, IUsuariosIdentityServicos usuarioIdentity)
+        public CriaConviteHandler(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _usuarioIdentity = usuarioIdentity;
         }
         public async Task<Resultado<GetCriaConviteDTO>> Handle(CriaConviteCommand request, CancellationToken cancellationToken)
         {
             try
             {
-                var idUsuarioDestinatario = await _usuarioIdentity.ObtemIdUsuario(request.emailDestinatario!);
+                Usuario usuarioDestinatario = await _unitOfWork.usuariosRepostorio.BuscarObjetoUnico(x => x.Email.Equals(request.emailDestinatario!));
 
-                if (string.IsNullOrEmpty(idUsuarioDestinatario))
+                if (usuarioDestinatario is null)
                     return Resultado<GetCriaConviteDTO>.GeraFalha(Falha.NaoEncontrado("Usuário destinatário não encontrado."));
 
                 var conta = await _unitOfWork.contasRepositorio.BuscarContaComUsuarios(x => x.Id == request.idConta && x.ContaUsuarios.Any(u => u.IdUsuario == request.idRemetente));
@@ -41,8 +37,6 @@ namespace Financ.Application.CQRS.Convites_.Handler
                     return Resultado<GetCriaConviteDTO>.GeraFalha(Falha.NaoEncontrado("Conta não encontrada."));
 
                 ContasUsuarios? contaUsuarioRemetente = conta.ContaUsuarios.FirstOrDefault(x => x.IdUsuario == request.idRemetente);
-
-                Usuario usuarioDestinatario = await _usuarioIdentity.ObtemUsuario(idUsuarioDestinatario);
 
                 Convites convite = new Convites(request.acesso, contaUsuarioRemetente, usuarioDestinatario,request.expiracaoContaUsuario);
                 await _unitOfWork.convitesRepostorio.Adicionar(convite);
