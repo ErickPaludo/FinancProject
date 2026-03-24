@@ -1,5 +1,4 @@
-﻿using Financ.Domain.Interfaces.InterfaceEntidades;
-using Financ.Domain.Validacoes;
+﻿using Financ.Domain.Validacoes;
 using Financ.Domain.Validacoes.Mensagens;
 using System;
 using System.Collections.Generic;
@@ -10,27 +9,36 @@ using System.Threading.Tasks;
 
 namespace Financ.Domain.Entidades
 {
-    public class Usuario : IUsuarioIdentity
+    public class Usuario
     {
-        [Key]
-        public string IdUsuario { get; private set; }
+        public string Id { get; private set; }
+        public string Email { get; private set; }
         public string PrimeiroNome { get; private set; }
         public string SegundoNome { get; private set; }
-        public string Email { get; private set; }
+        public string Salt { get; private set; }
+        public string HashPass { get; private set; } = string.Empty;
 
-        public Usuario(string idUsuario, string primeiroNome, string segundoNome, string email)
+        private Usuario() { }
+        public Usuario(string idUsuario, string primeiroNome, string segundoNome, string email, string salt, string hashPass)
         {
             UsuariosValidacoes.Verifica(string.IsNullOrEmpty(idUsuario), MensagensBase.USUARIO_NAO_INFORMADO);
             VerificaNome(primeiroNome, segundoNome);
             VerificaEmail(email);
 
-            IdUsuario = idUsuario;
+            Id = idUsuario;
         }
 
-        public Usuario(string primeiroNome, string segundoNome, string email)
+        public Usuario(string primeiroNome, string segundoNome, string email, string salt, string hashPass)
         {
             VerificaNome(primeiroNome, segundoNome);
             VerificaEmail(email);
+            Id = Guid.NewGuid().ToString();
+
+            UsuariosValidacoes.Verifica(string.IsNullOrWhiteSpace(salt), MensagensUsuarios.MESMA_SENHA);
+            UsuariosValidacoes.Verifica(string.IsNullOrWhiteSpace(hashPass), MensagensUsuarios.MESMA_SENHA);
+
+            Salt = salt;
+            HashPass = hashPass;
         }
 
         public string NomeCompleto => $"{PrimeiroNome} {SegundoNome}".Trim();
@@ -48,13 +56,21 @@ namespace Financ.Domain.Entidades
 
             PrimeiroNome = primeiroNome;
             SegundoNome = segundoNome;
-        }  
+        }
         private void VerificaEmail(string email)
         {
             UsuariosValidacoes.Verifica(string.IsNullOrWhiteSpace(email), MensagensUsuarios.EMAIL_OBRIGATORIO);
             UsuariosValidacoes.Verifica(email.Length > 256, MensagensUsuarios.EMAIL_MAXIMO);
             UsuariosValidacoes.Verifica(email.Length < 6, MensagensUsuarios.EMAIL_MINIMO);
             Email = email;
+        }
+        public void AtualizaSenha(string salt, string hashPass)
+        {
+            UsuariosValidacoes.Verifica(salt == Salt, MensagensUsuarios.MESMA_SENHA);
+            UsuariosValidacoes.Verifica(hashPass == HashPass, MensagensUsuarios.MESMA_SENHA);
+
+            Salt = salt;
+            HashPass = hashPass;
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Financ.Domain.Enums;
-using Financ.Domain.Interfaces.InterfaceEntidades;
 using Financ.Domain.Validacoes;
 using Financ.Domain.Validacoes.Mensagens;
 using System;
@@ -18,6 +17,7 @@ namespace Financ.Domain.Entidades
         public TiposAcessos Acesso { get; private set; }
         public TipoStatusContasUsuario Status { get; protected set; }
         public DateTime? Expiracao { get; private set; }
+        public Usuario Usuario { get; private set; }
 
         public Conta Conta { get; private set; }
 
@@ -52,7 +52,7 @@ namespace Financ.Domain.Entidades
 
             if (convite.ExpiracaoContaUsuario.HasValue)
             {
-                Expiracao = DateTime.Now.AddMinutes(convite.ExpiracaoContaUsuario.Value);
+                Expiracao = DateTime.UtcNow.AddMinutes(convite.ExpiracaoContaUsuario.Value);
             }
         }
 
@@ -79,7 +79,7 @@ namespace Financ.Domain.Entidades
             Conta = conta;
             //Usuario = usuario!;
             IdUsuario = idUsuario;
-            DthrReg = DateTime.Now;
+            DthrReg = DateTime.UtcNow;
         }
         public void AtualizaOutraContaUsuario(ContasUsuarios? contasUsuarioRemetente, TiposAcessos? acesso, TipoStatusContasUsuario? status,int? expiracao = null, bool? expirado = null)
         {
@@ -114,11 +114,11 @@ namespace Financ.Domain.Entidades
             if (expiracao.HasValue)
             {
                 ContasUsuariosValidacao.Verifica(ValidaExpiracao(expiracao.Value), MensagensContasUsuarios.TEMPO_MIN_EXPIRACAO);
-                Expiracao = DateTime.Now.AddMinutes(expiracao.Value);
+                Expiracao = DateTime.UtcNow.AddMinutes(expiracao.Value);
             }
 
             if(expirado.HasValue)
-                Expiracao = expirado.Value ? DateTime.Now.AddMinutes(-20) : null;
+                Expiracao = expirado.Value ? DateTime.UtcNow.AddMinutes(-20) : null;
 
         }
         public void SairDaConta()
@@ -132,7 +132,7 @@ namespace Financ.Domain.Entidades
 
             //Verifica se a conta possui mais usuários conectados a conta, e se o usuário é o único mestre, para evitar que a conta fique sem um usuário mestre.
 
-            ContasUsuariosValidacao.Verifica(Conta.Convites.Any(x => DateTime.Now <= x.Expiracao && x.Aceito is null && x.IdUsuarioRemetente.Equals(IdUsuario)), MensagensContasUsuarios.USUARIO_POSSUI_CONVITES_EM_ANDAMENTO);
+            ContasUsuariosValidacao.Verifica(Conta.Convites.Any(x => DateTime.UtcNow <= x.Expiracao && x.Aceito is null && x.IdUsuarioRemetente.Equals(IdUsuario)), MensagensContasUsuarios.USUARIO_POSSUI_CONVITES_EM_ANDAMENTO);
 
         }
         public void RemoverUsuarioDaConta(ContasUsuarios? contasUsuarioRemetente)

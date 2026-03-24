@@ -39,7 +39,7 @@ namespace Financ.Domain.Entidades
         {
             Status = TiposStatusContas.Ativo;
             TipoConta = TiposContas.Corrente;
-            DthrReg = DateTime.Now;
+            DthrReg = DateTime.UtcNow;
         }
 
         private void ValidaTitulo(string titulo)
@@ -81,7 +81,7 @@ namespace Financ.Domain.Entidades
         public bool ConviteEmAndamento(string idUsuario)
         {
             return Convites.Any(x => x.IdUsuarioDestinatario == idUsuario
-            && DateTime.Now <= x.Expiracao 
+            && DateTime.UtcNow <= x.Expiracao 
             && x.Aceito == null);
         }
         public bool UsuarioPertenceConta(string idUsuario)
