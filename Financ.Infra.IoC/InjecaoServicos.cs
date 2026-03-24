@@ -11,9 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Financ.Infra.Data.Identity;
 using Microsoft.AspNetCore.Identity;
-using Financ.Domain.Interfaces.Autenticação;
 using Financ.Application.Comun.Resultado;
 using Financ.Application.DTOs.Autenticação.Get;
 using Financ.Application.DTOs.Contas.Get;
@@ -30,11 +28,11 @@ using Financ.Application.CQRS.Contas_Usuarios.Querys;
 using Financ.Application.CQRS.Contas_Usuarios.Handler;
 using Financ.Application.CQRS.Usuarios.Commands;
 using Financ.Application.CQRS.Usuarios.Handler;
-using Financ.Application.CQRS.UsuarioAutenticação.Commands;
 using Financ.Application.CQRS.Usuarios.Querys;
-using Financ.Application.CQRS.UsuarioAutenticação.Handler;
 using Financ.Application.CQRS.Convites_.Commands;
 using Financ.Application.CQRS.Convites_.Handler;
+using Financ.Application.CQRS.Autenticação.Handler;
+using Financ.Application.CQRS.Autenticação.Commands;
 
 
 namespace Financ.Infra.IoC
@@ -43,7 +41,6 @@ namespace Financ.Infra.IoC
     {
         public static void ConfigurarInjecaoServicos(this IServiceCollection services)
         {
-            services.AddScoped<IUsuariosIdentityServicos, UsuariosIdentityServicos>();
 
             services.AddScoped<IRequestHandler<CriarContaCommand, Resultado<RetornaContasDTO>>, CriarContaHandler>();
             services.AddScoped<IRequestHandler<AtualizarContaCommand, Resultado<RetornaContasDTO>>, AtualizarContasHandler>();
@@ -56,14 +53,11 @@ namespace Financ.Infra.IoC
 
             // 3. Contexto de Usuários e Autenticação
             services.AddScoped<IRequestHandler<CadastraUsuarioCommand, Resultado<string>>, CadastraUsuarioHandler>();
-            services.AddScoped<IRequestHandler<AutenticadoUsuarioCommand, Resultado<RetornaTokenDTO>>, AutenticadoUsuarioHandler>();
+            services.AddScoped<IRequestHandler<AutenticacaoCommand, Resultado<RetornaTokenDTO>>, AutenticacaoHandler>();
             services.AddScoped<IRequestHandler<RetornaUsuarioPorIdQuery, Resultado<RetornaUsuarioDTO>>, RetornaUsuarioHandler>();
-            
+
             services.AddScoped<IRequestHandler<CriaConviteCommand, Resultado<GetCriaConviteDTO>>, CriaConviteHandler>();
 
-            services.AddIdentity<UsuarioIdentity, IdentityRole>()
-           .AddEntityFrameworkStores<AppContextoData>()
-           .AddDefaultTokenProviders();
         }
     }
 }

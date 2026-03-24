@@ -1,5 +1,9 @@
-﻿using Financ.Domain.Interfaces.Autenticação;
-using Financ.Infra.Data.Identity;
+﻿using Financ.Application.Interfaces.Autenticação;
+using Financ.Application.Services.Autenticação;
+using Financ.Domain.Interfaces;
+using Financ.Domain.Interfaces.Repositorios;
+using Financ.Infra.Data;
+using Financ.Infra.Security.Configurações.Autenticação;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -7,7 +11,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,62 +24,48 @@ namespace Financ.Infra.IoC
         public static IServiceCollection ConfigurarInjecaoAutenticaoJWT(this IServiceCollection services,
            IConfiguration configuration)
         {
-            services.AddScoped<IAutenticacao, Autenticacao>();
+            services.Configure<AutenticaoConfig>(configuration.GetSection("TokenJWT"));
 
-            //informar o tipo de autenticacao JWT-Bearer
-            // definir o modelo de desafio de autenticacao
-            services.AddAuthentication(opt =>
+            services.AddScoped<IAutenticacaoServico, AutenticacaoServico>();
+
+            services.AddAuthentication(options =>
             {
-                opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-            //habilita a autenticacao JWT usando o esquema e desafio definidos
-           // validar o token
             .AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
                     ValidateIssuerSigningKey = true,
-               //     valores validos
-                    ValidIssuer = configuration["JWT:Issuer"],
-                    ValidAudience = configuration["JWT:Audience"],
+                    ValidateLifetime = true,
                     IssuerSigningKey = new SymmetricSecurityKey(
-                         Encoding.UTF8.GetBytes(configuration["JWT:SecretKey"]!)),
-                    ClockSkew = TimeSpan.Zero// se nao zerar,sera o tempo de vida do config mais 5 min
+                        Encoding.UTF8.GetBytes(configuration["TokenJWT:SecretKeyJWT"])),
+                    ClockSkew = TimeSpan.Zero
                 };
 
                 options.Events = new JwtBearerEvents
                 {
                     OnTokenValidated = async context =>
                     {
-                        var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager<UsuarioIdentity>>();
-                        var claimsPrincipal = context.Principal;
+                        var userId = context.Principal.FindFirst(ClaimTypes.NameIdentifier).Value;
+                        var sid = context.Principal.FindFirst("sid")?.Value;
 
-                        // Tenta pegar o usuário pelo ID do token
-                        var usuario = await userManager.GetUserAsync(claimsPrincipal);
+                        var repo = context.HttpContext.RequestServices
+                            .GetRequiredService<IAutenticacoesRepositorio>();
 
-                        // 1. Verifica se o usuário ainda existe
-                        if (usuario == null)
+                        var usuario = await repo.BuscarObjetoUnico(x => x.IdUsuario == userId);
+
+                        if (usuario == null || usuario.RefreshToken != sid || usuario.Revoke)
                         {
-                            context.Fail("Usuário não encontrado.");
-                            return;
-                        }
-
-                        // 2. (Opcional, mas recomendado) Verifica se o SecurityStamp mudou (ex: senha alterada)
-                        // Isso requer que a claim do SecurityStamp esteja no token, ou você valida manualmente se necessário.
-                        // Para Identity padrão, o token precisa ter sido gerado incluindo o SecurityStamp se quiser usar o validador nativo,
-                        // ou você pode checar se o usuário está bloqueado:
-                        if (await userManager.IsLockedOutAsync(usuario))
-                        {
-                            context.Fail("Usuário bloqueado.");
-                            return;
+                            context.Fail("Sessão inválida");
                         }
                     }
                 };
             });
+
             return services;
         }
     }
