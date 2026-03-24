@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Financ.Infra.Data.Identity;
 
 namespace Financ.Infra.Data.ConfiguracaoTabelas
 {
@@ -29,16 +28,20 @@ namespace Financ.Infra.Data.ConfiguracaoTabelas
             builder.HasIndex(e => e.IdUsuarioDestinatario);
 
             // Mapeia a string para a tabela do Identity sem precisar do objeto na classe Convites
-            builder.HasOne<UsuarioIdentity>()
+            builder.HasOne(c => c.Remetente)
+             .WithMany()
+             .HasForeignKey(c => c.IdUsuarioRemetente)
+             .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(c => c.Destinatario)
                 .WithMany()
-                .HasForeignKey(e => e.IdUsuarioRemetente)
-                .OnDelete(DeleteBehavior.Cascade);
+                .HasForeignKey(c => c.IdUsuarioDestinatario)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(c => c.Conta)
                  .WithMany(u => u.Convites)
                  .HasForeignKey(u => u.IdConta)
-                 .OnDelete(DeleteBehavior.Cascade);
-
+                 .OnDelete(DeleteBehavior.Restrict);
 
             //// Relação com remetente
             //builder.HasOne(e => e.Remetente)

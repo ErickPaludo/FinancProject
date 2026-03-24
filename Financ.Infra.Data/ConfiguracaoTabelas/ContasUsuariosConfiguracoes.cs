@@ -1,5 +1,4 @@
 ﻿using Financ.Domain.Entidades;
-using Financ.Infra.Data.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -22,16 +21,10 @@ namespace Financ.Infra.Data.ConfiguracaoTabelas
             builder.Property(e => e.Status).IsRequired();
             builder.Property(e => e.DthrReg).IsRequired();
 
-            //builder.HasOne(e => e.Contas)
-            //    .WithMany(e => e.ContasUsuariosVinculados)
-            //    .HasForeignKey(e => e.IdConta)
-            //    .OnDelete(DeleteBehavior.Restrict);
-
-            builder.HasOne<UsuarioIdentity>()
-                    .WithMany()
-                    .HasForeignKey(e => e.IdUsuario)
-                    .IsRequired()
-                    .OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(a => a.Usuario)
+                   .WithMany()
+                   .HasForeignKey(a => a.IdUsuario)
+                   .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
