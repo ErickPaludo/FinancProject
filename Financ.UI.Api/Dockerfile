@@ -1,30 +1,30 @@
-# Acesse https://aka.ms/customizecontainer para saber como personalizar seu contêiner de depuração e como o Visual Studio usa este Dockerfile para criar suas imagens para uma depuração mais rápida.
-
-# Esta fase é usada durante a execução no VS no modo rápido (Padrão para a configuração de Depuração)
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
-USER $APP_UID
-WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
-
-
-# Esta fase é usada para compilar o projeto de serviço
+# Estágio de construção
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
-ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+
+# Copia o arquivo de solução e todos os arquivos de projeto para restaurar as dependências
+COPY *.sln .
 COPY ["Financ.UI.Api/Financ.UI.Api.csproj", "Financ.UI.Api/"]
-RUN dotnet restore "./Financ.UI.Api/Financ.UI.Api.csproj"
+COPY ["Financ.Application/Financ.Application.csproj", "Financ.Application/"]
+COPY ["Financ.Domain/Financ.Domain.csproj", "Financ.Domain/"]
+COPY ["Financ.Infra.Data/Financ.Infra.Data.csproj", "Financ.Infra.Data/"]
+COPY ["Financ.Infra.IoC/Financ.Infra.IoC.csproj", "Financ.Infra.IoC/"]
+COPY ["Financ.Infra.Security/Financ.Infra.Security.csproj", "Financ.Infra.Security/"]
+
+RUN dotnet restore "Financ.UI.Api/Financ.UI.Api.csproj"
+
+# Copia o restante dos arquivos da aplicação e constrói
 COPY . .
-WORKDIR "/src/Financ.UI.Api"
-RUN dotnet build "./Financ.UI.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR /src/Financ.UI.Api
+RUN dotnet build "Financ.UI.Api.csproj" -c Release -o /app/build
 
-# Esta fase é usada para publicar o projeto de serviço a ser copiado para a fase final
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Financ.UI.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-
-# Esta fase é usada na produção ou quando executada no VS no modo normal (padrão quando não está usando a configuração de Depuração)
-FROM base AS final
+# Estágio de publicação
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS publish
 WORKDIR /app
-COPY --from=publish /app/publish .
+COPY --from=build /app/build .
+
+COPY wait-for-it.sh .
+RUN chmod +x wait-for-it.sh
+
+# Ponto de entrada da aplicação
 ENTRYPOINT ["dotnet", "Financ.UI.Api.dll"]

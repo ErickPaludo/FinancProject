@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  financapi:
+    build:
+      context: .
+      dockerfile: Financ.UI.Api/Dockerfile
+    ports:
+      - "5000:5000" # Mapeia 5000 do Windows para 5000 do Container
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000 # Força a API a usar a porta 5000
+      - ConnectionStrings__SqlServer=Server=sqlserver;Database=dbfinanc;User Id=sa;Password=F1n4c+Pld22;TrustServerCertificate=True;
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    restart: on-failure
+
+  # SERVIÇO PARA APLICAR AS MIGRATIONS AUTOMATICAMENTE
+  ef-migrations:
+    build:
+      context: .
+      dockerfile: Financ.UI.Api/Dockerfile
+      target: build
+    environment:
+      - ConnectionStrings__SqlServer=Server=sqlserver;Database=dbfinanc;User Id=sa;Password=F1n4c+Pld22;TrustServerCertificate=True;
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    entrypoint: >
+      bash -c "dotnet tool install --global dotnet-ef &&
+               export PATH=\"$PATH:/root/.dotnet/tools\" &&
+               dotnet ef database update --project Financ.Infra.Data --startup-project Financ.UI.Api"
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=F1n4c+Pld22
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "F1n4c+Pld22", "-Q", "SELECT 1", "-C"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    restart: always
+
+volumes:
+  sqlserver_data:
