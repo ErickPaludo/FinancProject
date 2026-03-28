@@ -6,6 +6,7 @@ using FluentAssertions;
 using Xunit;
 using System;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace Financ.TesteUnitarios.Domain
 {
@@ -15,12 +16,12 @@ namespace Financ.TesteUnitarios.Domain
             => new Conta("Conta Teste");
 
         private Usuario CriarUsuario(string id)
-            => new Usuario(id, "Nome", "Sobrenome", $"{id}@teste.com");
+            => new Usuario(id, "Nome", "Sobrenome", $"{id}@teste.com", "salt", "hash");
 
         private string NovoIdUsuario() => Guid.NewGuid().ToString();
 
-        private Convites CriarConvite(TiposAcessos aceso, ContasUsuarios usuarioRemetente, Usuario idUsuarioDestinatario)
-            => new Convites(aceso, usuarioRemetente, idUsuarioDestinatario);
+        private Convites CriarConvite(TiposAcessos acesso, ContasUsuarios usuarioRemetente, Usuario usuarioDestinatario, int? expiracaoContaUsuario = null)
+            => new Convites(acesso, usuarioRemetente, usuarioDestinatario, expiracaoContaUsuario);
 
         private ContasUsuarios CriarContaUsuario(Conta conta, string idUsuario, TiposAcessos acesso = TiposAcessos.Mestre, TipoStatusContasUsuario status = TipoStatusContasUsuario.Ativo)
         {
@@ -43,7 +44,7 @@ namespace Financ.TesteUnitarios.Domain
         {
             var conta = CriarContaAtiva();
 
-            var usuario = new ContasUsuarios(1, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Administrador);
+            var usuario = new ContasUsuarios(1, conta, CriarUsuario(NovoIdUsuario()).Id, TiposAcessos.Administrador);
 
             usuario.Status.Should().Be(TipoStatusContasUsuario.Ativo);
             usuario.Acesso.Should().Be(TiposAcessos.Administrador);
@@ -53,9 +54,9 @@ namespace Financ.TesteUnitarios.Domain
         public void Construtor_ComUsuario_DeveCriarComoMestre()
         {
             var conta = CriarContaAtiva();
-            var usuario = CriarUsuario(NovoIdUsuario()).IdUsuario;
+            var usuarioId = CriarUsuario(NovoIdUsuario()).Id;
 
-            var contasUsuario = new ContasUsuarios(conta, usuario);
+            var contasUsuario = new ContasUsuarios(conta, usuarioId);
 
             contasUsuario.Acesso.Should().Be(TiposAcessos.Mestre);
             contasUsuario.Status.Should().Be(TipoStatusContasUsuario.Ativo);
@@ -67,7 +68,7 @@ namespace Financ.TesteUnitarios.Domain
             var conta = CriarContaAtiva();
             var mestre1 = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
 
-            var convite = new Convites(TiposAcessos.Mestre, mestre1, CriarUsuario(NovoIdUsuario()));
+            var convite = CriarConvite(TiposAcessos.Mestre, mestre1, CriarUsuario(NovoIdUsuario()));
 
             var mestre2 = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
 
@@ -75,6 +76,36 @@ namespace Financ.TesteUnitarios.Domain
 
             contasUsuario.Acesso.Should().Be(TiposAcessos.Administrador);
             convite.Observacao.Should().Contain(MensagensContasUsuarios.MAX_MESTRES_CONVERTE_PARA_ADMIN);
+        }
+
+        [Fact]
+        public void Construtor_Convite_DeveCriarComAcessoCorreto_QuandoNaoAtingeLimiteMestres()
+        {
+            var conta = CriarContaAtiva();
+            var mestre1 = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
+
+            var usuarioDestinatario = CriarUsuario(NovoIdUsuario());
+            var convite = CriarConvite(TiposAcessos.Visualizador, mestre1, usuarioDestinatario);
+
+            var contasUsuario = new ContasUsuarios(convite);
+
+            contasUsuario.Acesso.Should().Be(TiposAcessos.Visualizador);
+            contasUsuario.Status.Should().Be(TipoStatusContasUsuario.Ativo);
+            convite.Observacao.Should().BeNull();
+        }
+
+        [Fact]
+        public void Construtor_Convite_DeveDefinirExpiracaoCorretamente()
+        {
+            var conta = CriarContaAtiva();
+            var remetente = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
+            var destinatario = CriarUsuario(NovoIdUsuario());
+            int minutosExpiracao = 30;
+
+            var convite = CriarConvite(TiposAcessos.Visualizador, remetente, destinatario, minutosExpiracao);
+            var contasUsuario = new ContasUsuarios(convite);
+
+            contasUsuario.Expiracao.Should().BeCloseTo(DateTime.UtcNow.AddMinutes(minutosExpiracao), TimeSpan.FromSeconds(5));
         }
 
         // Testes de Erro
@@ -96,7 +127,7 @@ namespace Financ.TesteUnitarios.Domain
         public void Construtor_ComContaNula_DeveLancarExcecao()
         {
             Action act = () =>
-                new ContasUsuarios(1, null, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Administrador);
+                new ContasUsuarios(1, null, CriarUsuario(NovoIdUsuario()).Id, TiposAcessos.Administrador);
 
             act.Should().Throw<ContasUsuariosValidacao>()
                 .WithMessage(MensagensContasUsuarios.CONTA_NAO_PODE_SER_NULA);
@@ -108,7 +139,7 @@ namespace Financ.TesteUnitarios.Domain
             var conta = new Conta("Conta Teste");
             var usuarioRemetente = CriarContaUsuario(conta, NovoIdUsuario());
             var usuarioDestinatario = CriarUsuario(NovoIdUsuario());
-            var convite = new Convites(TiposAcessos.Mestre, usuarioRemetente, usuarioDestinatario);
+            var convite = CriarConvite(TiposAcessos.Mestre, usuarioRemetente, usuarioDestinatario);
 
             // Simula a conta se tornando inativa ANTES da criação do ContasUsuarios pelo convite
             conta.AtualizaConta(usuarioRemetente, null, TiposStatusContas.Inativo);
@@ -162,6 +193,15 @@ namespace Financ.TesteUnitarios.Domain
                 .WithMessage(MensagensContasUsuarios.ACESSO_INVALIDO);
         }
 
+        [Fact]
+        public void Construtor_ConviteNulo_DeveLancarExcecao()
+        {
+            Action act = () => new ContasUsuarios(null);
+
+            act.Should().Throw<ContasUsuariosValidacao>()
+                .WithMessage(MensagensContasUsuarios.CONVITE_NAO_PODE_SER_NULO);
+        }
+
         #endregion
 
         #region AtualizaOutraContaUsuario
@@ -171,10 +211,8 @@ namespace Financ.TesteUnitarios.Domain
         public void Atualiza_FluxoValido_DeveAtualizarAcessoEStatus()
         {
             var conta = CriarContaAtiva();
-            var alvo = new ContasUsuarios(1, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Visualizador);
-            var remetente = new ContasUsuarios(2, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Mestre);
-            conta.AddUsuario(alvo);
-            conta.AddUsuario(remetente);
+            var alvo = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Visualizador);
+            var remetente = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
 
             alvo.AtualizaOutraContaUsuario(
                 remetente,
@@ -189,10 +227,8 @@ namespace Financ.TesteUnitarios.Domain
         public void Atualiza_ApenasAcesso_DeveAtualizarCorretamente()
         {
             var conta = CriarContaAtiva();
-            var alvo = new ContasUsuarios(1, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Visualizador);
-            var remetente = new ContasUsuarios(2, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Mestre);
-            conta.AddUsuario(alvo);
-            conta.AddUsuario(remetente);
+            var alvo = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Visualizador);
+            var remetente = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
 
             alvo.AtualizaOutraContaUsuario(remetente, TiposAcessos.Administrador, null);
 
@@ -204,10 +240,8 @@ namespace Financ.TesteUnitarios.Domain
         public void Atualiza_ApenasStatus_DeveAtualizarCorretamente()
         {
             var conta = CriarContaAtiva();
-            var alvo = new ContasUsuarios(1, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Visualizador);
-            var remetente = new ContasUsuarios(2, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Mestre);
-            conta.AddUsuario(alvo);
-            conta.AddUsuario(remetente);
+            var alvo = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Visualizador);
+            var remetente = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
 
             alvo.AtualizaOutraContaUsuario(remetente, null, TipoStatusContasUsuario.Bloqueado);
 
@@ -215,12 +249,54 @@ namespace Financ.TesteUnitarios.Domain
             alvo.Status.Should().Be(TipoStatusContasUsuario.Bloqueado);
         }
 
+        [Fact]
+        public void Atualiza_DeveDefinirExpiracao_QuandoParametroExpiracaoFornecido()
+        {
+            var conta = CriarContaAtiva();
+            var alvo = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Visualizador);
+            var remetente = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
+            int minutosExpiracao = 60;
+
+            alvo.AtualizaOutraContaUsuario(remetente, null, null, minutosExpiracao);
+
+            alvo.Expiracao.Should().BeCloseTo(DateTime.UtcNow.AddMinutes(minutosExpiracao), TimeSpan.FromSeconds(5));
+        }
+
+        [Fact]
+        public void Atualiza_DeveExpirarConta_QuandoParametroExpiradoForTrue()
+        {
+            var conta = CriarContaAtiva();
+            var alvo = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Visualizador);
+            var remetente = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
+
+            alvo.AtualizaOutraContaUsuario(remetente, null, null, null, true);
+
+            alvo.Expiracao.Should().BeBefore(DateTime.UtcNow);
+        }
+
+        [Fact]
+        public void Atualiza_DeveRemoverExpiracao_QuandoParametroExpiradoForFalse()
+        {
+            var conta = CriarContaAtiva();
+            var alvo = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Visualizador);
+            var remetente = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
+
+            // Define uma expiração inicial
+            alvo.AtualizaOutraContaUsuario(remetente, null, null, 60);
+            alvo.Expiracao.Should().NotBeNull();
+
+            // Remove a expiração
+            alvo.AtualizaOutraContaUsuario(remetente, null, null, null, false);
+
+            alvo.Expiracao.Should().BeNull();
+        }
+
         // Testes de Erro
         [Fact]
         public void Atualiza_DeveFalhar_SeRemetenteForOMesmoUsuario()
         {
             var conta = CriarContaAtiva();
-            var usuario = new ContasUsuarios(1, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Mestre);
+            var usuario = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
 
             Action act = () =>
                 usuario.AtualizaOutraContaUsuario(usuario, TiposAcessos.Administrador, null);
@@ -234,10 +310,8 @@ namespace Financ.TesteUnitarios.Domain
         {
             var conta = CriarContaAtiva();
 
-            var alvo = new ContasUsuarios(1, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Visualizador);
-            var remetente = new ContasUsuarios(2, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Administrador);
-            conta.AddUsuario(alvo);
-            conta.AddUsuario(remetente);
+            var alvo = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Visualizador);
+            var remetente = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Administrador);
 
             Action act = () =>
                 alvo.AtualizaOutraContaUsuario(remetente, TiposAcessos.Administrador, null);
@@ -251,10 +325,8 @@ namespace Financ.TesteUnitarios.Domain
         {
             var conta = CriarContaAtiva();
 
-            var alvo = new ContasUsuarios(1, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Visualizador);
-            var remetente = new ContasUsuarios(2, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Mestre, TipoStatusContasUsuario.Inativo);
-            conta.AddUsuario(alvo);
-            conta.AddUsuario(remetente);
+            var alvo = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Visualizador);
+            var remetente = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre, TipoStatusContasUsuario.Inativo);
 
             Action act = () =>
                 alvo.AtualizaOutraContaUsuario(remetente, TiposAcessos.Administrador, null);
@@ -263,144 +335,119 @@ namespace Financ.TesteUnitarios.Domain
                 .WithMessage(MensagensContasUsuarios.ACESSO_NEGADO_POR_STATUS);
         }
 
-        [Fact]
-        public void Atualiza_DeveFalhar_SeAlvoForMestre()
-        {
-            var conta = CriarContaAtiva();
-
-            var alvo = new ContasUsuarios(1, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Mestre);
-            var remetente = new ContasUsuarios(2, conta, CriarUsuario(NovoIdUsuario()).IdUsuario, TiposAcessos.Mestre);
-            conta.AddUsuario(alvo);
-            conta.AddUsuario(remetente);
-
-            Action act = () =>
-                alvo.AtualizaOutraContaUsuario(remetente, TiposAcessos.Administrador, null);
-
-            act.Should().Throw<ContasUsuariosValidacao>()
-                .WithMessage(MensagensContasUsuarios.USUARIO_MESTRE_NAO_PODE_SER_ATUALIZADO);
-        }
+       
 
         [Fact]
-        public void Atualiza_Para_Mestre_Limite_Maximo()
+        public void Atualiza_DeveFalhar_SeUsuarioAlvoForMestreEStatusDiferenteDeAtivo()
         {
             var conta = CriarContaAtiva();
-
-            var usuarioMestre = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
-            var outroMestre = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
             var alvo = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Administrador);
             var remetente = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
 
-            Action act = () =>
-                alvo.AtualizaOutraContaUsuario(remetente, TiposAcessos.Mestre, null);
+            Action act = () => alvo.AtualizaOutraContaUsuario(remetente, TiposAcessos.Mestre, TipoStatusContasUsuario.Inativo);
+
+            act.Should().Throw<ContasUsuariosValidacao>()
+                .WithMessage(MensagensContasUsuarios.ATUALIZA_PARA_USUARIO_MESTRE_DIFERENTE_DE_ATIVO);
+        }
+
+        [Fact]
+        public void Atualiza_DeveFalhar_SeConflitoAoExpirar()
+        {
+            var conta = CriarContaAtiva();
+            var alvo = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Visualizador);
+            var remetente = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
+
+            Action act = () => alvo.AtualizaOutraContaUsuario(remetente, null, null, 30, true);
+
+            act.Should().Throw<ContasUsuariosValidacao>()
+                .WithMessage(MensagensContasUsuarios.CONFLITO_AO_EXPIRAR);
+        }
+
+        [Fact]
+        public void Atualiza_DeveFalhar_SeTempoMinimoExpiracaoInvalido()
+        {
+            var conta = CriarContaAtiva();
+            var alvo = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Visualizador);
+            var remetente = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
+
+            Action act = () => alvo.AtualizaOutraContaUsuario(remetente, null, null, 10); // Menos de 15 minutos
+
+            act.Should().Throw<ContasUsuariosValidacao>()
+                .WithMessage(MensagensContasUsuarios.TEMPO_MIN_EXPIRACAO);
+        }
+
+        [Fact]
+        public void Atualiza_DeveFalhar_SeUsuarioMestreTentarAtualizarAcessoParaMestreELimiteAtingido()
+        {
+            var conta = CriarContaAtiva();
+            var mestre1 = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
+            var mestre2 = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
+            var alvo = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Visualizador);
+
+            Action act = () => alvo.AtualizaOutraContaUsuario(mestre1, TiposAcessos.Mestre, null);
 
             act.Should().Throw<ContasUsuariosValidacao>()
                 .WithMessage(MensagensBase.LIMITE_USUARIOS_MESTRES);
         }
 
         [Fact]
-        public void Atualiza_ComAcessoInvalido_DeveLancarExcecao()
+        public void Atualiza_DeveFalhar_SeUsuarioMestreTentarAtualizarAcessoParaMestreComTempoLimite()
         {
             var conta = CriarContaAtiva();
-            var alvo = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Visualizador);
-            var remetente = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
+            var mestre1 = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
+            var alvo = new ContasUsuarios(CriarConvite(TiposAcessos.Administrador,mestre1,CriarUsuario(NovoIdUsuario()),null));
 
-            TiposAcessos acessoInvalido = (TiposAcessos)999;
-
-            Action act = () =>
-                alvo.AtualizaOutraContaUsuario(remetente, acessoInvalido, null);
+            Action act = () => alvo.AtualizaOutraContaUsuario(mestre1, TiposAcessos.Mestre, null, 30);
 
             act.Should().Throw<ContasUsuariosValidacao>()
-                .WithMessage(MensagensContasUsuarios.ACESSO_INVALIDO);
-        }
-
-        [Fact]
-        public void Atualiza_ComStatusInvalido_DeveLancarExcecao()
-        {
-            var conta = CriarContaAtiva();
-            var alvo = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Visualizador);
-            var remetente = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
-
-            TipoStatusContasUsuario statusInvalido = (TipoStatusContasUsuario)999;
-
-            Action act = () =>
-                alvo.AtualizaOutraContaUsuario(remetente, null, statusInvalido);
-
-            act.Should().Throw<ContasUsuariosValidacao>()
-                .WithMessage(MensagensBase.STATUS_INVALIDO);
-        }
-
-        [Fact]
-        public void Atualiza_DeveFalhar_SeUsuarioRemetenteNaoPertenceAContaDoAlvo()
-        {
-            var conta1 = CriarContaAtiva();
-            var conta2 = CriarContaAtiva();
-
-            var alvo = CriarContaUsuario(conta1, NovoIdUsuario(), TiposAcessos.Visualizador);
-            var remetenteDeOutraConta = CriarContaUsuario(conta2, NovoIdUsuario(), TiposAcessos.Mestre);
-
-            Action act = () =>
-                alvo.AtualizaOutraContaUsuario(remetenteDeOutraConta, TiposAcessos.Administrador, null);
-
-            act.Should().Throw<ContasUsuariosValidacao>()
-                .WithMessage(MensagensContasUsuarios.USUARIO_NAO_PERTENCE_A_CONTA);
+                .WithMessage(MensagensContasUsuarios.USUARIO_MESTRE_COM_TEMPO_LIMITE_JA_DEFINIDO);
         }
 
         #endregion
 
         #region SairDaConta
-
-        // Testes de Sucesso
-        [Fact]
-        public void SairDaConta_DevePermitirSair_QuandoNaoForUnicoMestre()
-        {
-            var conta = CriarContaAtiva();
-            var mestre1 = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
-            var mestre2 = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
-
-            Action act = () => mestre1.SairDaConta();
-            act.Should().NotThrow(); // Não deve lançar exceção
-        }
+       
 
         [Fact]
-        public void SairDaConta_QuandoTiver_ConviteAtivo_GeraErro()
+        public void SairDaConta_DeveRemoverUsuarioEInativarConta_SeForUltimoUsuario()
         {
             var conta = CriarContaAtiva();
-            var mestre1 = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
-            var mestre2 = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
-            var convidado = CriarUsuario(NovoIdUsuario());
+            var mestre = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
 
-            Convites convite = CriarConvite(TiposAcessos.Administrador, mestre2 ,convidado);
+            mestre.SairDaConta();
+            conta.SairDaConta(mestre);
 
-            mestre2.Conta.AddConvite(convite);
-
-            Action act = () => mestre2.SairDaConta();
-
-            act.Should().Throw<ContasUsuariosValidacao>()
-                           .WithMessage(MensagensContasUsuarios.USUARIO_POSSUI_CONVITES_EM_ANDAMENTO);
-        }
-
-
-        [Fact]
-        public void SairDaConta_DevePermitirSair_QuandoNaoForMestre()
-        {
-            var conta = CriarContaAtiva();
-            var administrador = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Administrador);
-
-            Action act = () => administrador.SairDaConta();
-            act.Should().NotThrow(); // Não deve lançar exceção
+            conta.ContaUsuarios.Should().BeEmpty();
+            conta.Status.Should().Be(TiposStatusContas.Inativo);
         }
 
         // Testes de Erro
         [Fact]
-        public void SairDaConta_DeveFalhar_QuandoForUnicoMestreEExistiremOutrosUsuariosNaConta()
+        public void SairDaConta_DeveFalhar_SeUnicoUsuarioMestreTentarSairComOutrosUsuariosNaoMestres()
         {
             var conta = CriarContaAtiva();
-            var unicoMestre = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
-            var outroUsuario = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Visualizador);
+            var mestre = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
+            var admin = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Administrador);
 
-            Action act = () => unicoMestre.SairDaConta();
+            Action act = () => mestre.SairDaConta();
+
             act.Should().Throw<ContasUsuariosValidacao>()
                 .WithMessage(MensagensContasUsuarios.UNICO_USUARIO_MESTRE_NA_CONTA);
+        }
+
+        [Fact]
+        public void SairDaConta_DeveFalhar_SeUsuarioPossuiConvitesEmAndamento()
+        {
+            var conta = CriarContaAtiva();
+            var mestre = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
+            var destinatario = CriarUsuario(NovoIdUsuario());
+            var convite = CriarConvite(TiposAcessos.Visualizador, mestre, destinatario);
+            conta.AddConvite(convite);
+
+            Action act = () => mestre.SairDaConta();
+
+            act.Should().Throw<ContasUsuariosValidacao>()
+                .WithMessage(MensagensContasUsuarios.USUARIO_POSSUI_CONVITES_EM_ANDAMENTO);
         }
 
         #endregion
@@ -409,89 +456,130 @@ namespace Financ.TesteUnitarios.Domain
 
         // Testes de Sucesso
         [Fact]
-        public void RemoverUsuarioDaConta_DeveRemoverComSucesso_QuandoRemetenteForMestreEAlvoNaoForMestre()
+        public void RemoverUsuarioDaConta_DeveRemoverUsuarioComSucesso()
         {
             var conta = CriarContaAtiva();
             var remetente = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
             var alvo = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Visualizador);
 
-            Action act = () => alvo.RemoverUsuarioDaConta(remetente);
-            act.Should().NotThrow(); // Não deve lançar exceção
+            alvo.RemoverUsuarioDaConta(remetente);
+            conta.SairDaConta(alvo); // A remoção da lista é feita na Conta, não no ContasUsuarios
+
+            conta.ContaUsuarios.Should().NotContain(alvo);
         }
 
         // Testes de Erro
         [Fact]
-        public void RemoverUsuarioDaConta_DeveFalhar_SeRemetenteForOMesmoUsuario()
+        public void RemoverUsuarioDaConta_DeveFalhar_SeRemetenteNaoForMestreAtivoDaConta()
         {
             var conta = CriarContaAtiva();
-            var remetente = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
-
-            Action act = () =>
-                remetente.RemoverUsuarioDaConta(remetente);
-
-            act.Should().Throw<ContasUsuariosValidacao>()
-                .WithMessage(MensagensContasUsuarios.USUARIO_TENTA_SE_EXPULSAR);
-        }
-
-        [Fact]
-        public void RemoverUsuarioDaConta_DeveFalhar_SeAlvoForMestre()
-        {
-            var conta = CriarContaAtiva();
-
-            var remetente = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
-            var alvoMestre = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
-
-            Action act = () =>
-                alvoMestre.RemoverUsuarioDaConta(remetente);
-
-            act.Should().Throw<ContasUsuariosValidacao>()
-                .WithMessage(MensagensContasUsuarios.USUARIO_MESTRE_NAO_PODE_SER_REMOVIDO);
-        }
-
-        [Fact]
-        public void RemoverUsuarioDaConta_DeveFalhar_SeRemetenteNaoForMestre()
-        {
-            var conta = CriarContaAtiva();
-
             var remetente = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Administrador);
             var alvo = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Visualizador);
 
-            Action act = () =>
-                alvo.RemoverUsuarioDaConta(remetente);
+            Action act = () => alvo.RemoverUsuarioDaConta(remetente);
 
             act.Should().Throw<ContasUsuariosValidacao>()
                 .WithMessage(MensagensContasUsuarios.ACESSO_NEGADO);
         }
 
         [Fact]
-        public void RemoverUsuarioDaConta_DeveFalhar_SeRemetenteEstiverInativo()
+        public void RemoverUsuarioDaConta_DeveFalhar_SeRemetenteForOMesmoUsuario()
         {
             var conta = CriarContaAtiva();
+            var usuario = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
 
-            var remetente = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre, TipoStatusContasUsuario.Inativo);
-            var alvo = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Visualizador);
-
-            Action act = () =>
-                alvo.RemoverUsuarioDaConta(remetente);
+            Action act = () => usuario.RemoverUsuarioDaConta(usuario);
 
             act.Should().Throw<ContasUsuariosValidacao>()
-                .WithMessage(MensagensContasUsuarios.ACESSO_NEGADO_POR_STATUS);
+                .WithMessage(MensagensContasUsuarios.USUARIO_TENTA_SE_EXPULSAR);
         }
 
         [Fact]
-        public void RemoverUsuarioDaConta_DeveFalhar_SeUsuarioRemetenteNaoPertenceAContaDoAlvo()
+        public void RemoverUsuarioDaConta_DeveFalhar_SeUsuarioAlvoForMestre()
         {
-            var conta1 = CriarContaAtiva();
-            var conta2 = CriarContaAtiva();
+            var conta = CriarContaAtiva();
+            var remetente = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
+            var alvo = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
 
-            var alvo = CriarContaUsuario(conta1, NovoIdUsuario(), TiposAcessos.Visualizador);
-            var remetenteDeOutraConta = CriarContaUsuario(conta2, NovoIdUsuario(), TiposAcessos.Mestre);
-
-            Action act = () =>
-                alvo.RemoverUsuarioDaConta(remetenteDeOutraConta);
+            Action act = () => alvo.RemoverUsuarioDaConta(remetente);
 
             act.Should().Throw<ContasUsuariosValidacao>()
-                .WithMessage(MensagensContasUsuarios.USUARIO_NAO_PERTENCE_A_CONTA);
+                .WithMessage(MensagensContasUsuarios.USUARIO_MESTRE_NAO_PODE_SER_REMOVIDO);
+        }
+
+        #endregion
+
+        #region ValidaPermissoeNaConta
+
+        [Fact]
+        public void ValidaPermissoeNaConta_DeveRetornarTrue_SeAcessoMestreNaoAtingiuLimite()
+        {
+            var conta = CriarContaAtiva();
+            var mestre1 = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
+
+            var contasUsuario = new ContasUsuarios(1, conta, NovoIdUsuario(), TiposAcessos.Visualizador);
+
+            contasUsuario.ValidaPermissoeNaConta(TiposAcessos.Mestre).Should().BeTrue();
+        }
+
+        [Fact]
+        public void ValidaPermissoeNaConta_DeveRetornarFalse_SeAcessoMestreAtingiuLimite()
+        {
+            var conta = CriarContaAtiva();
+            var mestre1 = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
+            var mestre2 = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
+
+            var contasUsuario = new ContasUsuarios(1, conta, NovoIdUsuario(), TiposAcessos.Visualizador);
+
+            contasUsuario.ValidaPermissoeNaConta(TiposAcessos.Mestre).Should().BeFalse();
+        }
+
+        #endregion
+
+        #region ValidaUsuarioMestre
+
+        [Theory]
+        [InlineData(TiposAcessos.Mestre, true)]
+        [InlineData(TiposAcessos.Administrador, false)]
+        [InlineData(TiposAcessos.Visualizador, false)]
+        public void ValidaUsuarioMestre_DeveRetornarCorretamente(TiposAcessos acesso, bool esperado)
+        {
+            var conta = CriarContaAtiva();
+            var contasUsuario = CriarContaUsuario(conta, NovoIdUsuario(), acesso);
+
+            contasUsuario.ValidaUsuarioMestre(acesso).Should().Be(esperado);
+        }
+
+        #endregion
+
+        #region ExpiracaoPorAcesso
+
+        [Theory]
+        [InlineData(TiposAcessos.Mestre, true)]
+        [InlineData(TiposAcessos.Administrador, false)]
+        [InlineData(TiposAcessos.Visualizador, false)]
+        public void ExpiracaoPorAcesso_DeveRetornarCorretamente(TiposAcessos acesso, bool esperado)
+        {
+            var conta = CriarContaAtiva();
+            var contasUsuario = CriarContaUsuario(conta, NovoIdUsuario(), acesso);
+
+            contasUsuario.ExpiracaoPorAcesso(acesso).Should().Be(esperado);
+        }
+
+        #endregion
+
+        #region ValidaExpiracao
+
+        [Theory]
+        [InlineData(10, true)] // Menor que 15
+        [InlineData(15, false)] // Igual a 15
+        [InlineData(20, false)] // Maior que 15
+        public void ValidaExpiracao_DeveRetornarCorretamente(int minutos, bool esperado)
+        {
+            var conta = CriarContaAtiva();
+            var contasUsuario = CriarContaUsuario(conta, NovoIdUsuario());
+
+            contasUsuario.ValidaExpiracao(minutos).Should().Be(esperado);
         }
 
         #endregion
