@@ -26,6 +26,8 @@ namespace Financ.Domain.Entidades
             VerificaEmail(email);
 
             Id = idUsuario;
+            Salt = salt;
+            HashPass = hashPass;
         }
 
         public Usuario(string primeiroNome, string segundoNome, string email, string salt, string hashPass)
@@ -41,7 +43,7 @@ namespace Financ.Domain.Entidades
             HashPass = hashPass;
         }
 
-        public string NomeCompleto => $"{PrimeiroNome} {SegundoNome}".Trim();
+        public string NomeCompleto => $"{PrimeiroNome.Trim()} {SegundoNome.Trim()}";
 
         private void VerificaNome(string primeiroNome, string segundoNome)
         {

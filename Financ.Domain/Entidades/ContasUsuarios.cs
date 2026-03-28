@@ -35,7 +35,8 @@ namespace Financ.Domain.Entidades
         }
         public ContasUsuarios(Convites convite)
         {
-            ValidaContasUsuarios(convite.Conta, convite.IdUsuarioDestinatario);
+            ContasUsuariosValidacao.Verifica(convite is null,MensagensContasUsuarios.CONVITE_NAO_PODE_SER_NULO);
+            ValidaContasUsuarios(convite!.Conta, convite.IdUsuarioDestinatario);
             ValidaEnums(convite.Acesso, null);
 
             if (!ValidaPermissoeNaConta(convite.Acesso))
@@ -55,7 +56,6 @@ namespace Financ.Domain.Entidades
                 Expiracao = DateTime.UtcNow.AddMinutes(convite.ExpiracaoContaUsuario.Value);
             }
         }
-
         public ContasUsuarios(Conta conta, string idUasuario)
         {
             ValidaContasUsuarios(conta, idUasuario);
@@ -81,45 +81,53 @@ namespace Financ.Domain.Entidades
             IdUsuario = idUsuario;
             DthrReg = DateTime.UtcNow;
         }
-        public void AtualizaOutraContaUsuario(ContasUsuarios? contasUsuarioRemetente, TiposAcessos? acesso, TipoStatusContasUsuario? status,int? expiracao = null, bool? expirado = null)
+        public void AtualizaOutraContaUsuario(ContasUsuarios? contasUsuarioRemetente, TiposAcessos? acesso, TipoStatusContasUsuario? status, int? expiracao = null, bool? expirado = null)
         {
-            ValidaUsuarioRemetenteMestreAtivoDaConta(contasUsuarioRemetente);
+
+            #region Validação Remetente
+            ContasUsuariosValidacao.Verifica(contasUsuarioRemetente is null || contasUsuarioRemetente.Conta != Conta, MensagensContasUsuarios.USUARIO_NAO_PERTENCE_A_CONTA);
             ContasUsuariosValidacao.Verifica(contasUsuarioRemetente == this, MensagensContasUsuarios.USUARIO_TENTA_SE_ATUALIZAR);
-            ContasUsuariosValidacao.Verifica(Acesso == TiposAcessos.Mestre, MensagensContasUsuarios.USUARIO_MESTRE_NAO_PODE_SER_ATUALIZADO);
+            ContasUsuariosValidacao.Verifica(contasUsuarioRemetente!.Acesso != TiposAcessos.Mestre, MensagensContasUsuarios.ACESSO_NEGADO);
+            ContasUsuariosValidacao.Verifica(contasUsuarioRemetente.Status != TipoStatusContasUsuario.Ativo, MensagensContasUsuarios.ACESSO_NEGADO_POR_STATUS);
+            #endregion
+
+            ContasUsuariosValidacao.Verifica(ValidaUsuarioMestre(Acesso), MensagensContasUsuarios.USUARIO_MESTRE_NAO_PODE_SER_ATUALIZADO);
 
             ValidaEnums(acesso, status);
 
-            if (acesso.HasValue && status.HasValue)
-            {
-                ContasUsuariosValidacao.Verifica(acesso.Value.Equals(TiposAcessos.Mestre) && !status.Value.Equals(TipoStatusContasUsuario.Ativo), MensagensContasUsuarios.ATUALIZA_PARA_USUARIO_MESTRE_DIFERENTE_DE_ATIVO);
-            }
 
             if (acesso.HasValue)
             {
+                ContasUsuariosValidacao.Verifica(
+                   (Expiracao is not null ||
+                    (expiracao.HasValue || (expirado.HasValue && expirado.Value))) &&
+                    ValidaUsuarioMestre(acesso.Value),
+                    MensagensContasUsuarios.USUARIO_MESTRE_COM_TEMPO_LIMITE_JA_DEFINIDO); 
+
                 ContasUsuariosValidacao.Verifica(!ValidaPermissoeNaConta(acesso.Value), MensagensBase.LIMITE_USUARIOS_MESTRES);
                 Acesso = acesso.Value;
+
             }
 
             if (status.HasValue)
-                Status = status.Value;
-
-            bool usuarioMestre = ExpiracaoPorAcesso(Acesso);
-
-            if (expiracao.HasValue)
-                ContasUsuariosValidacao.Verifica(usuarioMestre, MensagensContasUsuarios.MESTRE_NAO_POSSUI_TEMPO_LIMITE);
-
-            if(expirado.HasValue && expirado.Value)
-                ContasUsuariosValidacao.Verifica(usuarioMestre, MensagensContasUsuarios.MESTRE_NAO_POSSUI_TEMPO_LIMITE);
-
-            if (expiracao.HasValue)
             {
-                ContasUsuariosValidacao.Verifica(ValidaExpiracao(expiracao.Value), MensagensContasUsuarios.TEMPO_MIN_EXPIRACAO);
-                Expiracao = DateTime.UtcNow.AddMinutes(expiracao.Value);
+                ContasUsuariosValidacao.Verifica(!status.Value.Equals(TipoStatusContasUsuario.Ativo) && ValidaUsuarioMestre(Acesso), MensagensContasUsuarios.ATUALIZA_PARA_USUARIO_MESTRE_DIFERENTE_DE_ATIVO);
+                Status = status.Value;
             }
 
-            if(expirado.HasValue)
-                Expiracao = expirado.Value ? DateTime.UtcNow.AddMinutes(-20) : null;
+            if (expiracao.HasValue || expirado.HasValue)
+            {
+                ContasUsuariosValidacao.Verifica(expiracao.HasValue && (expirado.HasValue), MensagensContasUsuarios.CONFLITO_AO_EXPIRAR);
 
+                if (expiracao.HasValue)
+                {
+                    ContasUsuariosValidacao.Verifica(ValidaExpiracao(expiracao.Value), MensagensContasUsuarios.TEMPO_MIN_EXPIRACAO);
+                    Expiracao = DateTime.UtcNow.AddMinutes(expiracao.Value);
+                }
+
+                if (expirado.HasValue)
+                    Expiracao = expirado.Value ? DateTime.UtcNow.AddMinutes(-60) : null;
+            }
         }
         public void SairDaConta()
         {
@@ -141,6 +149,23 @@ namespace Financ.Domain.Entidades
             ContasUsuariosValidacao.Verifica(contasUsuarioRemetente == this, MensagensContasUsuarios.USUARIO_TENTA_SE_EXPULSAR);
             ContasUsuariosValidacao.Verifica(Acesso == TiposAcessos.Mestre, MensagensContasUsuarios.USUARIO_MESTRE_NAO_PODE_SER_REMOVIDO);
         }
+        public bool ValidaPermissoeNaConta(TiposAcessos acessoDestinatario)
+        {
+            return !(acessoDestinatario.Equals(TiposAcessos.Mestre) && Conta.ContaUsuarios.Where(x => x.Acesso.Equals(TiposAcessos.Mestre) && x.Status.Equals(TipoStatusContasUsuario.Ativo)).Take(2).Count() == 2);
+        }
+        public bool ValidaUsuarioMestre(TiposAcessos acesso)
+        {
+            return TiposAcessos.Mestre.Equals(acesso);
+        }
+        public bool ExpiracaoPorAcesso(TiposAcessos acesso)
+        {
+            return acesso.Equals(TiposAcessos.Mestre);
+        }
+        public bool ValidaExpiracao(int minutos)
+        {
+            return minutos < 15;
+        }
+
         private void ValidaUsuarioRemetenteMestreAtivoDaConta(ContasUsuarios? usuario)
         {
             ValidaUsuarioPertenceConta(usuario);
@@ -149,37 +174,13 @@ namespace Financ.Domain.Entidades
 
         private void ValidaUsuarioPertenceConta(ContasUsuarios? usuario)
         {
-            ContasUsuariosValidacao.Verifica(
-                usuario is null || usuario.Conta != Conta,
-                MensagensContasUsuarios.USUARIO_NAO_PERTENCE_A_CONTA);
+            ContasUsuariosValidacao.Verifica(usuario is null || usuario.Conta != Conta, MensagensContasUsuarios.USUARIO_NAO_PERTENCE_A_CONTA);
         }
 
         private void ValidaUsuarioMestreAtivo(ContasUsuarios usuario)
         {
-            ContasUsuariosValidacao.Verifica(
-                usuario.Acesso != TiposAcessos.Mestre,
-                MensagensContasUsuarios.ACESSO_NEGADO);
-
-            ContasUsuariosValidacao.Verifica(
-                usuario.Status != TipoStatusContasUsuario.Ativo,
-                MensagensContasUsuarios.ACESSO_NEGADO_POR_STATUS);
-        }
-        public bool ValidaPermissoeNaConta(TiposAcessos acessoDestinatario)
-        {
-            return !(acessoDestinatario.Equals(TiposAcessos.Mestre) && Conta.ContaUsuarios.Where(x => x.Acesso.Equals(TiposAcessos.Mestre) && x.Status.Equals(TipoStatusContasUsuario.Ativo)).Take(2).Count() == 2);
-        }
-        public bool ValidaTempoExpiracaoUsuarioMestre(TiposAcessos acesso)
-        {
-            return TiposAcessos.Mestre.Equals(acesso) ;
-        }
-
-        public bool ExpiracaoPorAcesso(TiposAcessos acesso)
-        {
-            return acesso.Equals(TiposAcessos.Mestre);
-        }
-        public bool ValidaExpiracao(int minutos)
-        {
-            return minutos < 15;
+            ContasUsuariosValidacao.Verifica(usuario.Acesso != TiposAcessos.Mestre, MensagensContasUsuarios.ACESSO_NEGADO);
+            ContasUsuariosValidacao.Verifica(usuario.Status != TipoStatusContasUsuario.Ativo, MensagensContasUsuarios.ACESSO_NEGADO_POR_STATUS);
         }
     }
 }
