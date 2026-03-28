@@ -10,8 +10,6 @@ namespace Financ.Application.DTOs.ContasUsuarios.Post
     public class RemoveContaUsuarioDTO
     {
         [Required]
-        public int idConta { get; set; }
-        [Required]
         public string idUsuarioDestinatario { get; set; } = string.Empty;
     }
 }

@@ -1,5 +1,7 @@
-﻿using Financ.Application.DTOs.Contas.Get;
+﻿using Financ.Application.DTOs.Base;
+using Financ.Application.DTOs.Contas.Get;
 using Financ.Application.DTOs.ContasUsuarios.Get;
+using Financ.Application.DTOs.ContasUsuarios.Get.Filtros;
 using Financ.Application.DTOs.ContasUsuarios.Post;
 using Financ.Domain.Entidades;
 using System;
@@ -22,14 +24,16 @@ namespace Financ.Application.Mapeamento
                           contaUsuario.Status,
                           contaUsuario.Expiracao,
                           contaUsuario.Expiracao.HasValue && contaUsuario.Expiracao < DateTime.UtcNow);
-        public static List<RetornaContasDTO> ParaDTO(IEnumerable<ContasUsuarios> contasUsuarios)
+
+        public static Data<RetornaContasUsuariosDTO> ParaDTO(IEnumerable<ContasUsuarios> contasUsuarios, FiltroContasUsuarioDTO? filtros)
         {
-            List<RetornaContasDTO> listaContas = new List<RetornaContasDTO>();
+            List<RetornaContasUsuariosDTO> listaContas = new List<RetornaContasUsuariosDTO>();
             foreach (var contaUsuario in contasUsuarios)
             {
-                listaContas.Add(new RetornaContasDTO(contaUsuario.Conta!.Id, contaUsuario.Conta.Titulo!, contaUsuario.Conta.Status));
+                listaContas.Add(new RetornaContasUsuariosDTO(new RetornaContasDTO(contaUsuario.Conta!.Id, contaUsuario.Conta.Titulo!, contaUsuario.Conta.Status), contaUsuario.Expiracao is not null ? contaUsuario.Expiracao < DateTime.UtcNow : null, contaUsuario.Expiracao));
             }
-            return listaContas;
+
+            return new Data<RetornaContasUsuariosDTO>(listaContas,new Meta { filtros = filtros});
         }
         public static RetornaCadastroContasUsuariosDTO ParaDTO(ContasUsuarios contaUsuario) =>
             new RetornaCadastroContasUsuariosDTO(

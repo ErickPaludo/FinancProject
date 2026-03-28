@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Financ.Application.DTOs.Contas.Get.Filtros
+namespace Financ.Application.DTOs.ContasUsuarios.Get.Filtros
 {
-    public class FiltroContaDTO
+    public class FiltroContasUsuarioDTO
     {
         public int? Id { get; set; }
         public string? Titulo { get; set; }

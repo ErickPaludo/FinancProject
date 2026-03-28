@@ -9,7 +9,6 @@ namespace Financ.Application.DTOs.ContasUsuarios.Get.Filtros
 {
     public class FiltroUsuarioAssociado
     {
-        public int IdConta { get; set; }
         public string? IdUsuario { get; set; }
         public string? NomeUsuario { get; set; }
         public TiposAcessos? Acesso { get; set; }

@@ -1,6 +1,5 @@
 ﻿using Financ.Application.Comun.Resultado;
 using Financ.Application.CQRS.Contas_.Commands;
-using Financ.Application.DTOs.Contas.Get;
 using Financ.Application.DTOs.ContasUsuarios.Get;
 using Financ.Application.Mapeamento;
 using Financ.Domain.Entidades;

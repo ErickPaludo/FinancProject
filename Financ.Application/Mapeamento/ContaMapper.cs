@@ -1,4 +1,4 @@
-﻿using Financ.Application.DTOs.Contas.Get;
+﻿using Financ.Application.DTOs.ContasUsuarios.Get;
 using Financ.Domain.Entidades;
 using System;
 using System.Collections.Generic;
