@@ -6,22 +6,14 @@ using Financ.Infra.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NetDevPack.SimpleMediator;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
 using Financ.Application.Comun.Resultado;
 using Financ.Application.DTOs.Autenticação.Get;
-using Financ.Application.DTOs.Contas.Get;
 using Financ.Application.DTOs.ContasUsuarios.Get;
 using Financ.Application.DTOs.Usuarios.Get;
 using Financ.Application.DTOs.ContasUsuarios.Post;
 using Financ.Application.DTOs.Convites.Get;
 using Financ.Application.CQRS.Contas_.Commands;
 using Financ.Application.CQRS.Contas_Commands;
-using Financ.Application.CQRS.Contas_.Querys;
 using Financ.Application.CQRS.Contas_.Handler;
 using Financ.Application.CQRS.Contas_Usuarios.Commands;
 using Financ.Application.CQRS.Contas_Usuarios.Querys;
@@ -44,7 +36,6 @@ namespace Financ.Infra.IoC
 
             services.AddScoped<IRequestHandler<CriarContaCommand, Resultado<RetornaContasDTO>>, CriarContaHandler>();
             services.AddScoped<IRequestHandler<AtualizarContaCommand, Resultado<RetornaContasDTO>>, AtualizarContasHandler>();
-            services.AddScoped<IRequestHandler<RetornaContaQuery, Resultado<List<RetornaContasDTO>>>, RetornaContasHandler>();
 
             // 2. Contexto de Contas de Usuários (Vínculos)
             services.AddScoped<IRequestHandler<AceitaConviteCommand, Resultado<RetornaPostCadastroDTO>>, AceitaConviteHandler>();

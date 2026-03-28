@@ -9,7 +9,7 @@ public static class MigrationManager
     {
         using (var scope = host.Services.CreateScope())
         {
-            using (var appContext = scope.ServiceProvider.GetRequiredService<AppContextoData>()) // Substitua ApplicationDbContext pelo nome do seu DbContext
+            using (var appContext = scope.ServiceProvider.GetRequiredService<AppContextoData>()) 
             {
                 try
                 {
@@ -17,9 +17,8 @@ public static class MigrationManager
                 }
                 catch (Exception ex)
                 {
-                    // Logar o erro, ou lidar com ele de forma apropriada
                     Console.WriteLine($"Erro ao aplicar migrations: {ex.Message}");
-                    throw; // Re-lançar a exceção para falhar a inicialização do host se as migrations não puderem ser aplicadas
+                    throw; 
                 }
             }
         }

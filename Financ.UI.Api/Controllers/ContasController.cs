@@ -1,16 +1,11 @@
-using Financ.Application.Comun.Resultado;
 using Financ.Application.CQRS.Contas_.Commands;
-using Financ.Application.CQRS.Contas_.Querys;
 using Financ.Application.CQRS.Contas_Commands;
 using Financ.Application.DTOs.Contas.Get;
-using Financ.Application.DTOs.Contas.Get.Filtros;
 using Financ.Application.DTOs.Contas.Ptch;
-using Financ.Domain.Entidades;
 using Financ.UI.Api.Extensao;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NetDevPack.SimpleMediator;
-using System.Security.Claims;
 
 namespace Financ.UI.Api.Controllers
 {
@@ -31,12 +26,6 @@ namespace Financ.UI.Api.Controllers
         {
             var conta = await _mediator.Send(new CriarContaCommand(User.RetornaIdUsuario(), contaDTO.Titulo));
             return conta.RetornoAutomatico();
-        }
-        [HttpGet]
-        public async Task<IActionResult> RetornarContas([FromQuery] FiltroContaDTO? parametros)
-        {
-            var contasLista = await _mediator.Send(new RetornaContaQuery(User.RetornaIdUsuario(), parametros));
-            return contasLista.RetornoAutomatico();
         }
 
         [HttpPatch("{idContaUsuario}/atualiza")]

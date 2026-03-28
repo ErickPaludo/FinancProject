@@ -30,9 +30,16 @@ namespace Financ.UI.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> RetornaUsuarosAssociados([FromQuery] FiltroUsuarioAssociado filtroConta)
+        public async Task<IActionResult> RetornarContas([FromQuery] FiltroContasUsuarioDTO? parametros)
         {
-            var usuariosAssociados = await _mediator.Send(new RetornaUsuariosAssociadosQuery(User.RetornaIdUsuario(), filtroConta.IdConta, filtroConta.IdUsuario, filtroConta.NomeUsuario, filtroConta.Acesso, filtroConta.Status));
+            var contasLista = await _mediator.Send(new RetornaContaUsuariosQuery(User.RetornaIdUsuario(), parametros));
+            return contasLista.RetornoAutomatico();
+        }
+
+        [HttpGet("{idConta}/associados")]
+        public async Task<IActionResult> RetornaUsuarosAssociados([FromRoute]int idConta, [FromQuery] FiltroUsuarioAssociado filtroConta)
+        {
+            var usuariosAssociados = await _mediator.Send(new RetornaUsuariosAssociadosQuery(User.RetornaIdUsuario(), idConta, filtroConta.IdUsuario, filtroConta.NomeUsuario, filtroConta.Acesso, filtroConta.Status));
             return usuariosAssociados.RetornoAutomatico();
         }
 
@@ -50,10 +57,10 @@ namespace Financ.UI.Api.Controllers
             return convite.RetornoAutomatico();
         }
 
-        [HttpPost("expurgo")]
-        public async Task<IActionResult> RemoveContaUsuario(RemoveContaUsuarioDTO contaUsuarioDTO)
+        [HttpPost("{idConta}/expurgo")]
+        public async Task<IActionResult> RemoveContaUsuario([FromRoute]int idConta, [FromBody]RemoveContaUsuarioDTO contaUsuarioDTO)
         {
-            var convite = await _mediator.Send(new RemoveContaUsuarioCommand(User.RetornaIdUsuario(),contaUsuarioDTO.idUsuarioDestinatario,contaUsuarioDTO.idConta));
+            var convite = await _mediator.Send(new RemoveContaUsuarioCommand(User.RetornaIdUsuario(),contaUsuarioDTO.idUsuarioDestinatario,idConta));
             return convite.RetornoAutomatico();
         }
     }
