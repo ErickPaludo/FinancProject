@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Financ.Domain.Validacoes
 {
-    internal class AutenticacaoValidacoes : BaseValidacao
+    public class AutenticacaoValidacoes : BaseValidacao
     {
         public AutenticacaoValidacoes(string erro) : base(erro) { }
         public static void Verifica(bool condicao, string mensagem)

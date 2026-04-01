@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Financ.Domain.Validacoes;
+using Financ.Domain.Validacoes.Mensagens;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -17,7 +19,7 @@ namespace Financ.Domain.Entidades
 
         public Usuario Usuario { get; private set; }
 
-        public Autenticacao(){}
+        public Autenticacao() { }
 
         public Autenticacao(string idUsuario, string refreshToken, long expirationRefresh)
         {
@@ -26,7 +28,10 @@ namespace Financ.Domain.Entidades
             RefreshToken = refreshToken;
             ExpirationRefresh = expirationRefresh;
         }
-
+        public void ValidaRefreshToken(string refreshToken)
+        {
+            AutenticacaoValidacoes.Verifica(string.IsNullOrEmpty(refreshToken) || RefreshToken is null || Revoke, MensagensAutenticacao.REFRESH_TOKEN_INVALIDO);
+        }
         public void AtualizaRefreshToken(string refreshToken, long expirationRefresh)
         {
             RefreshToken = refreshToken;
@@ -37,5 +42,6 @@ namespace Financ.Domain.Entidades
         {
             Revoke = true;
         }
+
     }
 }

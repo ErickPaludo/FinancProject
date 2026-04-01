@@ -54,7 +54,7 @@ namespace Financ.Domain.Entidades
             Status = status;
         }
 
-        public void AtualizaConta(ContasUsuarios usuario, string? titulo, TiposStatusContas? status)
+        public void AtualizaConta(ContasUsuarios? usuario, string? titulo, TiposStatusContas? status)
         {
             ContasValidacao.Verifica(usuario is null || usuario.Conta != this, MensagensContasUsuarios.USUARIO_NAO_PERTENCE_A_CONTA);
             ContasValidacao.Verifica(!usuario!.Status.Equals(TipoStatusContasUsuario.Ativo), MensagensBase.USUARIO_INATIVO_NAO_PODE_SER_ATUALIZADO);
