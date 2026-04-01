@@ -6,9 +6,11 @@ using Konscious.Security.Cryptography;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Financ.Application.Services.Segurança
@@ -20,8 +22,10 @@ namespace Financ.Application.Services.Segurança
         {
             _segurancaConfig = segurancaConfig.Value;
         }
-        public (string salt, string hash) CriaPassArgon(string senha,string? salt = null)
+        public (string salt, string hash) CriaSenhaArgon(string senha, string? salt = null)
         {
+
+            ValidaNivelDeSegurancaSenha(senha);
             byte[] senhaBytes = Encoding.UTF8.GetBytes(senha);
             byte[] saltBytes = salt is null ? UtilSeguranca.GeraBytesAleatorios(32) : Convert.FromBase64String(salt);
 
@@ -41,12 +45,38 @@ namespace Financ.Application.Services.Segurança
             return (saltBase, hashBase);
         }
 
-        public bool ValidaPassArgon(string senhaBanco, string senha,string salt)
+        public bool ValidaSenhaArgon(string senhaBanco, string senha,string salt)
         {
-           return CryptographicOperations.FixedTimeEquals(
+            return CryptographicOperations.FixedTimeEquals(
                UtilSeguranca.ConverteParaBytes(senhaBanco),
-               UtilSeguranca.ConverteParaBytes(CriaPassArgon(senha, salt).hash)
+               UtilSeguranca.ConverteParaBytes(CriaSenhaArgon(senha, salt).hash)
             );
         } 
+        private void ValidaNivelDeSegurancaSenha(string senha)
+        {
+            if (string.IsNullOrWhiteSpace(senha))
+                throw new Exception("Informe a senha");
+
+            if(senha.Length < 8)
+                throw new Exception("A senha deve conter no mínimo 8 caracteres");
+
+            if(senha.Length > 16)
+                throw new Exception("A senha deve conter no máximo 16 caracteres");
+
+            var nivelSeguranca = Zxcvbn.Core.EvaluatePassword(senha).Score;
+
+            if (nivelSeguranca >= 3)
+                return;
+
+            string mensagem = nivelSeguranca switch
+            {
+                0 => "Senha extremamente fraca",
+                1 => "Senha muito fraca",
+                2 => "Senha fraca",
+                _ => "Senha inválida"
+            };
+
+            throw new Exception(mensagem);
+        }
     }
 }
