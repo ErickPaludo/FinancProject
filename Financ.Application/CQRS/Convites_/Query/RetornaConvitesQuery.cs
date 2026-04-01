@@ -1,4 +1,5 @@
 ﻿using Financ.Application.Comun.Resultado;
+using Financ.Application.DTOs.Base;
 using Financ.Application.DTOs.Convites.Get;
 using NetDevPack.SimpleMediator;
 using System;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Financ.Application.CQRS.Convites_.Query
 {
-    public class RetornaConvitesQuery : IRequest<Resultado<List<GetRetornaConvitesDTO>>>
+    public class RetornaConvitesQuery : IRequest<Resultado<BaseGet<GetRetornaConvitesDTO>>>
     {
         public string IdUsuario { get; }
         public bool RetornaConvitesRemetente { get; }

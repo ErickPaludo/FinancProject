@@ -4,6 +4,7 @@ using Financ.Application.DTOs.Autenticação.Get;
 using Financ.Application.Interfaces.Autenticação;
 using Financ.Domain.Entidades;
 using Financ.Domain.Interfaces;
+using Financ.Domain.Validacoes;
 using NetDevPack.SimpleMediator;
 using System;
 using System.Collections.Generic;
@@ -24,23 +25,31 @@ namespace Financ.Application.CQRS.Autenticação.Handler
         }
         public async Task<Resultado<RetornaTokenDTO>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
         {
-            Autenticacao? auth = await _unitOfWork.autenticacoesRepositorio.BuscarAuthComUsuarios(x => x.RefreshToken!.Equals(request.refreshToken));
-
-            if (string.IsNullOrEmpty(request.refreshToken) || auth is null || auth.RefreshToken is null)
-                return Resultado<RetornaTokenDTO>.GeraFalha(Falha.NaoAutorizado("Refresh token invalido"));
-
-            var refreshToken = _tokenService.RefreshToken(auth!, request.refreshToken);
-
-            auth.AtualizaRefreshToken(refreshToken.refreshToken, refreshToken.expirationRefreshToken);
-            _unitOfWork.autenticacoesRepositorio.Atualiza(auth);
-            await _unitOfWork.Commit();
-            return Resultado<RetornaTokenDTO>.GeraSucesso(new RetornaTokenDTO
+            try
             {
-                Expiracao = refreshToken.expirationTokenFormatado,
-                ExpiracaoRefresh = refreshToken.expirationRefreshTokenFormatado,
-                RefreshToken = refreshToken.refreshToken,
-                Token = refreshToken.token,
-            });
+                Autenticacao? auth = await _unitOfWork.autenticacoesRepositorio.BuscarAuthComUsuarios(x => x.RefreshToken!.Equals(request.refreshToken));
+
+                if (auth is null)
+                    return Resultado<RetornaTokenDTO>.GeraFalha(Falha.NaoAutorizado("Refresh token invalido"));
+
+                auth.ValidaRefreshToken(request.refreshToken);
+
+                var refreshToken = _tokenService.RefreshToken(auth!, request.refreshToken);
+
+                auth.AtualizaRefreshToken(refreshToken.refreshToken, refreshToken.expirationRefreshToken);
+                _unitOfWork.autenticacoesRepositorio.Atualiza(auth);
+                await _unitOfWork.Commit();
+                return Resultado<RetornaTokenDTO>.GeraSucesso(new RetornaTokenDTO
+                {
+                    Expiracao = refreshToken.expirationTokenFormatado,
+                    ExpiracaoRefresh = refreshToken.expirationRefreshTokenFormatado,
+                    RefreshToken = refreshToken.refreshToken,
+                    Token = refreshToken.token,
+                });
+            }catch(AutenticacaoValidacoes ex)
+            {
+                return Resultado<RetornaTokenDTO>.GeraFalha(Falha.NaoAutorizado(ex.Message));
+            }
         }
     }
 }

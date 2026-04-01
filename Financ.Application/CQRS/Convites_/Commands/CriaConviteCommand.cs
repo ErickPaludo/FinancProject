@@ -1,4 +1,5 @@
 ﻿using Financ.Application.Comun.Resultado;
+using Financ.Application.DTOs.Base;
 using Financ.Application.DTOs.Convites.Get;
 using Financ.Domain.Enums;
 using NetDevPack.SimpleMediator;
@@ -10,5 +11,5 @@ using System.Threading.Tasks;
 
 namespace Financ.Application.CQRS.Convites_.Commands
 {
-    public record CriaConviteCommand(string idRemetente,string emailDestinatario,int idConta,TiposAcessos acesso, int? expiracaoContaUsuario) : IRequest<Resultado<GetCriaConviteDTO>>;
+    public record CriaConviteCommand(string idRemetente,string emailDestinatario,int idConta,TiposAcessos acesso, int? expiracaoContaUsuario) : IRequest<Resultado<BasePost<GetCriaConviteDTO>>>;
 }

@@ -1,4 +1,5 @@
 ﻿using Financ.Application.Comun.Resultado;
+using Financ.Application.DTOs.Base;
 using Financ.Application.DTOs.ContasUsuarios.Get;
 using Financ.Application.DTOs.ContasUsuarios.Post;
 using Financ.Domain.Entidades;
@@ -12,5 +13,5 @@ using System.Threading.Tasks;
 
 namespace Financ.Application.CQRS.Convites_.Commands
 {
-    public record AceitaConviteCommand(int IdConvite,bool aceito, string IdUsuario) : IRequest<Resultado<RetornaPostCadastroDTO>>;
+    public record AceitaConviteCommand(int IdConvite,bool aceito, string IdUsuario) : IRequest<Resultado<BasePost<RetornaPostCadastroDTO>>>;
 }

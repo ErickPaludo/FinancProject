@@ -1,5 +1,6 @@
 ﻿using Financ.Application.Comun.Resultado;
 using Financ.Application.CQRS.Convites_.Commands;
+using Financ.Application.DTOs.Base;
 using Financ.Application.DTOs.ContasUsuarios.Get;
 using Financ.Application.DTOs.ContasUsuarios.Post;
 using Financ.Application.Mapeamento;
@@ -16,21 +17,21 @@ using System.Threading.Tasks;
 
 namespace Financ.Application.CQRS.Convites_.Handler
 {
-    public class AceitaConviteHandler : IRequestHandler<AceitaConviteCommand, Resultado<RetornaPostCadastroDTO>>
+    public class AceitaConviteHandler : IRequestHandler<AceitaConviteCommand, Resultado<BasePost<RetornaPostCadastroDTO>>>
     {
         private readonly IUnitOfWork _unitOfWork;
         public AceitaConviteHandler(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
-        public async Task<Resultado<RetornaPostCadastroDTO>> Handle(AceitaConviteCommand request, CancellationToken cancellationToken)
+        public async Task<Resultado<BasePost<RetornaPostCadastroDTO>>> Handle(AceitaConviteCommand request, CancellationToken cancellationToken)
         {
             try
             {
                 var convite = await _unitOfWork.convitesRepostorio.BuscarConviteComContasEContasUsuarios(x => x.Id == request.IdConvite && x.IdUsuarioDestinatario.Equals(request.IdUsuario));
 
                 if (convite is null)
-                    return Resultado<RetornaPostCadastroDTO>.GeraFalha(Falha.NaoEncontrado("Convite não encontrado!"));
+                    return Resultado<BasePost<RetornaPostCadastroDTO>>.GeraFalha(Falha.NaoEncontrado("Convite não encontrado!"));
 
                 convite.AceitaConvite(request.aceito);
 
@@ -38,7 +39,7 @@ namespace Financ.Application.CQRS.Convites_.Handler
                 {
                     _unitOfWork.convitesRepostorio.Atualiza(convite);
                     await _unitOfWork.Commit();
-                    return Resultado<RetornaPostCadastroDTO>.GeraSucesso(new RetornaPostCadastroDTO(request.aceito, null,convite.Observacao));
+                    return Resultado<BasePost<RetornaPostCadastroDTO>>.GeraSucesso(new BasePost<RetornaPostCadastroDTO>(new RetornaPostCadastroDTO(request.aceito, null,convite.Observacao)));
                 }
 
                 var contaUsuario = new ContasUsuarios(convite);
@@ -48,11 +49,11 @@ namespace Financ.Application.CQRS.Convites_.Handler
                 _unitOfWork.convitesRepostorio.Atualiza(convite);
 
                 await _unitOfWork.Commit();
-                return Resultado<RetornaPostCadastroDTO>.GeraSucesso(ContasUsuariosMapper.ParaDTO(convite, contaUsuario));
+                return Resultado<BasePost<RetornaPostCadastroDTO>>.GeraSucesso(ContasUsuariosMapper.ParaDTO(convite, contaUsuario));
             }
             catch (ContasUsuariosValidacao contasUsuariosExcessao)
             {
-                return Resultado<RetornaPostCadastroDTO>.GeraFalha(Falha.ErroOperacional(contasUsuariosExcessao.Message));
+                return Resultado<BasePost<RetornaPostCadastroDTO>>.GeraFalha(Falha.ErroOperacional(contasUsuariosExcessao.Message));
             }
         }
     }

@@ -7,11 +7,5 @@ using System.Threading.Tasks;
 
 namespace Financ.Application.DTOs.ContasUsuarios.Get.Filtros
 {
-    public class FiltroUsuarioAssociado
-    {
-        public string? IdUsuario { get; set; }
-        public string? NomeUsuario { get; set; }
-        public TiposAcessos? Acesso { get; set; }
-        public TipoStatusContasUsuario? Status { get; set; }
-    }
+    public record FiltroUsuarioAssociado(string? IdUsuario = null, string? NomeUsuario = null, TiposAcessos? Acesso = null, TipoStatusContasUsuario? Status = null);
 }

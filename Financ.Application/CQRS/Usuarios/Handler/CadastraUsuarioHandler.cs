@@ -27,31 +27,22 @@ namespace Financ.Application.CQRS.Usuarios.Handler
         {
             try
             {
-                var converteSenha = _passService.CriaPassArgon(request.Senha);
-
-                Usuario usuario = new Usuario(request.PrimeiroNome, request.SegundoNome, request.Email, converteSenha.salt, converteSenha.hash);
-
-                if (!await _unitOfWork.usuariosRepostorio.ExisteId(x => x.Email.Equals(request.Email)))
-                {
-                    await _unitOfWork.usuariosRepostorio.Adicionar(usuario);
-                    await _unitOfWork.Commit();
-                    return Resultado<string>.GeraSucesso("Usuário criado com sucesso!");
-                }
-                else
-                {
+                if (await _unitOfWork.usuariosRepostorio.ExisteId(x => x.Email.Equals(request.Email)))
                     return Resultado<string>.GeraFalha(Falha.ErroOperacional("Já existe um usuário cadastrado com esse e-mail."));
-                }
 
-                return Resultado<string>.GeraFalha(Falha.ErroOperacional());
-
+                var converteSenha = _passService.CriaSenhaArgon(request.Senha,request.ConfirmarSenha);
+                Usuario usuario = new Usuario(request.PrimeiroNome, request.SegundoNome, request.Email, converteSenha.salt, converteSenha.hash);
+                await _unitOfWork.usuariosRepostorio.Adicionar(usuario);
+                await _unitOfWork.Commit();
+                return Resultado<string>.GeraSucesso("Usuário criado com sucesso!");
             }
             catch (UsuariosValidacoes ex)
             {
                 return Resultado<string>.GeraFalha(Falha.ErroOperacional(ex.Message));
             }
-            catch
+            catch (Exception ex)
             {
-                return Resultado<string>.GeraFalha(Falha.ErroOperacional());
+                return Resultado<string>.GeraFalha(Falha.ErroOperacional(ex.Message));
             }
         }
     }

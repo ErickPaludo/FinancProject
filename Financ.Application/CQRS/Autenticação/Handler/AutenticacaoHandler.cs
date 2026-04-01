@@ -36,7 +36,7 @@ namespace Financ.Application.CQRS.Autenticação.Handler
             if (usuario is null)
                 return Resultado<RetornaTokenDTO>.GeraFalha(Falha.NaoEncontrado("Usuário não encontrado!"));
 
-            if (!_segurancaServico.ValidaPassArgon(usuario.HashPass, request.Senha, usuario.Salt))
+            if (!_segurancaServico.ValidaSenhaArgon(usuario.HashPass, request.Senha, usuario.Salt))
                 return Resultado<RetornaTokenDTO>.GeraFalha(Falha.NaoAutorizado("Senha inválida."));
 
 

@@ -1,4 +1,5 @@
 ﻿using Financ.Application.Comun.Resultado;
+using Financ.Application.DTOs.Base;
 using Financ.Application.DTOs.ContasUsuarios.Get;
 using Financ.Domain.Entidades;
 using Financ.Domain.Enums;
@@ -16,5 +17,5 @@ namespace Financ.Application.CQRS.Contas_Commands
           string IdUsuario,      
           TiposStatusContas? Status,
           string? Titulo
-      ) : IRequest<Resultado<RetornaContasDTO>>;
+      ) : IRequest<Resultado<BasePost<RetornaContasDTO>>>;
 }

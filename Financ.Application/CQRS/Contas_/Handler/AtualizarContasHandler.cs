@@ -1,5 +1,6 @@
 ﻿using Financ.Application.Comun.Resultado;
 using Financ.Application.CQRS.Contas_Commands;
+using Financ.Application.DTOs.Base;
 using Financ.Application.DTOs.ContasUsuarios.Get;
 using Financ.Application.Mapeamento;
 using Financ.Domain.Entidades;
@@ -14,37 +15,34 @@ using System.Text;
 using System.Threading.Tasks;
 namespace Financ.Application.CQRS.Contas_.Handler
 {
-    public class AtualizarContasHandler : IRequestHandler<AtualizarContaCommand, Resultado<RetornaContasDTO>>
+    public class AtualizarContasHandler : IRequestHandler<AtualizarContaCommand, Resultado<BasePost<RetornaContasDTO>>>
     {
         private readonly IUnitOfWork _unitOfWork;
         public AtualizarContasHandler(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
-        public async Task<Resultado<RetornaContasDTO>> Handle(AtualizarContaCommand request, CancellationToken cancellationToken)
+        public async Task<Resultado<BasePost<RetornaContasDTO>>> Handle(AtualizarContaCommand request, CancellationToken cancellationToken)
         {
             try
             {
-                var conta = await _unitOfWork.contasRepositorio.BuscarPeloId<int>(request.IdConta);
+                Conta? conta = await _unitOfWork.contasRepositorio.BuscarContaComUsuarios(x => x.Id == request.IdConta);
+
                 if (conta is null)
-                    return Resultado<RetornaContasDTO>.GeraFalha(Falha.NaoEncontrado("Conta não encontrada."));
+                    return Resultado<BasePost<RetornaContasDTO>>.GeraFalha(Falha.NaoEncontrado("Conta não encontrada."));
 
-                if (await _unitOfWork.contasRepositorio.BuscarObjetoUnico(x => x.Id == request.IdConta) == null)
-                    return Resultado<RetornaContasDTO>.GeraFalha(Falha.NaoEncontrado("Conta ou usuário inválidos."));
-
-                var contaUsuario = await _unitOfWork.contasUsuariosRepositorio.BuscarObjetoUnico(x => x.IdConta == request.IdConta && x.IdUsuario == request.IdUsuario);
-                //if (contaUsuario is null)
-                //    return Resultado<RetornaContasDTO>.GeraFalha(Falha.ErroOperacional("O Usuário não pertence a está conta!"));
+                ContasUsuarios? contaUsuario = conta.ContaUsuarios.FirstOrDefault(x => x.IdUsuario == request.IdUsuario);
 
                 conta.AtualizaConta(contaUsuario, request.Titulo,request.Status);
 
                 _unitOfWork.contasRepositorio.Atualiza(conta);
                 await _unitOfWork.Commit();
-                return Resultado<RetornaContasDTO>.GeraSucesso(ContaMapper.ParaDTO(conta));
+
+                return Resultado<BasePost<RetornaContasDTO>>.GeraSucesso(ContasUsuariosMapper.ParaDTO(contaUsuario!, null));
             }
             catch (ContasValidacao contasExecao)
             {
-                return Resultado<RetornaContasDTO>.GeraFalha(Falha.ErroOperacional(contasExecao.Message));
+                return Resultado<BasePost<RetornaContasDTO>>.GeraFalha(Falha.ErroOperacional(contasExecao.Message));
             }
         }
     }

@@ -1,4 +1,5 @@
 ﻿using Financ.Application.Comun.Resultado;
+using Financ.Application.DTOs.Base;
 using Financ.Application.DTOs.ContasUsuarios.Get;
 using Financ.Domain.Entidades;
 using Financ.Domain.Enums;
@@ -13,5 +14,5 @@ namespace Financ.Application.CQRS.Contas_.Commands
 {
     public sealed record CriarContaCommand(
         string IdUsuario,
-        string Titulo) : IRequest<Resultado<RetornaContasDTO>>;
+        string Titulo) : IRequest<Resultado<BasePost<RetornaContasDTO>>>;
 }

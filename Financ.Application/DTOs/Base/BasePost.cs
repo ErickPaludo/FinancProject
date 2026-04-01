@@ -6,5 +6,6 @@ using System.Threading.Tasks;
 
 namespace Financ.Application.DTOs.Base
 {
-    public record Data<T>(List<T>? Conteudo, Meta? Metadados) where T : class;
+    public record BasePost<T>(T Valor) where T : class;
+
 }

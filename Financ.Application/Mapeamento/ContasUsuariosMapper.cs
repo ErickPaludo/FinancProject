@@ -10,12 +10,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Financ.Application.Mapeamento
 {
     public static class ContasUsuariosMapper
     {
-        public static RetornaUsuariosAssociadosDTO ParaDTO(ContasUsuarios contaUsuario, Usuario usuario) =>
+        public static RetornaUsuariosAssociadosDTO ParaUsuariosAssociadosDTO(ContasUsuarios contaUsuario, Usuario usuario) =>
             new RetornaUsuariosAssociadosDTO(
                           contaUsuario.IdUsuario,
                           usuario.NomeCompleto,
@@ -25,15 +26,19 @@ namespace Financ.Application.Mapeamento
                           contaUsuario.Expiracao,
                           contaUsuario.Expiracao.HasValue && contaUsuario.Expiracao < DateTime.UtcNow);
 
-        public static Data<RetornaContasUsuariosDTO> ParaDTO(IEnumerable<ContasUsuarios> contasUsuarios, FiltroContasUsuarioDTO? filtros)
+        public static BaseGet<RetornaContasDTO> ParaDTO(IEnumerable<ContasUsuarios> contasUsuarios, FiltroContasUsuarioDTO? filtros)
         {
-            List<RetornaContasUsuariosDTO> listaContas = new List<RetornaContasUsuariosDTO>();
+            List<RetornaContasDTO> listaContas = new List<RetornaContasDTO>();
             foreach (var contaUsuario in contasUsuarios)
             {
-                listaContas.Add(new RetornaContasUsuariosDTO(new RetornaContasDTO(contaUsuario.Conta!.Id, contaUsuario.Conta.Titulo!, contaUsuario.Conta.Status), contaUsuario.Expiracao is not null ? contaUsuario.Expiracao < DateTime.UtcNow : null, contaUsuario.Expiracao));
+                listaContas.Add(new RetornaContasDTO(contaUsuario.Conta!.Id, contaUsuario.Conta.Titulo!, contaUsuario.Conta.Status, contaUsuario.Expiracao is not null ? contaUsuario.Expiracao < DateTime.UtcNow : null, contaUsuario.Expiracao));
             }
 
-            return new Data<RetornaContasUsuariosDTO>(listaContas,new Meta { filtros = filtros});
+            return new BaseGet<RetornaContasDTO>(listaContas, new Meta { filtros = filtros });
+        }
+        public static BasePost<RetornaContasDTO> ParaDTO(ContasUsuarios contaUsuario, FiltroContasUsuarioDTO? filtros)
+        {
+            return new BasePost<RetornaContasDTO>(new RetornaContasDTO(contaUsuario.Conta!.Id, contaUsuario.Conta.Titulo!, contaUsuario.Conta.Status, contaUsuario.Expiracao is not null ? contaUsuario.Expiracao < DateTime.UtcNow : null, contaUsuario.Expiracao));
         }
         public static RetornaCadastroContasUsuariosDTO ParaDTO(ContasUsuarios contaUsuario) =>
             new RetornaCadastroContasUsuariosDTO(
@@ -41,7 +46,7 @@ namespace Financ.Application.Mapeamento
                           contaUsuario.Acesso,
                           contaUsuario.IdUsuario);
 
-        public static RetornaPostCadastroDTO ParaDTO(Convites convite, ContasUsuarios contaUsuario) =>
-         new RetornaPostCadastroDTO(convite.Aceito!.Value,ParaDTO(contaUsuario),convite.Observacao);
+        public static BasePost<RetornaPostCadastroDTO> ParaDTO(Convites convite, ContasUsuarios contaUsuario) =>
+         new BasePost<RetornaPostCadastroDTO>(new RetornaPostCadastroDTO(convite.Aceito!.Value, ParaDTO(contaUsuario), convite.Observacao));
     }
 }

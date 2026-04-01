@@ -10,10 +10,11 @@ using System.Threading.Tasks;
 using Financ.Application.Mapeamento;
 using Financ.Application.CQRS.Convites_.Query;
 using Financ.Domain.Entidades;
+using Financ.Application.DTOs.Base;
 
 namespace Financ.Application.CQRS.Convites_.Handler
 {
-    public class RetornaConvitesHandler : IRequestHandler<RetornaConvitesQuery, Resultado<List<GetRetornaConvitesDTO>>>
+    public class RetornaConvitesHandler : IRequestHandler<RetornaConvitesQuery, Resultado<BaseGet<GetRetornaConvitesDTO>>>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -22,14 +23,14 @@ namespace Financ.Application.CQRS.Convites_.Handler
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<Resultado<List<GetRetornaConvitesDTO>>> Handle(RetornaConvitesQuery request, CancellationToken cancellationToken)
+        public async Task<Resultado<BaseGet<GetRetornaConvitesDTO>>> Handle(RetornaConvitesQuery request, CancellationToken cancellationToken)
         {
             IEnumerable<Convites?> convites = await _unitOfWork.convitesRepostorio.ObterConviteComRemetenteDestinatarioEContaAsync(request.RetornaConvitesRemetente ? r => r.IdUsuarioRemetente.Equals(request.IdUsuario) : d => d.IdUsuarioDestinatario.Equals(request.IdUsuario));
 
             if(!convites.Any())
-                return Resultado<List<GetRetornaConvitesDTO>>.GeraFalha(Falha.NaoEncontrado("Nenhum convite foi encontrado!"));
+                return Resultado<BaseGet<GetRetornaConvitesDTO>>.GeraFalha(Falha.NaoEncontrado("Nenhum convite foi encontrado!"));
 
-             return Resultado<List<GetRetornaConvitesDTO>>.GeraSucesso(ConvitesMapper.ParaDTO(convites));
+             return Resultado<BaseGet<GetRetornaConvitesDTO>>.GeraSucesso(ConvitesMapper.ParaDTO(convites, request.RetornaConvitesRemetente));
         }
     }
 }

@@ -10,7 +10,7 @@ using NetDevPack.SimpleMediator;
 
 namespace Financ.Application.CQRS.Contas_Usuarios.Handler
 {
-    public class RetornaContasUsuariosHandler : IRequestHandler<RetornaContaUsuariosQuery, Resultado<Data<RetornaContasUsuariosDTO>>>
+    public class RetornaContasUsuariosHandler : IRequestHandler<RetornaContaUsuariosQuery, Resultado<BaseGet<RetornaContasDTO>>>
     {
         private readonly IUnitOfWork _unitOfWork;
         public RetornaContasUsuariosHandler(IUnitOfWork unitOfWork)
@@ -18,16 +18,16 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<Resultado<Data<RetornaContasUsuariosDTO>>> Handle(RetornaContaUsuariosQuery request, CancellationToken cancellationToken)
+        public async Task<Resultado<BaseGet<RetornaContasDTO>>> Handle(RetornaContaUsuariosQuery request, CancellationToken cancellationToken)
         {
            var contasUsuarios = await ContasUsuariosSelecionadas(request);
 
             if (contasUsuarios.Count() == 0)
-                return Resultado<Data<RetornaContasUsuariosDTO>>.GeraFalha(Falha.NaoEncontrado("Nenhuma conta foi encontrada!"));
+                return Resultado<BaseGet<RetornaContasDTO>>.GeraFalha(Falha.NaoEncontrado("Nenhuma conta foi encontrada!"));
 
             List<RetornaContasDTO> listaContas = new List<RetornaContasDTO>();
 
-            return Resultado<Data<RetornaContasUsuariosDTO>>.GeraSucesso(ContasUsuariosMapper.ParaDTO(contasUsuarios, request.Filtros));
+            return Resultado<BaseGet<RetornaContasDTO>>.GeraSucesso(ContasUsuariosMapper.ParaDTO(contasUsuarios, request.Filtros));
         }
         private async Task<IEnumerable<ContasUsuarios>> ContasUsuariosSelecionadas(RetornaContaUsuariosQuery filtros)
         {

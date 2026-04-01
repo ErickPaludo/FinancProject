@@ -29,10 +29,10 @@ namespace Financ.Application.CQRS.Segurança.Handler
             if (usuario is null)
                 return Resultado<string>.GeraFalha(Falha.NaoEncontrado("Usuário não encontrado!"));
 
-            if (!_passService.ValidaPassArgon(usuario.HashPass, request.senhaAntiga, usuario.Salt))
+            if (!_passService.ValidaSenhaArgon(usuario.HashPass, request.senhaAntiga, usuario.Salt))
                 return Resultado<string>.GeraFalha(Falha.NaoAutorizado("Senha inválida."));
 
-            var senha = _passService.CriaPassArgon(request.senhaNova);
+            var senha = _passService.CriaSenhaArgon(request.senhaNova,"");
             usuario.AtualizaSenha(senha.salt,senha.hash);
             _unitOfWork.usuariosRepostorio.Atualiza(usuario);
             await _unitOfWork.Commit();
