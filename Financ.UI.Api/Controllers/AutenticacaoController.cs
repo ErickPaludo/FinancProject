@@ -25,12 +25,21 @@ namespace Financ.UI.Api.Controllers
         public async Task<IActionResult> Login(ConectaUsuarioDTO usuario)
         {
             var tokenAutenticacao = await _mediator.Send(new AutenticacaoCommand(usuario.Email, usuario.Senha));
+
+            if (tokenAutenticacao.ValidaSucesso)
+                SetRefreshTokenCookie(tokenAutenticacao!.Sucesso!.RefreshToken);
+
             return tokenAutenticacao.RetornoAutomatico();
         }
         [HttpPost("refresh")]
-        public async Task<IActionResult> Refresh([FromHeader] string refreshToken)
+        public async Task<IActionResult> Refresh()
         {
+            var refreshToken = Request.Cookies["refreshToken"];
             var tokenAutenticacao = await _mediator.Send(new RefreshTokenCommand(refreshToken));
+
+            if (tokenAutenticacao.ValidaSucesso)
+                SetRefreshTokenCookie(tokenAutenticacao!.Sucesso!.RefreshToken);
+
             return tokenAutenticacao.RetornoAutomatico();
         }
         [HttpPost("revoke")]
@@ -39,6 +48,22 @@ namespace Financ.UI.Api.Controllers
         {
             var tokenAutenticacao = await _mediator.Send(new RevokeCommand(User.RetornaIdUsuario()));
             return tokenAutenticacao.RetornoAutomatico();
+        }
+
+        private void SetRefreshTokenCookie(string refreshToken)
+        {
+            if (string.IsNullOrEmpty(refreshToken))
+                return;
+
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,               // não acessível pelo JS
+                Secure = false,                 // HTTPS em produção
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddDays(7)
+            };
+
+            Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
         }
     }
 }

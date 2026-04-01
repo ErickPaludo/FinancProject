@@ -31,9 +31,10 @@ namespace Financ.UI.Api
                 options.AddPolicy(name: MyAllowSpecificOrigins,
                     policy =>
                     {
-                        policy.AllowAnyOrigin()
+                        policy.WithOrigins("http://localhost:5173", "http://68.211.177.67:5000")
                               .AllowAnyMethod()
-                              .AllowAnyHeader();
+                              .AllowAnyHeader()
+                              .AllowCredentials();
                     });
             });
             builder.Services.AddControllers();
@@ -44,8 +45,8 @@ namespace Financ.UI.Api
             // Configure the HTTP request pipeline.
             //if (app.Environment.IsDevelopment())
             //{
-                app.UseSwagger();
-                app.UseSwaggerUI();
+            app.UseSwagger();
+            app.UseSwaggerUI();
             //}
             app.UseHttpsRedirection();
             app.UseRouting();

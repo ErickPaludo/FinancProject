@@ -37,9 +37,9 @@ namespace Financ.UI.Api.Controllers
         }
 
         [HttpGet("{idConta}/associados")]
-        public async Task<IActionResult> RetornaUsuarosAssociados([FromRoute]int idConta, [FromQuery] FiltroUsuarioAssociado filtroConta)
+        public async Task<IActionResult> RetornaUsuarosAssociados([FromRoute]int idConta, [FromQuery] FiltroUsuarioAssociado? filtroConta = null)
         {
-            var usuariosAssociados = await _mediator.Send(new RetornaUsuariosAssociadosQuery(User.RetornaIdUsuario(), idConta, filtroConta.IdUsuario, filtroConta.NomeUsuario, filtroConta.Acesso, filtroConta.Status));
+            var usuariosAssociados = await _mediator.Send(new RetornaUsuariosAssociadosQuery(idConta,User.RetornaIdUsuario(), filtroConta));
             return usuariosAssociados.RetornoAutomatico();
         }
 
