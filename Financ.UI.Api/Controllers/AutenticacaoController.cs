@@ -59,7 +59,7 @@ namespace Financ.UI.Api.Controllers
             {
                 HttpOnly = true,               // não acessível pelo JS
                 Secure = false,                 // HTTPS em produção
-                SameSite = SameSiteMode.Strict,
+                SameSite = SameSiteMode.None,
                 Expires = DateTime.UtcNow.AddDays(7)
             };
 
