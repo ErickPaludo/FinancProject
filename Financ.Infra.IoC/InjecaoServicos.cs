@@ -33,22 +33,13 @@ namespace Financ.Infra.IoC
     {
         public static void ConfigurarInjecaoServicos(this IServiceCollection services)
         {
-
-            services.AddScoped<IRequestHandler<CriarContaCommand, Resultado<RetornaContasDTO>>, CriarContaHandler>();
-            services.AddScoped<IRequestHandler<AtualizarContaCommand, Resultado<RetornaContasDTO>>, AtualizarContasHandler>();
-
             // 2. Contexto de Contas de Usuários (Vínculos)
-            services.AddScoped<IRequestHandler<AceitaConviteCommand, Resultado<RetornaPostCadastroDTO>>, AceitaConviteHandler>();
             services.AddScoped<IRequestHandler<AtualizarContaUsuarioCommand, Resultado<RetornaCadastroContasUsuariosDTO>>, AtualizarContaUsuarioHandler>();
-            services.AddScoped<IRequestHandler<RetornaUsuariosAssociadosQuery, Resultado<List<RetornaUsuariosAssociadosDTO>>>, RetornaUsuariosAssociadosHandler>();
 
             // 3. Contexto de Usuários e Autenticação
             services.AddScoped<IRequestHandler<CadastraUsuarioCommand, Resultado<string>>, CadastraUsuarioHandler>();
             services.AddScoped<IRequestHandler<AutenticacaoCommand, Resultado<RetornaTokenDTO>>, AutenticacaoHandler>();
             services.AddScoped<IRequestHandler<RetornaUsuarioPorIdQuery, Resultado<RetornaUsuarioDTO>>, RetornaUsuarioHandler>();
-
-            services.AddScoped<IRequestHandler<CriaConviteCommand, Resultado<GetCriaConviteDTO>>, CriaConviteHandler>();
-
         }
     }
 }
