@@ -23,5 +23,8 @@ namespace Financ.Domain.Validacoes.Mensagens
 
         public const string MESMA_SENHA = "Senhas identicas.";
         public const string SENHA_VAZIA = "Obrigatório informar uma senha.";
+
+        public const string PRIMEIRO_NOME_INVALIDO = "Nome inválido";
+        public const string SEGUNDO_NOME_INVALIDO = "Sobrenome inválido";
     }
 }

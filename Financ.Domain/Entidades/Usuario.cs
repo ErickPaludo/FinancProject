@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Financ.Domain.Entidades
@@ -50,12 +51,26 @@ namespace Financ.Domain.Entidades
             UsuariosValidacoes.Verifica(string.IsNullOrWhiteSpace(primeiroNome), MensagensUsuarios.PRIMEIRO_NOME_OBRIGATORIO);
             UsuariosValidacoes.Verifica(string.IsNullOrWhiteSpace(segundoNome), MensagensUsuarios.SEGUNDO_NOME_OBRIGATORIO);
 
+            // Verifica comprimento mínimo e máximo
             UsuariosValidacoes.Verifica(primeiroNome.Length > 100, MensagensUsuarios.PRIMEIRO_NOME_MAXIMO);
             UsuariosValidacoes.Verifica(primeiroNome.Length < 3, MensagensUsuarios.PRIMEIRO_NOME_MINIMO);
 
             UsuariosValidacoes.Verifica(segundoNome.Length > 100, MensagensUsuarios.SEGUNDO_NOME_MAXIMO);
             UsuariosValidacoes.Verifica(segundoNome.Length < 3, MensagensUsuarios.SEGUNDO_NOME_MINIMO);
 
+            // Verifica caracteres inválidos (aceita letras, acentos, hífen e apóstrofo)
+            UsuariosValidacoes.Verifica(!primeiroNome.All(c => char.IsLetter(c) || c == '-' || c == '\'' || c == ' '),
+                MensagensUsuarios.PRIMEIRO_NOME_INVALIDO);
+            UsuariosValidacoes.Verifica(!segundoNome.All(c => char.IsLetter(c) || c == '-' || c == '\'' || c == ' '),
+                MensagensUsuarios.SEGUNDO_NOME_INVALIDO);
+
+            // Verifica espaços inválidos
+            UsuariosValidacoes.Verifica(primeiroNome.StartsWith(" ") || primeiroNome.EndsWith(" ") || primeiroNome.Contains("  "),
+                MensagensUsuarios.PRIMEIRO_NOME_INVALIDO);
+            UsuariosValidacoes.Verifica(segundoNome.StartsWith(" ") || segundoNome.EndsWith(" ") || segundoNome.Contains("  "),
+                MensagensUsuarios.SEGUNDO_NOME_INVALIDO);
+
+            // Atribuição final
             PrimeiroNome = primeiroNome;
             SegundoNome = segundoNome;
         }
@@ -64,7 +79,7 @@ namespace Financ.Domain.Entidades
             UsuariosValidacoes.Verifica(string.IsNullOrWhiteSpace(email), MensagensUsuarios.EMAIL_OBRIGATORIO);
             UsuariosValidacoes.Verifica(email.Length > 256, MensagensUsuarios.EMAIL_MAXIMO);
             UsuariosValidacoes.Verifica(email.Length < 6, MensagensUsuarios.EMAIL_MINIMO);
-            Email = email;
+            Email = email.Trim();
         }
         public void AtualizaSenha(string salt, string hashPass)
         {
