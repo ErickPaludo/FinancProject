@@ -30,7 +30,7 @@ namespace Financ.Application.CQRS.Usuarios.Handler
                 if (await _unitOfWork.usuariosRepostorio.ExisteId(x => x.Email.Equals(request.Email)))
                     return Resultado<string>.GeraFalha(Falha.ErroOperacional("Já existe um usuário cadastrado com esse e-mail."));
 
-                var converteSenha = _passService.CriaSenhaArgon(request.Senha,request.ConfirmarSenha);
+                var converteSenha = _passService.CriaSenhaArgon(request.Senha);
                 Usuario usuario = new Usuario(request.PrimeiroNome, request.SegundoNome, request.Email, converteSenha.salt, converteSenha.hash);
                 await _unitOfWork.usuariosRepostorio.Adicionar(usuario);
                 await _unitOfWork.Commit();
