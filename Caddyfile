@@ -1,3 +1,21 @@
+{
+    # Define o e-mail globalmente para o registro ACME
+    email erickpaludoyt@gmail.com
+}
+
 api.pldprojects.com.br {
-    reverse_proxy financ-api:5000
+    # Força o ZeroSSL para ignorar o bloqueio do Let's Encrypt
+    tls {
+        issuer acme {
+            dir https://acme.zerossl.com/v2/DV90
+        }
+    }
+
+    # Proxy para sua API (verifique se o nome é financ-api ou financapi )
+    reverse_proxy financ-api:5000 {
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
 }

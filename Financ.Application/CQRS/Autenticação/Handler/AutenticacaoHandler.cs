@@ -31,7 +31,8 @@ namespace Financ.Application.CQRS.Autenticação.Handler
 
         public async Task<Resultado<RetornaTokenDTO>> Handle(AutenticacaoCommand request, CancellationToken cancellationToken)
         {
-            var usuario = await _unitOfWork.usuariosRepostorio.BuscarObjetoUnico(x => x.Email.Equals(request.Email));
+            request.Email = request.Email.Trim();
+            var usuario = await _unitOfWork.usuariosRepostorio.BuscarObjetoUnico(x => x.Email == request.Email);
 
             if (usuario is null)
                 return Resultado<RetornaTokenDTO>.GeraFalha(Falha.NaoEncontrado("Usuário não encontrado!"));

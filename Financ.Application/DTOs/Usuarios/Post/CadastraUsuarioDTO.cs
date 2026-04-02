@@ -6,13 +6,10 @@ namespace Financ.Application.DTOs.Usuarios.Post
 {
     public class CadastraUsuarioDTO
     {
-        [Required]
         public string PrimeiroNome { get; set; }
 
-        [Required]
         public string SegundoNome { get; set; }
-        [Required]
-        [EmailAddress]
+
         public string Email { get; set; }
 
         [Required]

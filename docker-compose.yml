@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-  # PROXY REVERSO COM HTTPS AUTOMÁTICO (Caddy)
   caddy:
     image: caddy:latest
     container_name: caddy-proxy
@@ -16,7 +15,6 @@ services:
     networks:
       - financ-network
 
-  # SUA API .NET
   financapi:
     build:
       context: .
@@ -25,14 +23,13 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:5000
-      - ConnectionStrings__SqlServer=Server=sqlserver;Database=dbfinanc;User Id=sa;Password=F1n4c+P1d22;TrustServerCertificate=True
+      - ConnectionStrings:SqlServer=Server=sqlserver;Database=dbfinanc;User Id=sa;Password=F1n4c+P1d22;TrustServerCertificate=True
     depends_on:
       - sqlserver
     restart: on-failure
     networks:
       - financ-network
 
-  # SERVIÇO PARA APLICAR AS MIGRATIONS AUTOMATICAMENTE
   ef-migrations:
     build:
       context: .
@@ -40,7 +37,7 @@ services:
       target: build
     container_name: financ-migrations
     environment:
-      - ConnectionStrings__SqlServer=Server=sqlserver;Database=dbfinanc;User Id=sa;Password=F1n4c+P1d22;TrustServerCertificate=True
+      - ConnectionStrings:SqlServer=Server=sqlserver;Database=dbfinanc;User Id=sa;Password=F1n4c+P1d22;TrustServerCertificate=True
     depends_on:
       - sqlserver
     entrypoint: >
@@ -50,7 +47,6 @@ services:
     networks:
       - financ-network
 
-  # BANCO DE DADOS SQL SERVER
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: financ-sqlserver
@@ -59,7 +55,7 @@ services:
       - MSSQL_SA_PASSWORD=F1n4c+P1d22
       - MSSQL_PID=Developer
     ports:
-      - "1433:1433"
+      - "0.0.0.0:1433:1433"
     networks:
       - financ-network
 
