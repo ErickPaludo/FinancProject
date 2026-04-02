@@ -31,7 +31,7 @@ namespace Financ.UI.Api
                 options.AddPolicy(name: MyAllowSpecificOrigins,
                     policy =>
                     {
-                        policy.WithOrigins("http://localhost:5173")
+                        policy.WithOrigins("http://localhost:5173", "https://financ-gestaofinanceira.github.io")
                               .AllowAnyMethod()
                               .AllowAnyHeader()
                               .AllowCredentials();
