@@ -1,8 +1,3 @@
 api.pldprojects.com.br {
-    # Força o uso do ZeroSSL para fugir do limite do Let's Encrypt
-    tls {
-        issuer zerossl
-    }
-    
     reverse_proxy financ-api:5000
 }
