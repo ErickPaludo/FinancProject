@@ -1,20 +1,36 @@
 version: '3.8'
 
 services:
+  # PROXY REVERSO COM HTTPS AUTOMÁTICO (Caddy)
+  caddy:
+    image: caddy:latest
+    container_name: caddy-proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - financ-network
+
+  # SUA API .NET
   financapi:
     build:
       context: .
       dockerfile: Financ.UI.Api/Dockerfile
-    ports:
-      - "5000:5000" # Mapeia 5000 do Windows para 5000 do Container
+    container_name: financ-api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:5000 # Força a API a usar a porta 5000
-      - ConnectionStrings__SqlServer=Server=sqlserver;Database=dbfinanc;User Id=sa;Password=F1n4c+Pld22;TrustServerCertificate=True;
+      - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__SqlServer=Server=sqlserver;Database=dbfinanc;User Id=sa;Password=F1n4c+P1d22;TrustServerCertificate=True
     depends_on:
-      sqlserver:
-        condition: service_healthy
+      - sqlserver
     restart: on-failure
+    networks:
+      - financ-network
 
   # SERVIÇO PARA APLICAR AS MIGRATIONS AUTOMATICAMENTE
   ef-migrations:
@@ -22,31 +38,35 @@ services:
       context: .
       dockerfile: Financ.UI.Api/Dockerfile
       target: build
+    container_name: financ-migrations
     environment:
-      - ConnectionStrings__SqlServer=Server=sqlserver;Database=dbfinanc;User Id=sa;Password=F1n4c+Pld22;TrustServerCertificate=True;
+      - ConnectionStrings__SqlServer=Server=sqlserver;Database=dbfinanc;User Id=sa;Password=F1n4c+P1d22;TrustServerCertificate=True
     depends_on:
-      sqlserver:
-        condition: service_healthy
+      - sqlserver
     entrypoint: >
       bash -c "dotnet tool install --global dotnet-ef &&
-               export PATH=\"$PATH:/root/.dotnet/tools\" &&
+               export PATH=\"$$PATH:/root/.dotnet/tools\" &&
                dotnet ef database update --project Financ.Infra.Data --startup-project Financ.UI.Api"
+    networks:
+      - financ-network
 
+  # BANCO DE DADOS SQL SERVER
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
-    ports:
-      - "1433:1433"
+    container_name: financ-sqlserver
     environment:
       - ACCEPT_EULA=Y
-      - SA_PASSWORD=F1n4c+Pld22
-    healthcheck:
-      test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "F1n4c+Pld22", "-Q", "SELECT 1", "-C"]
-      interval: 10s
-      timeout: 3s
-      retries: 10
-    volumes:
-      - sqlserver_data:/var/opt/mssql
-    restart: always
+      - MSSQL_SA_PASSWORD=F1n4c+P1d22
+      - MSSQL_PID=Developer
+    ports:
+      - "1433:1433"
+    networks:
+      - financ-network
+
+networks:
+  financ-network:
+    driver: bridge
 
 volumes:
-  sqlserver_data:
+  caddy_data:
+  caddy_config:

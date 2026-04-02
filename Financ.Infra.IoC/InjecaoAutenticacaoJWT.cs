@@ -28,6 +28,7 @@ namespace Financ.Infra.IoC
 
             services.AddScoped<IAutenticacaoServico, AutenticacaoServico>();
 
+            var secretKey = configuration.GetValue<string>("TokenJWT:SecretKeyJWT");
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -41,8 +42,7 @@ namespace Financ.Infra.IoC
                     ValidateAudience = false,
                     ValidateIssuerSigningKey = true,
                     ValidateLifetime = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(configuration["TokenJWT:SecretKeyJWT"])),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
                     ClockSkew = TimeSpan.Zero
                 };
 

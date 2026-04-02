@@ -52,15 +52,15 @@ namespace Financ.UI.Api.Controllers
 
         private void SetRefreshTokenCookie(string refreshToken)
         {
-            if (string.IsNullOrEmpty(refreshToken))
-                return;
+            if (string.IsNullOrEmpty(refreshToken)) return;
 
             var cookieOptions = new CookieOptions
             {
-                HttpOnly = true,               // não acessível pelo JS
-                Secure = false,                 // HTTPS em produção
-                SameSite = SameSiteMode.None,
-                Expires = DateTime.UtcNow.AddDays(7)
+                HttpOnly = true,
+                Secure = true, // OBRIGATÓRIO PARA HTTPS
+                SameSite = SameSiteMode.None, // OBRIGATÓRIO PARA CROSS-DOMAIN
+                Expires = DateTime.UtcNow.AddDays(7),
+                IsEssential = true
             };
 
             Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);

@@ -27,6 +27,7 @@ namespace Financ.Application.Services.Segurança
 
             ValidaNivelDeSegurancaSenha(senha);
             byte[] senhaBytes = Encoding.UTF8.GetBytes(senha);
+
             byte[] saltBytes = salt is null ? UtilSeguranca.GeraBytesAleatorios(32) : Convert.FromBase64String(salt);
 
             var cripto = new Argon2id(senhaBytes)
@@ -45,22 +46,22 @@ namespace Financ.Application.Services.Segurança
             return (saltBase, hashBase);
         }
 
-        public bool ValidaSenhaArgon(string senhaBanco, string senha,string salt)
+        public bool ValidaSenhaArgon(string senhaBanco, string senha, string salt)
         {
             return CryptographicOperations.FixedTimeEquals(
                UtilSeguranca.ConverteParaBytes(senhaBanco),
                UtilSeguranca.ConverteParaBytes(CriaSenhaArgon(senha, salt).hash)
             );
-        } 
+        }
         private void ValidaNivelDeSegurancaSenha(string senha)
         {
             if (string.IsNullOrWhiteSpace(senha))
                 throw new Exception("Informe a senha");
 
-            if(senha.Length < 8)
+            if (senha.Length < 8)
                 throw new Exception("A senha deve conter no mínimo 8 caracteres");
 
-            if(senha.Length > 16)
+            if (senha.Length > 16)
                 throw new Exception("A senha deve conter no máximo 16 caracteres");
 
             var nivelSeguranca = Zxcvbn.Core.EvaluatePassword(senha).Score;
