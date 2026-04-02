@@ -27,7 +27,9 @@ namespace Financ.Application.CQRS.Usuarios.Handler
         {
             try
             {
-                if (await _unitOfWork.usuariosRepostorio.ExisteId(x => x.Email.Equals(request.Email)))
+                request.Email = request.Email.Trim();
+
+                if (await _unitOfWork.usuariosRepostorio.ExisteId(x => x.Email == request.Email))
                     return Resultado<string>.GeraFalha(Falha.ErroOperacional("Já existe um usuário cadastrado com esse e-mail."));
 
                 var converteSenha = _passService.CriaSenhaArgon(request.Senha);
