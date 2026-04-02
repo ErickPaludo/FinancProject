@@ -1,9 +1,8 @@
 api.pldprojects.com.br {
-    # Garante que o Caddy repasse todos os headers originais e o corpo intacto
-    reverse_proxy financapi:5000 {
-        header_up Host {host}
-        header_up X-Real-IP {remote_host}
-        header_up X-Forwarded-For {remote_host}
-        header_up X-Forwarded-Proto {scheme}
+    # Força o uso do ZeroSSL para fugir do limite do Let's Encrypt
+    tls {
+        issuer zerossl
     }
+    
+    reverse_proxy financ-api:5000
 }
