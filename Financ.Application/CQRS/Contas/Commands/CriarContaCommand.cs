@@ -14,5 +14,6 @@ namespace Financ.Application.CQRS.Contas_.Commands
 {
     public sealed record CriarContaCommand(
         string IdUsuario,
-        string Titulo) : IRequest<Resultado<BasePost<RetornaContasDTO>>>;
+        string Titulo,
+        string Cor) : IRequest<Resultado<BasePost<RetornaContasDTO>>>;
 }

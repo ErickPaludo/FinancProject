@@ -24,7 +24,7 @@ namespace Financ.UI.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> CadastrarContas(CadastrarContaDTO contaDTO)
         {
-            var conta = await _mediator.Send(new CriarContaCommand(User.RetornaIdUsuario(), contaDTO.Titulo));
+            var conta = await _mediator.Send(new CriarContaCommand(User.RetornaIdUsuario(), contaDTO.Titulo,contaDTO.Cor));
             return conta.RetornoAutomatico();
         }
 
@@ -32,7 +32,7 @@ namespace Financ.UI.Api.Controllers
         public async Task<IActionResult> AtualizaConta(int idContaUsuario, AtualizaContaDTO contaDTO)
         {
 
-            var contaAtualizada = await _mediator.Send(new AtualizarContaCommand(idContaUsuario, User.RetornaIdUsuario(), contaDTO.Status, contaDTO.Titulo));
+            var contaAtualizada = await _mediator.Send(new AtualizarContaCommand(idContaUsuario, User.RetornaIdUsuario(), contaDTO.Status, contaDTO.Titulo,contaDTO.Cor));
             return contaAtualizada.RetornoAutomatico();
         }
     }

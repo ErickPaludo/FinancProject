@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Financ.Infra.Data.ConfiguracaoTabelas.Movimentações
 {
-    public class CategoriaConfiguração : IEntityTypeConfiguration<CategoriaMovimentacao>
+    public class CategoriaConfiguração : IEntityTypeConfiguration<Categoria>
     {
-        public void Configure(EntityTypeBuilder<CategoriaMovimentacao> builder)
+        public void Configure(EntityTypeBuilder<Categoria> builder)
         {
             builder.ToTable("fnc_categorias");
 
@@ -22,6 +22,13 @@ namespace Financ.Infra.Data.ConfiguracaoTabelas.Movimentações
                 .WithMany()
                 .HasForeignKey(e => e.IdConta)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.OwnsOne(c => c.Cor, cor =>
+            {
+                cor.Property(p => p.Valor)
+                   .HasColumnName("Cor")
+                   .IsRequired();
+            });
         }
     }
 }

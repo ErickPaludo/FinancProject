@@ -6,8 +6,8 @@ using System.Reflection;
 using Financ.Domain.Entidades.ContasBancarias;
 using Financ.Domain.Entidades.Usuarios;
 using Financ.Domain.Enums.ContasBancarias;
-using Financ.Domain.Validacoes.Base.Mensagens;
 using Financ.Domain.Validacoes.ContasBancarias;
+using Financ.Domain.Validacoes.Base.Mensagens;
 using Financ.Domain.Validacoes.ContasBancarias.Mensagens;
 
 namespace Financ.TesteUnitarios.Domain
@@ -15,7 +15,7 @@ namespace Financ.TesteUnitarios.Domain
     public class UnitTestesConvites
     {
         private Conta CriarContaAtiva(int id = 1)
-            => new Conta(id, "Conta Teste");
+            => new Conta(id, "Conta Teste", "#FFFFFF");
 
         private Usuario CriarUsuario(string id)
             => new Usuario(id, "Nome", "Sobrenome", $"{id}@teste.com", "salt", "hash");
@@ -156,7 +156,7 @@ namespace Financ.TesteUnitarios.Domain
         [Fact(DisplayName = "Não deve permitir convite se conta não for ativa")]
         public void CriarConvite_ContaInativa_DeveLancarExcecao()
         {
-            var conta = new Conta(1, "Conta Teste");
+            var conta = new Conta(1, "Conta Teste", "#FFFFFF");
 
             var usuarioRemetente = CriarUsuario(NovoIdUsuario());
             var usuarioDestinatario = CriarUsuario(NovoIdUsuario());
@@ -181,7 +181,7 @@ namespace Financ.TesteUnitarios.Domain
         [InlineData(TipoStatusContasUsuario.Bloqueado)]
         public void CriarConvite_UsuarioRemetenteInativo_DeveLancarExcecao(TipoStatusContasUsuario status)
         {
-            var conta = new Conta(1, "Conta Teste");
+            var conta = new Conta(1, "Conta Teste", "#FFFFFF");
 
             var usuarioRemetente = CriarUsuario(NovoIdUsuario());
             var usuarioDestinatario = CriarUsuario(NovoIdUsuario());

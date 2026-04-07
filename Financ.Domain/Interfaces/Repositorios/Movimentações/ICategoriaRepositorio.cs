@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Financ.Domain.Interfaces.Repositorios.Movimentações
 {
-    public interface ICategoriaRepositorio : IBaseRepositorio<CategoriaMovimentacao>
+    public interface ICategoriaRepositorio : IBaseRepositorio<Categoria>
     {
     }
 }

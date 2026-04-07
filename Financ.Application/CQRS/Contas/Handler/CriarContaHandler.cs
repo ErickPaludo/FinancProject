@@ -27,7 +27,7 @@ namespace Financ.Application.CQRS.Contas_.Handler
         {
             try
             {
-                Conta conta = new Conta(request.Titulo);
+                Conta conta = new Conta(request.Titulo, request.Cor);
                 ContaUsuario contaUsuario = new ContaUsuario(conta, request.IdUsuario);
 
                 await _unitOfWork.contasUsuariosRepositorio.Adicionar(contaUsuario); //Cria a conta e a conta usuario pois os objetos estão linkados

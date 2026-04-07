@@ -17,7 +17,7 @@ namespace Financ.Domain.Entidades.ContasBancarias
         public int IdConta { get; private set; }
         public string IdUsuario { get; private set; }
         public TiposAcessos Acesso { get; private set; }
-        public TipoStatusContasUsuario Status { get; protected set; }
+        public TipoStatusContasUsuario Status { get; private set; }
         public DateTime? Expiracao { get; private set; }
         public Usuario Usuario { get; private set; }
 
@@ -29,8 +29,13 @@ namespace Financ.Domain.Entidades.ContasBancarias
         {
             ContasUsuariosValidacao.Verifica(id <= 0, MensagensBase.ID_IGUAL_MENOR_ZERO);
             Id = id;
-            ValidaContasUsuarios(conta, idUsuario);
-            ValidaEnums(acesso, status);
+           // ContasUsuariosValidacao.Verifica(conta is null, MensagensContasUsuarios.CONTA_NAO_PODE_SER_NULA);
+           // ContasUsuariosValidacao.Verifica(conta!.Status != TiposStatusContas.Ativo, MensagensContasUsuarios.CONTA_NAO_ESTA_ATIVA);
+            ContasUsuariosValidacao.Verifica(string.IsNullOrEmpty(idUsuario), MensagensContasUsuarios.IDUSUARIO_INVALIDO);
+            Conta = conta;
+            //Usuario = usuario!;
+            IdUsuario = idUsuario;
+            DthrReg = DateTime.UtcNow; ValidaEnums(acesso, status);
             Status = status.HasValue ? status.Value : TipoStatusContasUsuario.Ativo;
             Acesso = acesso;
 

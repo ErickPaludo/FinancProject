@@ -30,6 +30,14 @@ namespace Financ.Infra.Data.ConfiguracaoTabelas.ContasBancarias
                   .HasForeignKey(u => u.IdConta)
                   .OnDelete(DeleteBehavior.Cascade);
 
+            builder.Property(e => e.Saldo).HasColumnType("Decimal(18,2)");
+
+            builder.OwnsOne(c => c.Cor, cor =>
+            {
+                cor.Property(p => p.Valor)
+                   .HasColumnName("Cor")
+                   .IsRequired();
+            });
         }
     }
 }

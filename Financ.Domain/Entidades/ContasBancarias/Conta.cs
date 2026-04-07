@@ -1,4 +1,5 @@
 ﻿using Financ.Domain.Enums.ContasBancarias;
+using Financ.Domain.Objetos_de_Valor;
 using Financ.Domain.Validacoes.Base.Mensagens;
 using Financ.Domain.Validacoes.ContasBancarias;
 using Financ.Domain.Validacoes.ContasBancarias.Mensagens;
@@ -14,7 +15,9 @@ namespace Financ.Domain.Entidades.ContasBancarias
     {
         public string Titulo { get; private set; }
         public TiposStatusContas Status { get; private set; }
-        public TiposContas TipoConta { get; private set; }
+        public TipoConta TipoConta { get; private set; }
+        public decimal Saldo { get; set; }
+        public Cor Cor { get; private set; }
         private readonly List<ContaUsuario> _contasUsuarios = new();
         public IReadOnlyCollection<ContaUsuario> ContaUsuarios => _contasUsuarios;
         private readonly List<Convite> _convites = new();
@@ -23,23 +26,24 @@ namespace Financ.Domain.Entidades.ContasBancarias
 
         public void AddUsuario(ContaUsuario usuario) => _contasUsuarios.Add(usuario);
         public void AddConvite(Convite convite) => _convites.Add(convite);
-        public Conta(string titulo)
+        public Conta(string titulo,string cor)
         {
             ValidaTitulo(titulo);
             ContaPadrao();
+            Cor = new Cor(cor);
         }
-        public Conta(int id, string titulo)
+        public Conta(int id, string titulo,string cor)
         {
             ValidaTitulo(titulo);
             ContaPadrao();
-
+            Cor = new Cor(cor);
             ContasValidacao.Verifica(id <= 0, MensagensBase.ID_IGUAL_MENOR_ZERO);
             Id = id;
         }
         private void ContaPadrao()
         {
             Status = TiposStatusContas.Ativo;
-            TipoConta = TiposContas.Corrente;
+            TipoConta = TipoConta.Corrente;
             DthrReg = DateTime.UtcNow;
         }
 
@@ -55,11 +59,14 @@ namespace Financ.Domain.Entidades.ContasBancarias
             Status = status;
         }
 
-        public void AtualizaConta(ContaUsuario? usuario, string? titulo, TiposStatusContas? status)
+        public void AtualizaConta(ContaUsuario? usuario, string? titulo, TiposStatusContas? status,string? cor = null)
         {
             ContasValidacao.Verifica(usuario is null || usuario.Conta != this, MensagensContasUsuarios.USUARIO_NAO_PERTENCE_A_CONTA);
             ContasValidacao.Verifica(!usuario!.Status.Equals(TipoStatusContasUsuario.Ativo), MensagensBase.USUARIO_INATIVO_NAO_PODE_SER_ATUALIZADO);
             ContasValidacao.Verifica((usuario!.Acesso != TiposAcessos.Mestre), MensagensContas.ATUALIZA_CONTA_USUARIO_SEM_PERMISSAO);
+            
+            if(cor != null)
+                Cor = new Cor(cor);
 
             if (titulo != null)
                 ValidaTitulo(titulo);

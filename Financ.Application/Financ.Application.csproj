@@ -15,17 +15,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="CQRS\Contas\Querys\**" />
+    <Compile Remove="DTOs\Contas\Get\**" />
+    <EmbeddedResource Remove="CQRS\Contas\Querys\**" />
+    <EmbeddedResource Remove="DTOs\Contas\Get\**" />
+    <None Remove="CQRS\Contas\Querys\**" />
+    <None Remove="DTOs\Contas\Get\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="NetDevPack.SimpleMediator" Version="1.2.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Financ.Domain\Financ.Domain.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="CQRS\Contas_\Querys\" />
-    <Folder Include="DTOs\Contas\Get\Filtros\" />
   </ItemGroup>
 
 </Project>

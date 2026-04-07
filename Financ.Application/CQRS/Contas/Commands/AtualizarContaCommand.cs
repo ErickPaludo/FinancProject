@@ -16,6 +16,7 @@ namespace Financ.Application.CQRS.Contas_Commands
           int IdConta,           
           string IdUsuario,      
           TiposStatusContas? Status,
-          string? Titulo
+          string? Titulo,
+          string? Cor
       ) : IRequest<Resultado<BasePost<RetornaContasDTO>>>;
 }

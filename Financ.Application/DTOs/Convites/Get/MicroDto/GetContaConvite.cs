@@ -7,5 +7,5 @@ using System.Threading.Tasks;
 
 namespace Financ.Application.DTOs.Convites.Get.MicroDto
 {
-    public record GetContaConvite(int idConta,string titulo,TiposContas tipoConta);
+    public record GetContaConvite(int idConta,string titulo,TipoConta tipoConta);
 }

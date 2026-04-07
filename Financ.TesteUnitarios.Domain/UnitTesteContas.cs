@@ -23,18 +23,18 @@ namespace Financ.TesteUnitarios.Domain
         [Fact]
         public void Deve_Criar_Conta_Valida()
         {
-            var conta = new Conta("Conta Teste");
+            var conta = new Conta("Conta Teste", "#FFFFFF");
 
             conta.Titulo.Should().Be("Conta Teste");
             conta.Status.Should().Be(TiposStatusContas.Ativo);
-            conta.TipoConta.Should().Be(TiposContas.Corrente);
+            conta.TipoConta.Should().Be(TipoConta.Corrente);
         }
 
         // Testes de Erro
         [Fact]
         public void Deve_Lancar_Excecao_Quando_Id_Menor_Igual_Zero()
         {
-            Action act = () => new Conta(0, "Conta");
+            Action act = () => new Conta(0, "Conta", "#FFFFFF");
 
             act.Should().Throw<Exception>();
         }
@@ -44,7 +44,7 @@ namespace Financ.TesteUnitarios.Domain
         [InlineData("  ")]
         public void Deve_Lancar_Excecao_Quando_Titulo_Invalido(string titulo)
         {
-            Action act = () => new Conta(titulo);
+            Action act = () => new Conta(titulo, "#FFFFFF");
 
             act.Should().Throw<Exception>();
         }
@@ -52,7 +52,7 @@ namespace Financ.TesteUnitarios.Domain
         [Fact]
         public void Deve_Lancar_Excecao_Quando_Titulo_Menor_Que_3()
         {
-            Action act = () => new Conta("ab");
+            Action act = () => new Conta("ab", "#FFFFFF");
 
             act.Should().Throw<Exception>();
         }
@@ -65,7 +65,7 @@ namespace Financ.TesteUnitarios.Domain
         [Fact]
         public void Deve_Atualizar_Titulo_Quando_Usuario_Tiver_Permissao()
         {
-            var conta = new Conta("Conta Antiga");
+            var conta = new Conta("Conta Antiga", "#FFFFFF");
 
             var usuario = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
 
@@ -77,7 +77,7 @@ namespace Financ.TesteUnitarios.Domain
         [Fact]
         public void Deve_Atualizar_Status_Quando_Informado()
         {
-            var conta = new Conta("Conta Teste");
+            var conta = new Conta("Conta Teste", "#FFFFFF");
 
             var usuario = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
 
@@ -90,7 +90,7 @@ namespace Financ.TesteUnitarios.Domain
         [Fact]
         public void Nao_Deve_Alterar_Nada_Quando_Titulo_E_Status_Nulos()
         {
-            var conta = new Conta("Conta Teste");
+            var conta = new Conta("Conta Teste", "#FFFFFF");
 
             var usuario = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
 
@@ -103,7 +103,7 @@ namespace Financ.TesteUnitarios.Domain
         [Fact]
         public void Deve_Atualizar_Titulo_E_Status_Juntos()
         {
-            var conta = new Conta("Conta Antiga");
+            var conta = new Conta("Conta Antiga", "#FFFFFF");
 
             var usuario = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
 
@@ -117,7 +117,7 @@ namespace Financ.TesteUnitarios.Domain
         [Fact]
         public void Deve_Lancar_Excecao_Quando_Usuario_Nulo()
         {
-            var conta = new Conta("Conta Teste");
+            var conta = new Conta("Conta Teste", "#FFFFFF");
 
             Action act = () => conta.AtualizaConta(null!, "Novo Titulo", null);
 
@@ -127,7 +127,7 @@ namespace Financ.TesteUnitarios.Domain
         [Fact]
         public void Deve_Lancar_Excecao_Quando_Usuario_For_Visualizador()
         {
-            var conta = new Conta("Conta Teste");
+            var conta = new Conta("Conta Teste", "#FFFFFF");
 
             var usuario = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Visualizador);
 
@@ -142,7 +142,7 @@ namespace Financ.TesteUnitarios.Domain
         [InlineData(TipoStatusContasUsuario.Bloqueado)]
         public void Deve_Lancar_Excecao_Quando_Usuario_Nao_For_Ativo(TipoStatusContasUsuario status)
         {
-            var conta = new Conta("Conta Teste");
+            var conta = new Conta("Conta Teste", "#FFFFFF");
 
             var usuario = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre, status);
 
@@ -155,8 +155,8 @@ namespace Financ.TesteUnitarios.Domain
         [Fact]
         public void Deve_Lancar_Excecao_Quando_Usuario_Pertencer_A_Otra_Conta()
         {
-            var conta1 = new Conta("Conta 1");
-            var conta2 = new Conta("Conta 2");
+            var conta1 = new Conta("Conta 1", "#FFFFFF");
+            var conta2 = new Conta("Conta 2", "#FFFFFF");
 
             var usuario = CriarContaUsuario(conta2, NovoIdUsuario(), TiposAcessos.Mestre);
 
@@ -168,7 +168,7 @@ namespace Financ.TesteUnitarios.Domain
         [Fact]
         public void Deve_Lancar_Excecao_Quando_Titulo_Invalido_Na_Atualizacao()
         {
-            var conta = new Conta("Conta Teste");
+            var conta = new Conta("Conta Teste", "#FFFFFF");
 
             var usuario = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
 
@@ -180,7 +180,7 @@ namespace Financ.TesteUnitarios.Domain
         [Fact]
         public void Deve_Lancar_Excecao_Quando_Usuario_For_Administrador()
         {
-            var conta = new Conta("Conta Teste");
+            var conta = new Conta("Conta Teste", "#FFFFFF");
 
             var usuario = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Administrador);
 

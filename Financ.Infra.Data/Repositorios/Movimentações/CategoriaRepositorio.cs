@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Financ.Infra.Data.Repositorios.Movimentações
 {
-    public class CategoriaRepositorio : BaseRepositorio<CategoriaMovimentacao>, ICategoriaRepositorio
+    public class CategoriaRepositorio : BaseRepositorio<Categoria>, ICategoriaRepositorio
     {
         public CategoriaRepositorio(AppContextoData contexto) : base(contexto)
         {

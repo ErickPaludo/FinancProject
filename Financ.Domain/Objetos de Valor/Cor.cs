@@ -1,0 +1,27 @@
+﻿using Financ.Domain.Validacoes.Cor;
+using Financ.Domain.Validacoes.Cor.Mensagens;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+
+namespace Financ.Domain.Objetos_de_Valor
+{
+    public class Cor
+    {
+        public string Valor { get; private set; }
+        private Cor(){}
+
+        public Cor(string valor)
+        {
+            ValidaCor(valor);
+            Valor = valor;
+        }
+        private void ValidaCor(string valor)
+        {
+            CorValidacao.Verifica(!Regex.IsMatch(valor, "^#([0-9A-Fa-f]{6})$"), MensagemCor.COR_INVALIDA);
+        }
+    }
+}

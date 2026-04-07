@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace Financ.Domain.Validacoes.Movimentações
 {
-    public class MovimentacaoContaCorrenteValidacao : BaseValidacao
+    public class MovimentacaoValidacao : BaseValidacao
     {
-        public MovimentacaoContaCorrenteValidacao(string Erro) : base(Erro) { }
+        public MovimentacaoValidacao(string Erro) : base(Erro) { }
         public static void Verifica(bool condicao, string mensagem)
         {
-            VerificaExcessao<MovimentacaoContaCorrenteValidacao>(condicao, mensagem);
+            VerificaExcessao<MovimentacaoValidacao>(condicao, mensagem);
         }
     }
 }

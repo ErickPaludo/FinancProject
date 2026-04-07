@@ -6,8 +6,8 @@ using System.Collections.Generic;
 using Financ.Domain.Entidades.ContasBancarias;
 using Financ.Domain.Entidades.Usuarios;
 using Financ.Domain.Enums.ContasBancarias;
-using Financ.Domain.Validacoes.Base.Mensagens;
 using Financ.Domain.Validacoes.ContasBancarias;
+using Financ.Domain.Validacoes.Base.Mensagens;
 using Financ.Domain.Validacoes.ContasBancarias.Mensagens;
 
 namespace Financ.TesteUnitarios.Domain
@@ -15,7 +15,7 @@ namespace Financ.TesteUnitarios.Domain
     public class ContasUsuariosTests
     {
         private Conta CriarContaAtiva()
-            => new Conta("Conta Teste");
+            => new Conta("Conta Teste", "#FFFFFF");
 
         private Usuario CriarUsuario(string id)
             => new Usuario(id, "Nome", "Sobrenome", $"{id}@teste.com", "salt", "hash");
@@ -138,7 +138,7 @@ namespace Financ.TesteUnitarios.Domain
         [Fact]
         public void Construtor_ComContaInativa_DeveLancarExcecao()
         {
-            var conta = new Conta("Conta Teste");
+            var conta = new Conta("Conta Teste", "#FFFFFF");
             var usuarioRemetente = CriarContaUsuario(conta, NovoIdUsuario());
             var usuarioDestinatario = CriarUsuario(NovoIdUsuario());
             var convite = CriarConvite(TiposAcessos.Mestre, usuarioRemetente, usuarioDestinatario);
