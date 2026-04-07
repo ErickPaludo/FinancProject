@@ -2,7 +2,7 @@
 using Financ.Application.DTOs.Convites.Get;
 using Financ.Application.DTOs.Convites.Get.MicroDto;
 using Financ.Application.DTOs.Usuarios.Get;
-using Financ.Domain.Entidades;
+using Financ.Domain.Entidades.ContasBancarias;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,8 +13,8 @@ namespace Financ.Application.Mapeamento
 {
     public static class ConvitesMapper
     {
-        public static BasePost<GetCriaConviteDTO> ParaDTO(Convites convite) => new BasePost<GetCriaConviteDTO>(new GetCriaConviteDTO(convite.Id, convite.Acesso));
-        public static BaseGet<GetRetornaConvitesDTO> ParaDTO(IEnumerable<Convites>? convites, object? filtro)
+        public static BasePost<GetCriaConviteDTO> ParaDTO(Convite convite) => new BasePost<GetCriaConviteDTO>(new GetCriaConviteDTO(convite.Id, convite.Acesso));
+        public static BaseGet<GetRetornaConvitesDTO> ParaDTO(IEnumerable<Convite>? convites, object? filtro)
         {
             List<GetRetornaConvitesDTO> listaConvites = new List<GetRetornaConvitesDTO>();
             if (convites != null)

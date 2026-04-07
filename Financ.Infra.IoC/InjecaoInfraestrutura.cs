@@ -1,8 +1,12 @@
 ﻿using Financ.Domain.Interfaces;
-using Financ.Domain.Interfaces.Repositorios;
+using Financ.Domain.Interfaces.Repositorios.ContasBancarias;
+using Financ.Domain.Interfaces.Repositorios.Segurança;
+using Financ.Domain.Interfaces.Repositorios.Usuarios;
 using Financ.Infra.Data;
 using Financ.Infra.Data.Contexto;
-using Financ.Infra.Data.Repositorios;
+using Financ.Infra.Data.Repositorios.ContasBancarias;
+using Financ.Infra.Data.Repositorios.Segurança;
+using Financ.Infra.Data.Repositorios.Usuarios;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

@@ -1,9 +1,9 @@
 ﻿using Financ.Application.Comun.Resultado;
 using Financ.Application.CQRS.Contas_Usuarios.Commands;
 using Financ.Application.DTOs.ContasUsuarios.Post;
-using Financ.Domain.Entidades;
+using Financ.Domain.Entidades.ContasBancarias;
 using Financ.Domain.Interfaces;
-using Financ.Domain.Validacoes;
+using Financ.Domain.Validacoes.ContasBancarias;
 using NetDevPack.SimpleMediator;
 using System;
 using System.Collections.Generic;
@@ -29,7 +29,7 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
                 if (conta is null)
                     return Resultado<string>.GeraFalha(Falha.NaoEncontrado("Conta não encontrada"));
 
-                ContasUsuarios? contaUsuario = conta.ContaUsuarios.FirstOrDefault(x => x.IdUsuario.Equals(request.idUsuario));
+                ContaUsuario? contaUsuario = conta.ContaUsuarios.FirstOrDefault(x => x.IdUsuario.Equals(request.idUsuario));
 
                 conta.SairDaConta(contaUsuario);
 

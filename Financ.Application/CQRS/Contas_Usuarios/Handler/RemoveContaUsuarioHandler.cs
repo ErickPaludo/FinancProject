@@ -1,8 +1,8 @@
 ﻿using Financ.Application.Comun.Resultado;
 using Financ.Application.CQRS.Contas_Usuarios.Commands;
-using Financ.Domain.Entidades;
+using Financ.Domain.Entidades.ContasBancarias;
 using Financ.Domain.Interfaces;
-using Financ.Domain.Validacoes;
+using Financ.Domain.Validacoes.ContasBancarias;
 using NetDevPack.SimpleMediator;
 using System;
 using System.Collections.Generic;
@@ -29,8 +29,8 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
                 if (conta is null)
                     return Resultado<string>.GeraFalha(Falha.NaoEncontrado("A conta informada não existe ou já foi removida."));
 
-                ContasUsuarios? contaUsuarioRemetente = conta.ContaUsuarios.FirstOrDefault(x => x.IdUsuario.Equals(request.idUsuarioRemetente));
-                ContasUsuarios? contaUsuarioDestinatario = conta.ContaUsuarios.FirstOrDefault(x => x.IdUsuario.Equals(request.idUsuarioDestinatario));
+                ContaUsuario? contaUsuarioRemetente = conta.ContaUsuarios.FirstOrDefault(x => x.IdUsuario.Equals(request.idUsuarioRemetente));
+                ContaUsuario? contaUsuarioDestinatario = conta.ContaUsuarios.FirstOrDefault(x => x.IdUsuario.Equals(request.idUsuarioDestinatario));
 
                 if (contaUsuarioDestinatario is null)
                     return Resultado<string>.GeraFalha(Falha.NaoEncontrado("O usuário destinatario não pertence a conta informada."));

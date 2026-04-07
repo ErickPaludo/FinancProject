@@ -1,12 +1,14 @@
-﻿using Financ.Domain.Entidades;
-using Financ.Domain.Enums;
-using Financ.Domain.Validacoes;
-using Financ.Domain.Validacoes.Mensagens;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Xunit;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using Financ.Domain.Entidades.ContasBancarias;
+using Financ.Domain.Entidades.Usuarios;
+using Financ.Domain.Enums.ContasBancarias;
+using Financ.Domain.Validacoes.Base.Mensagens;
+using Financ.Domain.Validacoes.ContasBancarias;
+using Financ.Domain.Validacoes.ContasBancarias.Mensagens;
 
 namespace Financ.TesteUnitarios.Domain
 {
@@ -20,12 +22,12 @@ namespace Financ.TesteUnitarios.Domain
 
         private string NovoIdUsuario() => Guid.NewGuid().ToString();
 
-        private Convites CriarConvite(TiposAcessos acesso, ContasUsuarios usuarioRemetente, Usuario usuarioDestinatario, int? expiracaoContaUsuario = null)
-            => new Convites(acesso, usuarioRemetente, usuarioDestinatario, expiracaoContaUsuario);
+        private Convite CriarConvite(TiposAcessos acesso, ContaUsuario usuarioRemetente, Usuario usuarioDestinatario, int? expiracaoContaUsuario = null)
+            => new Convite(acesso, usuarioRemetente, usuarioDestinatario, expiracaoContaUsuario);
 
-        private ContasUsuarios CriarContaUsuario(Conta conta, string idUsuario, TiposAcessos acesso = TiposAcessos.Mestre, TipoStatusContasUsuario status = TipoStatusContasUsuario.Ativo)
+        private ContaUsuario CriarContaUsuario(Conta conta, string idUsuario, TiposAcessos acesso = TiposAcessos.Mestre, TipoStatusContasUsuario status = TipoStatusContasUsuario.Ativo)
         {
-            ContasUsuarios contaUsuario = new ContasUsuarios(
+            ContaUsuario contaUsuario = new ContaUsuario(
                 1,
                 conta,
                 idUsuario,
@@ -44,7 +46,7 @@ namespace Financ.TesteUnitarios.Domain
         {
             var conta = CriarContaAtiva();
 
-            var usuario = new ContasUsuarios(1, conta, CriarUsuario(NovoIdUsuario()).Id, TiposAcessos.Administrador);
+            var usuario = new ContaUsuario(1, conta, CriarUsuario(NovoIdUsuario()).Id, TiposAcessos.Administrador);
 
             usuario.Status.Should().Be(TipoStatusContasUsuario.Ativo);
             usuario.Acesso.Should().Be(TiposAcessos.Administrador);
@@ -56,7 +58,7 @@ namespace Financ.TesteUnitarios.Domain
             var conta = CriarContaAtiva();
             var usuarioId = CriarUsuario(NovoIdUsuario()).Id;
 
-            var contasUsuario = new ContasUsuarios(conta, usuarioId);
+            var contasUsuario = new ContaUsuario(conta, usuarioId);
 
             contasUsuario.Acesso.Should().Be(TiposAcessos.Mestre);
             contasUsuario.Status.Should().Be(TipoStatusContasUsuario.Ativo);
@@ -72,7 +74,7 @@ namespace Financ.TesteUnitarios.Domain
 
             var mestre2 = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
 
-            var contasUsuario = new ContasUsuarios(convite);
+            var contasUsuario = new ContaUsuario(convite);
 
             contasUsuario.Acesso.Should().Be(TiposAcessos.Administrador);
             convite.Observacao.Should().Contain(MensagensContasUsuarios.MAX_MESTRES_CONVERTE_PARA_ADMIN);
@@ -87,7 +89,7 @@ namespace Financ.TesteUnitarios.Domain
             var usuarioDestinatario = CriarUsuario(NovoIdUsuario());
             var convite = CriarConvite(TiposAcessos.Visualizador, mestre1, usuarioDestinatario);
 
-            var contasUsuario = new ContasUsuarios(convite);
+            var contasUsuario = new ContaUsuario(convite);
 
             contasUsuario.Acesso.Should().Be(TiposAcessos.Visualizador);
             contasUsuario.Status.Should().Be(TipoStatusContasUsuario.Ativo);
@@ -103,7 +105,7 @@ namespace Financ.TesteUnitarios.Domain
             int minutosExpiracao = 30;
 
             var convite = CriarConvite(TiposAcessos.Visualizador, remetente, destinatario, minutosExpiracao);
-            var contasUsuario = new ContasUsuarios(convite);
+            var contasUsuario = new ContaUsuario(convite);
 
             contasUsuario.Expiracao.Should().BeCloseTo(DateTime.UtcNow.AddMinutes(minutosExpiracao), TimeSpan.FromSeconds(5));
         }
@@ -117,7 +119,7 @@ namespace Financ.TesteUnitarios.Domain
             var conta = CriarContaAtiva();
 
             Action act = () =>
-                new ContasUsuarios(idInvalido, conta, "user-1", TiposAcessos.Administrador);
+                new ContaUsuario(idInvalido, conta, "user-1", TiposAcessos.Administrador);
 
             act.Should().Throw<ContasUsuariosValidacao>()
                 .WithMessage(MensagensBase.ID_IGUAL_MENOR_ZERO);
@@ -127,7 +129,7 @@ namespace Financ.TesteUnitarios.Domain
         public void Construtor_ComContaNula_DeveLancarExcecao()
         {
             Action act = () =>
-                new ContasUsuarios(1, null, CriarUsuario(NovoIdUsuario()).Id, TiposAcessos.Administrador);
+                new ContaUsuario(1, null, CriarUsuario(NovoIdUsuario()).Id, TiposAcessos.Administrador);
 
             act.Should().Throw<ContasUsuariosValidacao>()
                 .WithMessage(MensagensContasUsuarios.CONTA_NAO_PODE_SER_NULA);
@@ -145,7 +147,7 @@ namespace Financ.TesteUnitarios.Domain
             conta.AtualizaConta(usuarioRemetente, null, TiposStatusContas.Inativo);
 
             Action act = () =>
-                new ContasUsuarios(convite);
+                new ContaUsuario(convite);
 
             act.Should().Throw<ContasUsuariosValidacao>()
                 .WithMessage(MensagensContasUsuarios.CONTA_NAO_ESTA_ATIVA);
@@ -159,7 +161,7 @@ namespace Financ.TesteUnitarios.Domain
             var conta = CriarContaAtiva();
 
             Action act = () =>
-                new ContasUsuarios(1, conta, idUsuario, TiposAcessos.Administrador);
+                new ContaUsuario(1, conta, idUsuario, TiposAcessos.Administrador);
 
             act.Should().Throw<ContasUsuariosValidacao>()
                 .WithMessage(MensagensContasUsuarios.IDUSUARIO_INVALIDO);
@@ -173,7 +175,7 @@ namespace Financ.TesteUnitarios.Domain
             TipoStatusContasUsuario statusInvalido = (TipoStatusContasUsuario)999;
 
             Action act = () =>
-                new ContasUsuarios(1, conta, NovoIdUsuario(), TiposAcessos.Administrador, statusInvalido);
+                new ContaUsuario(1, conta, NovoIdUsuario(), TiposAcessos.Administrador, statusInvalido);
 
             act.Should().Throw<ContasUsuariosValidacao>()
                 .WithMessage(MensagensBase.STATUS_INVALIDO);
@@ -187,7 +189,7 @@ namespace Financ.TesteUnitarios.Domain
             TiposAcessos acessoInvalido = (TiposAcessos)999;
 
             Action act = () =>
-                new ContasUsuarios(1, conta, NovoIdUsuario(), acessoInvalido);
+                new ContaUsuario(1, conta, NovoIdUsuario(), acessoInvalido);
 
             act.Should().Throw<ContasUsuariosValidacao>()
                 .WithMessage(MensagensContasUsuarios.ACESSO_INVALIDO);
@@ -196,7 +198,7 @@ namespace Financ.TesteUnitarios.Domain
         [Fact]
         public void Construtor_ConviteNulo_DeveLancarExcecao()
         {
-            Action act = () => new ContasUsuarios(null);
+            Action act = () => new ContaUsuario(null);
 
             act.Should().Throw<ContasUsuariosValidacao>()
                 .WithMessage(MensagensContasUsuarios.CONVITE_NAO_PODE_SER_NULO);
@@ -395,7 +397,7 @@ namespace Financ.TesteUnitarios.Domain
         {
             var conta = CriarContaAtiva();
             var mestre1 = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
-            var alvo = new ContasUsuarios(CriarConvite(TiposAcessos.Administrador,mestre1,CriarUsuario(NovoIdUsuario()),null));
+            var alvo = new ContaUsuario(CriarConvite(TiposAcessos.Administrador,mestre1,CriarUsuario(NovoIdUsuario()),null));
 
             Action act = () => alvo.AtualizaOutraContaUsuario(mestre1, TiposAcessos.Mestre, null, 30);
 
@@ -517,7 +519,7 @@ namespace Financ.TesteUnitarios.Domain
             var conta = CriarContaAtiva();
             var mestre1 = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
 
-            var contasUsuario = new ContasUsuarios(1, conta, NovoIdUsuario(), TiposAcessos.Visualizador);
+            var contasUsuario = new ContaUsuario(1, conta, NovoIdUsuario(), TiposAcessos.Visualizador);
 
             contasUsuario.ValidaPermissoeNaConta(TiposAcessos.Mestre).Should().BeTrue();
         }
@@ -529,7 +531,7 @@ namespace Financ.TesteUnitarios.Domain
             var mestre1 = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
             var mestre2 = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
 
-            var contasUsuario = new ContasUsuarios(1, conta, NovoIdUsuario(), TiposAcessos.Visualizador);
+            var contasUsuario = new ContaUsuario(1, conta, NovoIdUsuario(), TiposAcessos.Visualizador);
 
             contasUsuario.ValidaPermissoeNaConta(TiposAcessos.Mestre).Should().BeFalse();
         }

@@ -1,5 +1,5 @@
 ﻿using Financ.Application.DTOs.Usuarios.Get;
-using Financ.Domain.Entidades;
+using Financ.Domain.Entidades.Usuarios;
 using System;
 using System.Collections.Generic;
 using System.Linq;

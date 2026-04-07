@@ -1,12 +1,14 @@
-﻿using Financ.Domain.Entidades;
-using Financ.Domain.Enums;
-using Financ.Domain.Validacoes;
-using Financ.Domain.Validacoes.Mensagens;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Xunit;
 using System;
 using System.Linq;
 using System.Reflection;
+using Financ.Domain.Entidades.ContasBancarias;
+using Financ.Domain.Entidades.Usuarios;
+using Financ.Domain.Enums.ContasBancarias;
+using Financ.Domain.Validacoes.Base.Mensagens;
+using Financ.Domain.Validacoes.ContasBancarias;
+using Financ.Domain.Validacoes.ContasBancarias.Mensagens;
 
 namespace Financ.TesteUnitarios.Domain
 {
@@ -18,9 +20,9 @@ namespace Financ.TesteUnitarios.Domain
         private Usuario CriarUsuario(string id)
             => new Usuario(id, "Nome", "Sobrenome", $"{id}@teste.com", "salt", "hash");
 
-        private ContasUsuarios CriarContaUsuarioMestre(Conta conta, string idUsuario, TipoStatusContasUsuario status = TipoStatusContasUsuario.Ativo)
+        private ContaUsuario CriarContaUsuarioMestre(Conta conta, string idUsuario, TipoStatusContasUsuario status = TipoStatusContasUsuario.Ativo)
         {
-            ContasUsuarios contaUsuario = new ContasUsuarios(
+            ContaUsuario contaUsuario = new ContaUsuario(
                 conta.ContaUsuarios.Count() + 1,
                 conta,
                 idUsuario,
@@ -29,9 +31,9 @@ namespace Financ.TesteUnitarios.Domain
             return contaUsuario;
         }
 
-        private ContasUsuarios CriarContaUsuarioAdministrador(Conta conta, string idUsuario, TipoStatusContasUsuario status = TipoStatusContasUsuario.Ativo)
+        private ContaUsuario CriarContaUsuarioAdministrador(Conta conta, string idUsuario, TipoStatusContasUsuario status = TipoStatusContasUsuario.Ativo)
         {
-            ContasUsuarios contaUsuario = new ContasUsuarios(
+            ContaUsuario contaUsuario = new ContaUsuario(
                 conta.ContaUsuarios.Count() + 1,
                 conta,
                 idUsuario,
@@ -53,7 +55,7 @@ namespace Financ.TesteUnitarios.Domain
             var usuarioDestinatario = CriarUsuario(NovoIdUsuario());
             var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuarioRemetente.Id);
 
-            Action action = () => new Convites(
+            Action action = () => new Convite(
                 TiposAcessos.Administrador,
                 contaUsuarioRemetente,
                 usuarioDestinatario);
@@ -70,7 +72,7 @@ namespace Financ.TesteUnitarios.Domain
             var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuarioRemetente.Id);
             int minutosExpiracao = 30;
 
-            var convite = new Convites(
+            var convite = new Convite(
                 TiposAcessos.Administrador,
                 contaUsuarioRemetente,
                 usuarioDestinatario,
@@ -90,7 +92,7 @@ namespace Financ.TesteUnitarios.Domain
             var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuarioRemetente.Id);
             TiposAcessos acessoInvalido = (TiposAcessos)999;
 
-            Action action = () => new Convites(
+            Action action = () => new Convite(
                 acessoInvalido,
                 contaUsuarioRemetente,
                 usuarioDestinatario);
@@ -104,7 +106,7 @@ namespace Financ.TesteUnitarios.Domain
         {
             var usuarioDestinatario = CriarUsuario(NovoIdUsuario());
 
-            Action action = () => new Convites(
+            Action action = () => new Convite(
                 TiposAcessos.Administrador,
                 null,
                 usuarioDestinatario);
@@ -120,7 +122,7 @@ namespace Financ.TesteUnitarios.Domain
             var usuarioRemetente = CriarUsuario(NovoIdUsuario());
             var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuarioRemetente.Id);
 
-            Action action = () => new Convites(
+            Action action = () => new Convite(
                 TiposAcessos.Administrador,
                 contaUsuarioRemetente,
                 null);
@@ -136,13 +138,13 @@ namespace Financ.TesteUnitarios.Domain
             var usuarioRemetente = CriarUsuario(NovoIdUsuario());
             var usuarioDestinatario = CriarUsuario(NovoIdUsuario());
 
-            var contaUsuarioRemetente = new ContasUsuarios(
+            var contaUsuarioRemetente = new ContaUsuario(
                 1,
                 conta,
                 usuarioRemetente.Id,
                 TiposAcessos.Administrador);
 
-            Action action = () => new Convites(
+            Action action = () => new Convite(
                 TiposAcessos.Administrador,
                 contaUsuarioRemetente,
                 usuarioDestinatario);
@@ -165,7 +167,7 @@ namespace Financ.TesteUnitarios.Domain
             var outroMestre = CriarContaUsuarioMestre(conta, Guid.NewGuid().ToString());
             conta.AtualizaConta(outroMestre, null, TiposStatusContas.Inativo);
 
-            Action action = () => new Convites(
+            Action action = () => new Convite(
                 TiposAcessos.Administrador,
                 contaUsuarioRemetente,
                 usuarioDestinatario);
@@ -185,7 +187,7 @@ namespace Financ.TesteUnitarios.Domain
             var usuarioDestinatario = CriarUsuario(NovoIdUsuario());
             var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuarioRemetente.Id, status);
 
-            Action action = () => new Convites(
+            Action action = () => new Convite(
                 TiposAcessos.Administrador,
                 contaUsuarioRemetente,
                 usuarioDestinatario);
@@ -203,7 +205,7 @@ namespace Financ.TesteUnitarios.Domain
             var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuarioRemetente.Id);
             CriarContaUsuarioAdministrador(conta, usuarioDestinatario.Id); // Adiciona o destinatário à conta
 
-            Action action = () => new Convites(
+            Action action = () => new Convite(
                 TiposAcessos.Administrador,
                 contaUsuarioRemetente,
                 usuarioDestinatario);
@@ -221,10 +223,10 @@ namespace Financ.TesteUnitarios.Domain
             var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuarioRemetente.Id);
 
             // Cria um convite em andamento
-            var conviteExistente = new Convites(TiposAcessos.Visualizador, contaUsuarioRemetente, usuarioDestinatario);
+            var conviteExistente = new Convite(TiposAcessos.Visualizador, contaUsuarioRemetente, usuarioDestinatario);
             conta.AddConvite(conviteExistente);
 
-            Action action = () => new Convites(
+            Action action = () => new Convite(
                 TiposAcessos.Administrador,
                 contaUsuarioRemetente,
                 usuarioDestinatario);
@@ -246,7 +248,7 @@ namespace Financ.TesteUnitarios.Domain
             var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuario1.Id);
             CriarContaUsuarioMestre(conta, usuario2.Id);
 
-            Action action = () => new Convites(
+            Action action = () => new Convite(
                 TiposAcessos.Mestre,
                 contaUsuarioRemetente,
                 usuario3);
@@ -264,7 +266,7 @@ namespace Financ.TesteUnitarios.Domain
             var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuarioRemetente.Id);
             int minutosExpiracao = 30;
 
-            Action action = () => new Convites(
+            Action action = () => new Convite(
                 TiposAcessos.Mestre,
                 contaUsuarioRemetente,
                 usuarioDestinatario,
@@ -283,7 +285,7 @@ namespace Financ.TesteUnitarios.Domain
             var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuarioRemetente.Id);
             int minutosExpiracao = 10; // Menor que 15
 
-            Action action = () => new Convites(
+            Action action = () => new Convite(
                 TiposAcessos.Administrador,
                 contaUsuarioRemetente,
                 usuarioDestinatario,
@@ -306,7 +308,7 @@ namespace Financ.TesteUnitarios.Domain
             var usuarioDestinatario = CriarUsuario(NovoIdUsuario());
             var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuarioRemetente.Id);
 
-            var convite = new Convites(
+            var convite = new Convite(
                 TiposAcessos.Administrador,
                 contaUsuarioRemetente,
                 usuarioDestinatario);
@@ -324,7 +326,7 @@ namespace Financ.TesteUnitarios.Domain
             var usuarioDestinatario = CriarUsuario(NovoIdUsuario());
             var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuarioRemetente.Id);
 
-            var convite = new Convites(
+            var convite = new Convite(
                 TiposAcessos.Administrador,
                 contaUsuarioRemetente,
                 usuarioDestinatario);
@@ -343,7 +345,7 @@ namespace Financ.TesteUnitarios.Domain
             var usuarioDestinatario = CriarUsuario(NovoIdUsuario());
             var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuarioRemetente.Id);
 
-            var convite = new Convites(
+            var convite = new Convite(
                 TiposAcessos.Administrador,
                 contaUsuarioRemetente,
                 usuarioDestinatario);
@@ -364,13 +366,13 @@ namespace Financ.TesteUnitarios.Domain
             var usuarioDestinatario = CriarUsuario(NovoIdUsuario());
             var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuarioRemetente.Id);
 
-            var convite = new Convites(
+            var convite = new Convite(
                 TiposAcessos.Administrador,
                 contaUsuarioRemetente,
                 usuarioDestinatario);
 
             // Usa Reflection para manipular a data de expiração para o passado
-            typeof(Convites).GetProperty(nameof(Convites.Expiracao), BindingFlags.Public | BindingFlags.Instance)
+            typeof(Convite).GetProperty(nameof(Convite.Expiracao), BindingFlags.Public | BindingFlags.Instance)
                 .SetValue(convite, DateTime.UtcNow.AddDays(-1));
 
             Action action = () => convite.AceitaConvite(true);
@@ -391,7 +393,7 @@ namespace Financ.TesteUnitarios.Domain
             var usuarioDestinatario = CriarUsuario(NovoIdUsuario());
             var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuarioRemetente.Id);
 
-            var convite = new Convites(
+            var convite = new Convite(
                 TiposAcessos.Administrador,
                 contaUsuarioRemetente,
                 usuarioDestinatario);
@@ -414,7 +416,7 @@ namespace Financ.TesteUnitarios.Domain
             var usuarioDestinatario = CriarUsuario(NovoIdUsuario());
             var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuarioRemetente.Id);
 
-            var convite = new Convites(
+            var convite = new Convite(
                 TiposAcessos.Administrador,
                 contaUsuarioRemetente,
                 usuarioDestinatario);
@@ -435,7 +437,7 @@ namespace Financ.TesteUnitarios.Domain
             var usuarioDestinatario = CriarUsuario(NovoIdUsuario());
             var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuarioRemetente.Id);
 
-            var convite = new Convites(
+            var convite = new Convite(
                 TiposAcessos.Administrador,
                 contaUsuarioRemetente,
                 usuarioDestinatario);
@@ -456,7 +458,7 @@ namespace Financ.TesteUnitarios.Domain
             var usuarioDestinatario = CriarUsuario(NovoIdUsuario());
             var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuarioRemetente.Id);
 
-            var convite = new Convites(
+            var convite = new Convite(
                 TiposAcessos.Administrador,
                 contaUsuarioRemetente,
                 usuarioDestinatario);
@@ -477,13 +479,13 @@ namespace Financ.TesteUnitarios.Domain
             var usuarioDestinatario = CriarUsuario(NovoIdUsuario());
             var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuarioRemetente.Id);
 
-            var convite = new Convites(
+            var convite = new Convite(
                 TiposAcessos.Administrador,
                 contaUsuarioRemetente,
                 usuarioDestinatario);
 
             // Usa Reflection para manipular a data de expiração para o passado
-            typeof(Convites).GetProperty(nameof(Convites.Expiracao), BindingFlags.Public | BindingFlags.Instance)
+            typeof(Convite).GetProperty(nameof(Convite.Expiracao), BindingFlags.Public | BindingFlags.Instance)
                 .SetValue(convite, DateTime.UtcNow.AddDays(-1));
 
             Action action = () => convite.RevogaConvite(usuarioRemetente.Id);
@@ -504,7 +506,7 @@ namespace Financ.TesteUnitarios.Domain
             var usuarioDestinatario = CriarUsuario(NovoIdUsuario());
             var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuarioRemetente.Id);
 
-            var convite = new Convites(
+            var convite = new Convite(
                 TiposAcessos.Administrador,
                 contaUsuarioRemetente,
                 usuarioDestinatario);
@@ -574,7 +576,7 @@ namespace Financ.TesteUnitarios.Domain
             var usuarioDestinatario = CriarUsuario(NovoIdUsuario());
             var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuarioRemetente.Id);
 
-            var convite = new Convites(TiposAcessos.Visualizador, contaUsuarioRemetente, usuarioDestinatario);
+            var convite = new Convite(TiposAcessos.Visualizador, contaUsuarioRemetente, usuarioDestinatario);
             conta.AddConvite(convite);
 
             conta.ConviteEmAndamento(usuarioDestinatario.Id).Should().BeTrue();
@@ -597,9 +599,9 @@ namespace Financ.TesteUnitarios.Domain
             var usuarioDestinatario = CriarUsuario(NovoIdUsuario());
             var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuarioRemetente.Id);
 
-            var convite = new Convites(TiposAcessos.Visualizador, contaUsuarioRemetente, usuarioDestinatario);
+            var convite = new Convite(TiposAcessos.Visualizador, contaUsuarioRemetente, usuarioDestinatario);
             // Usa Reflection para manipular a data de expiração para o passado
-            typeof(Convites).GetProperty(nameof(Convites.Expiracao), BindingFlags.Public | BindingFlags.Instance)
+            typeof(Convite).GetProperty(nameof(Convite.Expiracao), BindingFlags.Public | BindingFlags.Instance)
                 .SetValue(convite, DateTime.UtcNow.AddDays(-1));
             conta.AddConvite(convite);
 
@@ -614,7 +616,7 @@ namespace Financ.TesteUnitarios.Domain
             var usuarioDestinatario = CriarUsuario(NovoIdUsuario());
             var contaUsuarioRemetente = CriarContaUsuarioMestre(conta, usuarioRemetente.Id);
 
-            var convite = new Convites(TiposAcessos.Visualizador, contaUsuarioRemetente, usuarioDestinatario);
+            var convite = new Convite(TiposAcessos.Visualizador, contaUsuarioRemetente, usuarioDestinatario);
             convite.AceitaConvite(true);
             conta.AddConvite(convite);
 

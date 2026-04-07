@@ -1,6 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel;
-using Financ.Domain.Validacoes.Mensagens;
 
 namespace Financ.Application.DTOs.Usuarios.Post
 {

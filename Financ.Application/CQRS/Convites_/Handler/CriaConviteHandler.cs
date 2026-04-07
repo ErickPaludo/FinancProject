@@ -3,10 +3,11 @@ using Financ.Application.CQRS.Convites_.Commands;
 using Financ.Application.DTOs.Base;
 using Financ.Application.DTOs.Convites.Get;
 using Financ.Application.Mapeamento;
-using Financ.Domain.Entidades;
+using Financ.Domain.Entidades.ContasBancarias;
+using Financ.Domain.Entidades.Usuarios;
 using Financ.Domain.Enums;
 using Financ.Domain.Interfaces;
-using Financ.Domain.Validacoes;
+using Financ.Domain.Validacoes.ContasBancarias;
 using NetDevPack.SimpleMediator;
 using System;
 using System.Collections.Generic;
@@ -37,9 +38,9 @@ namespace Financ.Application.CQRS.Convites_.Handler
                 if (conta is null)
                     return Resultado<BasePost<GetCriaConviteDTO>>.GeraFalha(Falha.NaoEncontrado("Conta não encontrada."));
 
-                ContasUsuarios? contaUsuarioRemetente = conta.ContaUsuarios.FirstOrDefault(x => x.IdUsuario == request.idRemetente);
+                ContaUsuario? contaUsuarioRemetente = conta.ContaUsuarios.FirstOrDefault(x => x.IdUsuario == request.idRemetente);
 
-                Convites convite = new Convites(request.acesso, contaUsuarioRemetente, usuarioDestinatario,request.expiracaoContaUsuario);
+                Convite convite = new Convite(request.acesso, contaUsuarioRemetente, usuarioDestinatario,request.expiracaoContaUsuario);
                 await _unitOfWork.convitesRepostorio.Adicionar(convite);
                 await _unitOfWork.Commit();
 

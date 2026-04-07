@@ -3,7 +3,7 @@ using Financ.Application.CQRS.Contas_Usuarios.Querys;
 using Financ.Application.DTOs.Base;
 using Financ.Application.DTOs.ContasUsuarios.Get;
 using Financ.Application.Mapeamento;
-using Financ.Domain.Entidades;
+using Financ.Domain.Entidades.ContasBancarias;
 using Financ.Domain.Interfaces;
 using NetDevPack.SimpleMediator;
 
@@ -29,7 +29,7 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
 
             return Resultado<BaseGet<RetornaContasDTO>>.GeraSucesso(ContasUsuariosMapper.ParaDTO(contasUsuarios, request.Filtros));
         }
-        private async Task<IEnumerable<ContasUsuarios>> ContasUsuariosSelecionadas(RetornaContaUsuariosQuery filtros)
+        private async Task<IEnumerable<ContaUsuario>> ContasUsuariosSelecionadas(RetornaContaUsuariosQuery filtros)
         {
             var filtroId = filtros.Filtros?.Id;
             var filtroTitulo = filtros.Filtros?.Titulo;

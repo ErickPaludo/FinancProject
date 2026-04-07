@@ -9,8 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Financ.Application.Mapeamento;
 using Financ.Application.CQRS.Convites_.Query;
-using Financ.Domain.Entidades;
 using Financ.Application.DTOs.Base;
+using Financ.Domain.Entidades.ContasBancarias;
 
 namespace Financ.Application.CQRS.Convites_.Handler
 {
@@ -25,7 +25,7 @@ namespace Financ.Application.CQRS.Convites_.Handler
 
         public async Task<Resultado<BaseGet<GetRetornaConvitesDTO>>> Handle(RetornaConvitesQuery request, CancellationToken cancellationToken)
         {
-            IEnumerable<Convites?> convites = await _unitOfWork.convitesRepostorio.ObterConviteComRemetenteDestinatarioEContaAsync(request.RetornaConvitesRemetente ? r => r.IdUsuarioRemetente.Equals(request.IdUsuario) : d => d.IdUsuarioDestinatario.Equals(request.IdUsuario));
+            IEnumerable<Convite?> convites = await _unitOfWork.convitesRepostorio.ObterConviteComRemetenteDestinatarioEContaAsync(request.RetornaConvitesRemetente ? r => r.IdUsuarioRemetente.Equals(request.IdUsuario) : d => d.IdUsuarioDestinatario.Equals(request.IdUsuario));
 
             if(!convites.Any())
                 return Resultado<BaseGet<GetRetornaConvitesDTO>>.GeraFalha(Falha.NaoEncontrado("Nenhum convite foi encontrado!"));

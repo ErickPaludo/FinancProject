@@ -2,7 +2,7 @@
 using Financ.Application.Interfaces;
 using Financ.Application.Interfaces.Autenticação;
 using Financ.Application.Modelos.Autenticação;
-using Financ.Domain.Entidades;
+using Financ.Domain.Entidades.Segurança;
 using Financ.Infra.Security.Configurações.Autenticação;
 using Financ.Infra.Security.Uteis.Autenticação;
 using Financ.Infra.Security.Uteis.Segurança;

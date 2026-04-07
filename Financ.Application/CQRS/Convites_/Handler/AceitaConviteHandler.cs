@@ -5,9 +5,10 @@ using Financ.Application.DTOs.ContasUsuarios.Get;
 using Financ.Application.DTOs.ContasUsuarios.Post;
 using Financ.Application.Mapeamento;
 using Financ.Domain.Entidades;
+using Financ.Domain.Entidades.ContasBancarias;
 using Financ.Domain.Enums;
 using Financ.Domain.Interfaces;
-using Financ.Domain.Validacoes;
+using Financ.Domain.Validacoes.ContasBancarias;
 using NetDevPack.SimpleMediator;
 using System;
 using System.Collections.Generic;
@@ -42,7 +43,7 @@ namespace Financ.Application.CQRS.Convites_.Handler
                     return Resultado<BasePost<RetornaPostCadastroDTO>>.GeraSucesso(new BasePost<RetornaPostCadastroDTO>(new RetornaPostCadastroDTO(request.aceito, null,convite.Observacao)));
                 }
 
-                var contaUsuario = new ContasUsuarios(convite);
+                var contaUsuario = new ContaUsuario(convite);
 
                 contaUsuario = await _unitOfWork.contasUsuariosRepositorio.Adicionar(contaUsuario);
 

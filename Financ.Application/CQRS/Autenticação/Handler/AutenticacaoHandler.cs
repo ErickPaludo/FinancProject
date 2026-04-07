@@ -4,7 +4,7 @@ using Financ.Application.DTOs.Autenticação.Get;
 using Financ.Application.Interfaces.Autenticação;
 using Financ.Application.Interfaces.Segurança;
 using Financ.Application.Mapeamento;
-using Financ.Domain.Entidades;
+using Financ.Domain.Entidades.Segurança;
 using Financ.Domain.Interfaces;
 using NetDevPack.SimpleMediator;
 using Newtonsoft.Json.Linq;

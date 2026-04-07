@@ -3,7 +3,7 @@ using Financ.Application.CQRS.Contas_Usuarios.Querys;
 using Financ.Application.DTOs.Base;
 using Financ.Application.DTOs.ContasUsuarios.Get;
 using Financ.Application.Mapeamento;
-using Financ.Domain.Entidades;
+using Financ.Domain.Entidades.Usuarios;
 using Financ.Domain.Interfaces;
 using NetDevPack.SimpleMediator;
 

@@ -5,7 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Financ.Domain.Enums;
+using Financ.Domain.Enums.ContasBancarias;
 
 namespace Financ.Application.DTOs.ContasUsuarios.Get
 {

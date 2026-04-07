@@ -1,7 +1,7 @@
 ﻿using Financ.Application.Comun.Resultado;
 using Financ.Application.DTOs.Base;
 using Financ.Application.DTOs.Convites.Get;
-using Financ.Domain.Enums;
+using Financ.Domain.Enums.ContasBancarias;
 using NetDevPack.SimpleMediator;
 using System;
 using System.Collections.Generic;

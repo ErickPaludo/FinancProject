@@ -3,9 +3,9 @@ using Financ.Application.CQRS.Contas_.Commands;
 using Financ.Application.DTOs.Base;
 using Financ.Application.DTOs.ContasUsuarios.Get;
 using Financ.Application.Mapeamento;
-using Financ.Domain.Entidades;
+using Financ.Domain.Entidades.ContasBancarias;
 using Financ.Domain.Interfaces;
-using Financ.Domain.Validacoes;
+using Financ.Domain.Validacoes.ContasBancarias;
 using NetDevPack.SimpleMediator;
 using System;
 using System.Collections.Generic;
@@ -28,7 +28,7 @@ namespace Financ.Application.CQRS.Contas_.Handler
             try
             {
                 Conta conta = new Conta(request.Titulo);
-                ContasUsuarios contaUsuario = new ContasUsuarios(conta, request.IdUsuario);
+                ContaUsuario contaUsuario = new ContaUsuario(conta, request.IdUsuario);
 
                 await _unitOfWork.contasUsuariosRepositorio.Adicionar(contaUsuario); //Cria a conta e a conta usuario pois os objetos estão linkados
                 await _unitOfWork.Commit();

@@ -1,8 +1,15 @@
 ﻿using Financ.Application.Interfaces;
 using Financ.Domain.Interfaces;
-using Financ.Domain.Interfaces.Repositorios;
+using Financ.Domain.Interfaces.Repositorios.ContasBancarias;
+using Financ.Domain.Interfaces.Repositorios.Movimentações;
+using Financ.Domain.Interfaces.Repositorios.Segurança;
+using Financ.Domain.Interfaces.Repositorios.Usuarios;
 using Financ.Infra.Data.Contexto;
 using Financ.Infra.Data.Repositorios;
+using Financ.Infra.Data.Repositorios.ContasBancarias;
+using Financ.Infra.Data.Repositorios.Movimentações;
+using Financ.Infra.Data.Repositorios.Segurança;
+using Financ.Infra.Data.Repositorios.Usuarios;
 using Microsoft.Extensions.Configuration;
 
 
@@ -16,6 +23,8 @@ namespace Financ.Infra.Data
         private IConvitesRepostorio _convitesRepostorio;
         private IUsuariosRepositorio _usuariosRepostorio;
         private IAutenticacoesRepositorio _autenticacoesRepositorio;
+        private IMovimentacaoRepositorio _movimentacaoRepositorio;
+        private ICategoriaRepositorio _categoriaRepositorio;
 
         private readonly IConfiguration _configuration;
         public UnitOfWork(AppContextoData contexto, IConfiguration configuration)
@@ -28,7 +37,8 @@ namespace Financ.Infra.Data
         public IConvitesRepostorio convitesRepostorio { get { return _convitesRepostorio = _convitesRepostorio ?? new ConvitesRepositorio(_contexto); } }
         public IUsuariosRepositorio usuariosRepostorio { get { return _usuariosRepostorio = _usuariosRepostorio ?? new UsuariosRepositorio(_contexto); } }
         public IAutenticacoesRepositorio autenticacoesRepositorio { get { return _autenticacoesRepositorio = _autenticacoesRepositorio ?? new AutenticacoesRepositorio(_contexto); } }
-
+        public IMovimentacaoRepositorio movimentacaoRepositorio { get { return _movimentacaoRepositorio = _movimentacaoRepositorio ?? new MovimentacaoRepositorio(_contexto); } }
+        public ICategoriaRepositorio categoriaRepositorio { get { return _categoriaRepositorio = _categoriaRepositorio ?? new CategoriaRepositorio(_contexto); } }
         public async Task Commit()
         {
             await _contexto.SaveChangesAsync();

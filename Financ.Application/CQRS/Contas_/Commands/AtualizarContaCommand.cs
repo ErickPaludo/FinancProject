@@ -2,7 +2,7 @@
 using Financ.Application.DTOs.Base;
 using Financ.Application.DTOs.ContasUsuarios.Get;
 using Financ.Domain.Entidades;
-using Financ.Domain.Enums;
+using Financ.Domain.Enums.ContasBancarias;
 using NetDevPack.SimpleMediator;
 using System;
 using System.Collections.Generic;

@@ -1,6 +1,6 @@
 ﻿using Financ.Application.DTOs.Autenticação.Get;
 using Financ.Application.Modelos.Autenticação;
-using Financ.Domain.Entidades;
+using Financ.Domain.Entidades.Segurança;
 using System;
 using System.Collections.Generic;
 using System.Linq;

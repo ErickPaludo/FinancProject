@@ -2,10 +2,10 @@
 using Financ.Application.CQRS.Contas_Usuarios.Commands;
 using Financ.Application.DTOs.ContasUsuarios.Get;
 using Financ.Application.Mapeamento;
-using Financ.Domain.Entidades;
+using Financ.Domain.Entidades.ContasBancarias;
 using Financ.Domain.Enums;
 using Financ.Domain.Interfaces;
-using Financ.Domain.Validacoes;
+using Financ.Domain.Validacoes.ContasBancarias;
 using NetDevPack.SimpleMediator;
 using System;
 using System.Collections.Generic;
@@ -31,7 +31,7 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
                 if (conta is null)
                     return Resultado<RetornaCadastroContasUsuariosDTO>.GeraFalha(Falha.NaoEncontrado("Conta não encontrada!"));
 
-                ContasUsuarios? contaUsuarioDestinatario = conta.ContaUsuarios.FirstOrDefault(x => x.IdUsuario == request.idUsuarioAlterado);
+                ContaUsuario? contaUsuarioDestinatario = conta.ContaUsuarios.FirstOrDefault(x => x.IdUsuario == request.idUsuarioAlterado);
                 if (contaUsuarioDestinatario is null)
                     return Resultado<RetornaCadastroContasUsuariosDTO>.GeraFalha(Falha.NaoEncontrado("Usuário não encontrado."));
 

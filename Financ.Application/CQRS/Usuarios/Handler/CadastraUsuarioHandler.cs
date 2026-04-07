@@ -1,10 +1,10 @@
 ﻿using Financ.Application.Comun.Resultado;
 using Financ.Application.CQRS.Usuarios.Commands;
 using Financ.Application.Interfaces.Segurança;
-using Financ.Domain.Entidades;
+using Financ.Domain.Entidades.Usuarios;
 using Financ.Domain.Interfaces;
 using Financ.Domain.Interfaces.Repositorios;
-using Financ.Domain.Validacoes;
+using Financ.Domain.Validacoes.Usuarios;
 using NetDevPack.SimpleMediator;
 using System;
 using System.Collections.Generic;

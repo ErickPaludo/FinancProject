@@ -1,6 +1,7 @@
-﻿using Financ.Domain.Entidades;
-using Financ.Domain.Validacoes;
-using Financ.Domain.Validacoes.Mensagens;
+﻿using Financ.Domain.Entidades.Usuarios;
+using Financ.Domain.Validacoes.Base.Mensagens;
+using Financ.Domain.Validacoes.Usuarios;
+using Financ.Domain.Validacoes.Usuarios.Mensagens;
 using FluentAssertions;
 using System;
 using System.Collections.Generic;

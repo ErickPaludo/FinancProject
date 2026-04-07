@@ -1,4 +1,7 @@
-﻿using Financ.Domain.Interfaces.Repositorios;
+﻿using Financ.Domain.Interfaces.Repositorios.ContasBancarias;
+using Financ.Domain.Interfaces.Repositorios.Movimentações;
+using Financ.Domain.Interfaces.Repositorios.Segurança;
+using Financ.Domain.Interfaces.Repositorios.Usuarios;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +17,8 @@ namespace Financ.Domain.Interfaces
         IConvitesRepostorio convitesRepostorio { get; }
         IUsuariosRepositorio usuariosRepostorio { get; }
         IAutenticacoesRepositorio autenticacoesRepositorio { get; }
+        IMovimentacaoRepositorio movimentacaoRepositorio { get; }
+        ICategoriaRepositorio categoriaRepositorio { get; }
         Task Commit();
     }
 }

@@ -1,4 +1,6 @@
-﻿using Financ.Domain.Entidades;
+﻿using Financ.Domain.Entidades.ContasBancarias;
+using Financ.Domain.Entidades.Segurança;
+using Financ.Domain.Entidades.Usuarios;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -12,8 +14,8 @@ namespace Financ.Infra.Data.Contexto
     {
         public AppContextoData(DbContextOptions<AppContextoData> options) : base(options) { }
         public DbSet<Conta> Contas { get; set; }
-        public DbSet<ContasUsuarios> ContasUsuarios { get; set; }
-        public DbSet<Convites> Convites { get; set; }
+        public DbSet<ContaUsuario> ContasUsuarios { get; set; }
+        public DbSet<Convite> Convites { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Autenticacao> Autenticacao { get; set; }
 

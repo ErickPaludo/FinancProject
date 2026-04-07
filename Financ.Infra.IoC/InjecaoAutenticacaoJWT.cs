@@ -1,7 +1,7 @@
 ﻿using Financ.Application.Interfaces.Autenticação;
 using Financ.Application.Services.Autenticação;
 using Financ.Domain.Interfaces;
-using Financ.Domain.Interfaces.Repositorios;
+using Financ.Domain.Interfaces.Repositorios.Segurança;
 using Financ.Infra.Data;
 using Financ.Infra.Security.Configurações.Autenticação;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

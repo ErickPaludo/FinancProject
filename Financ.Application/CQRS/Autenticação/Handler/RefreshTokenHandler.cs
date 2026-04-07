@@ -2,9 +2,9 @@
 using Financ.Application.CQRS.Autenticação.Commands;
 using Financ.Application.DTOs.Autenticação.Get;
 using Financ.Application.Interfaces.Autenticação;
-using Financ.Domain.Entidades;
+using Financ.Domain.Entidades.Segurança;
 using Financ.Domain.Interfaces;
-using Financ.Domain.Validacoes;
+using Financ.Domain.Validacoes.Segurança;
 using NetDevPack.SimpleMediator;
 using System;
 using System.Collections.Generic;

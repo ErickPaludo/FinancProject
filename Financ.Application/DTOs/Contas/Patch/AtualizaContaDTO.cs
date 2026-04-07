@@ -1,4 +1,4 @@
-﻿using Financ.Domain.Enums;
+﻿using Financ.Domain.Enums.ContasBancarias;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

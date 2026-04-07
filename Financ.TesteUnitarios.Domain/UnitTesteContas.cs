@@ -1,5 +1,5 @@
-﻿using Financ.Domain.Entidades;
-using Financ.Domain.Enums;
+﻿using Financ.Domain.Entidades.ContasBancarias;
+using Financ.Domain.Enums.ContasBancarias;
 using FluentAssertions;
 using Xunit;
 
@@ -7,8 +7,8 @@ namespace Financ.TesteUnitarios.Domain
 {
     public class ContaTests
     {
-        private ContasUsuarios CriarContaUsuario(Conta conta, string idUsuario, TiposAcessos acesso, TipoStatusContasUsuario status = TipoStatusContasUsuario.Ativo)
-                => new ContasUsuarios(
+        private ContaUsuario CriarContaUsuario(Conta conta, string idUsuario, TiposAcessos acesso, TipoStatusContasUsuario status = TipoStatusContasUsuario.Ativo)
+                => new ContaUsuario(
                     1,
                     conta,
                     idUsuario,

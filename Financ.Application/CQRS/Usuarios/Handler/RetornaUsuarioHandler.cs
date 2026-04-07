@@ -2,7 +2,7 @@
 using Financ.Application.CQRS.Usuarios.Querys;
 using Financ.Application.DTOs.Usuarios.Get;
 using Financ.Application.Mapeamento;
-using Financ.Domain.Entidades;
+using Financ.Domain.Entidades.Usuarios;
 using Financ.Domain.Interfaces;
 using NetDevPack.SimpleMediator;
 using System;
