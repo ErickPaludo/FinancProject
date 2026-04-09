@@ -41,7 +41,7 @@ namespace Financ.TesteUnitarios.Domain
 
         private Categoria CriarCategoriaValida(Conta conta)
         {
-            return new Categoria(1, "Categoria Teste", "#FFFFF");
+            return new Categoria(conta, "Categoria Teste", "#FFFFFF");
         }
 
         [Fact]
@@ -178,9 +178,14 @@ namespace Financ.TesteUnitarios.Domain
         {
             // Arrange
             var conta = CriarContaValida();
+            var usuarioMestre = CriarUsuario(NovoIdUsuario());
+            var contaUsuarioMestre = CriarContaUsuario(conta,usuarioMestre, TiposAcessos.Mestre, TipoStatusContasUsuario.Ativo);
+            var categoria = CriarCategoriaValida(contaUsuarioMestre.Conta);
+
             var usuario = CriarUsuario(NovoIdUsuario());
-            var contaUsuarioExpirado = CriarContaUsuario(conta,usuario, TiposAcessos.Administrador, TipoStatusContasUsuario.Ativo);
-            var categoria = CriarCategoriaValida(contaUsuarioExpirado.Conta);
+            var contaUsuario = CriarContaUsuario(conta, usuarioMestre, TiposAcessos.Administrador, TipoStatusContasUsuario.Ativo);
+            contaUsuario.AtualizaOutraContaUsuario(contaUsuarioMestre,null,null, expirado: true);
+
             var tipo = TipoMovimentacao.Entrada;
             var valor = 100m;
             var titulo = "Titulo Valido";
@@ -188,7 +193,7 @@ namespace Financ.TesteUnitarios.Domain
             var dthrReg = DateTime.UtcNow;
 
             // Act
-            Action act = () => new Movimentacao(1, tipo, contaUsuarioExpirado, categoria, valor, titulo, observacao, dthrReg);
+            Action act = () => new Movimentacao(1, tipo, contaUsuario, categoria, valor, titulo, observacao, dthrReg);
 
             // Assert
             act.Should().Throw<MovimentacaoValidacao>()
@@ -241,6 +246,7 @@ namespace Financ.TesteUnitarios.Domain
         {
             // Arrange
             var contaUsuario = CriarContaUsuarioValida();
+            
             var outraConta = CriarContaValida(id: 2);
             var categoriaDeOutraConta = CriarCategoriaValida(outraConta);
             var tipo = TipoMovimentacao.Entrada;

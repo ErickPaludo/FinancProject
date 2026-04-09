@@ -1,11 +1,17 @@
-﻿using Financ.Domain.Enums.ContasBancarias;
+﻿using Financ.Domain.Entidades.Movimentações;
+using Financ.Domain.Enums.ContasBancarias;
+using Financ.Domain.Enums.Movimentações;
 using Financ.Domain.Objetos_de_Valor;
 using Financ.Domain.Validacoes.Base.Mensagens;
 using Financ.Domain.Validacoes.ContasBancarias;
 using Financ.Domain.Validacoes.ContasBancarias.Mensagens;
+using Financ.Domain.Validacoes.Movimentações;
+using Financ.Domain.Validacoes.Movimentações.Mensagens;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -26,13 +32,7 @@ namespace Financ.Domain.Entidades.ContasBancarias
 
         public void AddUsuario(ContaUsuario usuario) => _contasUsuarios.Add(usuario);
         public void AddConvite(Convite convite) => _convites.Add(convite);
-        public Conta(string titulo,string cor)
-        {
-            ValidaTitulo(titulo);
-            ContaPadrao();
-            Cor = new Cor(cor);
-        }
-        public Conta(int id, string titulo,string cor)
+        public Conta(int id, string titulo, string cor)
         {
             ValidaTitulo(titulo);
             ContaPadrao();
@@ -40,32 +40,19 @@ namespace Financ.Domain.Entidades.ContasBancarias
             ContasValidacao.Verifica(id <= 0, MensagensBase.ID_IGUAL_MENOR_ZERO);
             Id = id;
         }
-        private void ContaPadrao()
+        public Conta(string titulo, string cor)
         {
-            Status = TiposStatusContas.Ativo;
-            TipoConta = TipoConta.Corrente;
-            DthrReg = DateTime.UtcNow;
+            ValidaTitulo(titulo);
+            ContaPadrao();
+            Cor = new Cor(cor);
         }
-
-        private void ValidaTitulo(string titulo)
-        {
-            ContasValidacao.Verifica(string.IsNullOrWhiteSpace(titulo), MensagensContas.TITULO_OBRIGATORIO);
-            ContasValidacao.Verifica(titulo.Length < 3 || titulo.Length > 100, MensagensContas.TITULO_TAMANHO_INVALIDO);
-            Titulo = titulo;
-        }
-        private void ValidaStatusConta(TiposStatusContas status)
-        {
-            ContasValidacao.Verifica(!Enum.IsDefined(typeof(TiposStatusContas), status), MensagensBase.STATUS_INVALIDO);
-            Status = status;
-        }
-
-        public void AtualizaConta(ContaUsuario? usuario, string? titulo, TiposStatusContas? status,string? cor = null)
+        public void AtualizaConta(ContaUsuario? usuario, string? titulo, TiposStatusContas? status, string? cor = null)
         {
             ContasValidacao.Verifica(usuario is null || usuario.Conta != this, MensagensContasUsuarios.USUARIO_NAO_PERTENCE_A_CONTA);
             ContasValidacao.Verifica(!usuario!.Status.Equals(TipoStatusContasUsuario.Ativo), MensagensBase.USUARIO_INATIVO_NAO_PODE_SER_ATUALIZADO);
             ContasValidacao.Verifica((usuario!.Acesso != TiposAcessos.Mestre), MensagensContas.ATUALIZA_CONTA_USUARIO_SEM_PERMISSAO);
-            
-            if(cor != null)
+
+            if (cor != null)
                 Cor = new Cor(cor);
 
             if (titulo != null)
@@ -74,7 +61,6 @@ namespace Financ.Domain.Entidades.ContasBancarias
             if (status.HasValue)
                 ValidaStatusConta(status.Value);
         }
-
         public void SairDaConta(ContaUsuario? contaUsuario)
         {
             ContasValidacao.Verifica(contaUsuario is null || contaUsuario.Conta != this, MensagensContasUsuarios.USUARIO_NAO_PERTENCE_A_CONTA);
@@ -85,16 +71,36 @@ namespace Financ.Domain.Entidades.ContasBancarias
             if (ContaUsuarios.Count() == 0)
                 Status = TiposStatusContas.Inativo;
         }
-
         public bool ConviteEmAndamento(string idUsuario)
         {
             return Convites.Any(x => x.IdUsuarioDestinatario == idUsuario
-            && DateTime.UtcNow <= x.Expiracao 
+            && DateTime.UtcNow <= x.Expiracao
             && x.Aceito == null);
         }
         public bool UsuarioPertenceConta(string idUsuario)
         {
             return ContaUsuarios.Any(x => x.IdUsuario == idUsuario);
+        }
+        public void ProcessaMovimentacao(Movimentacao movimentacao,TipoMovimentacao tipo)
+        {
+            ContasValidacao.Verifica(movimentacao.Tipo.Equals(TipoMovimentacao.Saida) && movimentacao.Status.Equals(TipoStatusMovimentacao.Pago) && movimentacao.Valor > Saldo, MensagensContas.SALDO_INSUFICIENTE);
+        }
+        private void ContaPadrao()
+        {
+            Status = TiposStatusContas.Ativo;
+            TipoConta = TipoConta.Corrente;
+            DthrReg = DateTime.UtcNow;
+        }
+        private void ValidaTitulo(string titulo)
+        {
+            ContasValidacao.Verifica(string.IsNullOrWhiteSpace(titulo), MensagensContas.TITULO_OBRIGATORIO);
+            ContasValidacao.Verifica(titulo.Length < 3 || titulo.Length > 100, MensagensContas.TITULO_TAMANHO_INVALIDO);
+            Titulo = titulo;
+        }
+        private void ValidaStatusConta(TiposStatusContas status)
+        {
+            ContasValidacao.Verifica(!Enum.IsDefined(typeof(TiposStatusContas), status), MensagensBase.STATUS_INVALIDO);
+            Status = status;
         }
         #region Linhas de credito Fase 3
         //private void ValidaFechamentoVencimento(int diaFechamento, int diaVencimento)

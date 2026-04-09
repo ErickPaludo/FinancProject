@@ -21,6 +21,7 @@ namespace Financ.Domain.Objetos_de_Valor
         }
         private void ValidaCor(string valor)
         {
+            CorValidacao.Verifica(string.IsNullOrEmpty(valor), MensagemCor.COR_INVALIDA);
             CorValidacao.Verifica(!Regex.IsMatch(valor, "^#([0-9A-Fa-f]{6})$"), MensagemCor.COR_INVALIDA);
         }
     }

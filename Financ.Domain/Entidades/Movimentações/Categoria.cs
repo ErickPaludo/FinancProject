@@ -18,9 +18,10 @@ namespace Financ.Domain.Entidades.Movimentações
         public Cor Cor { get; private set; }
         public Conta Conta { get; private set; }
         private Categoria() { }
-        public Categoria(int idConta, string nome, string cor)
+        public Categoria(Conta conta, string nome, string cor)
         {
-            IdConta = idConta;
+            IdConta = conta.Id;
+            Conta = conta;
             ValidaNome(nome);
             Cor = new Cor(cor);
         }
@@ -33,6 +34,7 @@ namespace Financ.Domain.Entidades.Movimentações
         {
             MovimentacaoValidacao.Verifica(string.IsNullOrWhiteSpace(valor), MensagemCategoria.NOME_OBRIGATORIO);
             MovimentacaoValidacao.Verifica(valor.Length < 3 || valor.Length > 50, MensagemCategoria.CARACTERES_INVALIDOS);
+            Nome = valor;
         }
     }
 }

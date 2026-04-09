@@ -6,6 +6,7 @@ using Financ.Domain.Validacoes.Movimentações.Mensagens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -59,15 +60,15 @@ namespace Financ.Domain.Entidades.Movimentações
         }
         private void ValidaObservacao(string observacao)
         {
-            MovimentacaoValidacao.Verifica(string.IsNullOrWhiteSpace(observacao) && observacao.Length < 255, MensagemMovimentacao.OBSERVACAO_LIMITE_CARACTERES);
+            MovimentacaoValidacao.Verifica(!string.IsNullOrWhiteSpace(observacao) && observacao.Length > 255, MensagemMovimentacao.OBSERVACAO_LIMITE_CARACTERES);
             Observacao = observacao;
         }
         private void ValidaContaUsuario(ContaUsuario? contaUsuario)
         {
             MovimentacaoValidacao.Verifica(contaUsuario is null, MensagemMovimentacao.USUARIO_NAO_PERTENCE_A_CONTA);
             MovimentacaoValidacao.Verifica(!contaUsuario!.Status.Equals(TipoStatusContasUsuario.Ativo), MensagemMovimentacao.USUARIO_INATIVO);
-            MovimentacaoValidacao.Verifica(contaUsuario.Expiracao > DateTime.UtcNow, MensagemMovimentacao.USUARIO_EXPIRADO);
-            MovimentacaoValidacao.Verifica(!contaUsuario!.Acesso.Equals(TiposAcessos.Visualizador), MensagemMovimentacao.USUARIO_SEM_PERMISSAO);
+            MovimentacaoValidacao.Verifica(contaUsuario.Expiracao < DateTime.UtcNow, MensagemMovimentacao.USUARIO_EXPIRADO);
+            MovimentacaoValidacao.Verifica(contaUsuario!.Acesso.Equals(TiposAcessos.Visualizador), MensagemMovimentacao.USUARIO_SEM_PERMISSAO);
             IdContaUsuario = contaUsuario!.Id;
         }
         private void ValidaConta(Conta? conta)
@@ -77,7 +78,7 @@ namespace Financ.Domain.Entidades.Movimentações
         }
         private void ValidaCategoria(Categoria? categoria, Conta conta)
         {
-            MovimentacaoValidacao.Verifica(categoria != null && categoria!.Conta == conta, MensagemMovimentacao.CATEGORIA_NAO_PERTENCA_A_CONTA);
+            MovimentacaoValidacao.Verifica(categoria != null && categoria!.Conta != conta, MensagemMovimentacao.CATEGORIA_NAO_PERTENCA_A_CONTA);
             IdCategoria = categoria!.Id;
         }
         private void ValidaValor(decimal valor)

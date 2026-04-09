@@ -20,7 +20,6 @@ namespace Financ.Domain.Validacoes.Movimentações.Mensagens
         public static string USUARIO_EXPIRADO => "Usuário com tempo expirado.";
         public static string USUARIO_SEM_PERMISSAO => "Usuário não possui permissão para este tipo de ação.";
         public static string VALOR_DEVE_SER_MAIOR_QUE_ZERO => "Valor deve ser maior que 0";
-        public static string SALDO_INSUFICIENTE => "Saldo insuficiente";
         public static string DATAS_INVALIDAS => "Data de pagamento não pode ser superior a data de registro.";
 
     }

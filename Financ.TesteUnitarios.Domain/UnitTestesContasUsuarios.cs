@@ -129,7 +129,7 @@ namespace Financ.TesteUnitarios.Domain
         public void Construtor_ComContaNula_DeveLancarExcecao()
         {
             Action act = () =>
-                new ContaUsuario(1, null, CriarUsuario(NovoIdUsuario()).Id, TiposAcessos.Administrador);
+                new ContaUsuario(null, CriarUsuario(NovoIdUsuario()).Id);
 
             act.Should().Throw<ContasUsuariosValidacao>()
                 .WithMessage(MensagensContasUsuarios.CONTA_NAO_PODE_SER_NULA);
