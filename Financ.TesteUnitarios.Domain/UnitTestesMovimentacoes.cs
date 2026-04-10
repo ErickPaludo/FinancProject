@@ -65,7 +65,7 @@ namespace Financ.TesteUnitarios.Domain
             movimentacao.Valor.Should().Be(valor);
             movimentacao.Titulo.Should().Be(titulo);
             movimentacao.Observacao.Should().Be(observacao);
-            movimentacao.DthrReg.Should().Be(dthrReg);
+            movimentacao.DthrMovimentacao.Should().Be(dthrReg);
         }
 
         [Theory]

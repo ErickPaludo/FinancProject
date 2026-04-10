@@ -81,10 +81,13 @@ namespace Financ.Domain.Entidades.ContasBancarias
         {
             return ContaUsuarios.Any(x => x.IdUsuario == idUsuario);
         }
-        public void ProcessaMovimentacao(Movimentacao movimentacao,TipoMovimentacao tipo)
+        public void ProcessaMovimentacao(Movimentacao movimentacao, DateTime? dthrConclusao = null)
         {
-            ContasValidacao.Verifica(movimentacao.Tipo.Equals(TipoMovimentacao.Saida) && movimentacao.Status.Equals(TipoStatusMovimentacao.Pago) && movimentacao.Valor > Saldo, MensagensContas.SALDO_INSUFICIENTE);
+            ContasValidacao.Verifica(movimentacao.Tipo.Equals(TipoMovimentacao.Saida) && movimentacao.Valor > Saldo, MensagensContas.SALDO_INSUFICIENTE);
+            Saldo = movimentacao.Tipo.Equals(TipoMovimentacao.Entrada) ? Saldo + movimentacao.Valor : Saldo - movimentacao.Valor;
+            movimentacao.ConcluiMovimentacao(dthrConclusao);
         }
+    
         private void ContaPadrao()
         {
             Status = TiposStatusContas.Ativo;

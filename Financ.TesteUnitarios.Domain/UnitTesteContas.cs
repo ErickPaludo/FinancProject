@@ -1,6 +1,9 @@
 ﻿using Financ.Domain.Entidades.ContasBancarias;
+using Financ.Domain.Entidades.Movimentações;
 using Financ.Domain.Enums.ContasBancarias;
+using Financ.Domain.Enums.Movimentações;
 using FluentAssertions;
+using System.Drawing;
 using Xunit;
 
 namespace Financ.TesteUnitarios.Domain
@@ -16,6 +19,9 @@ namespace Financ.TesteUnitarios.Domain
                     status);
 
         private string NovoIdUsuario() => Guid.NewGuid().ToString();
+
+        private Movimentacao CriaMovimentacao(TipoMovimentacao tipo, ContaUsuario contaUsuario, Categoria? categoria, decimal valor, string titulo, string observacao, DateTime? dthrMovimentacao, int id = 1) =>  new Movimentacao(id, tipo, contaUsuario, categoria, valor, titulo, observacao, dthrMovimentacao);
+    
 
         #region Construtor
 
@@ -189,6 +195,18 @@ namespace Financ.TesteUnitarios.Domain
             act.Should().Throw<Exception>();
         }
 
+        #endregion
+        #region Movimentaçoes
+        [Fact]
+        public void Conclui_Movimentaca_De_Entrada_com_Sucesso()
+        {
+            var conta = new Conta(1, "Conta Teste", "#FFFFFF");
+
+            var usuario = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
+            var movimentacao = CriaMovimentacao(TipoMovimentacao.Entrada, usuario, null, 100, "Salário", "Recebimento do salário", DateTime.UtcNow);
+            conta.ProcessaMovimentacao(movimentacao);
+            conta.Should();
+        }
         #endregion
     }
 }
