@@ -5,6 +5,7 @@ using Financ.Application.DTOs.ContasUsuarios.Get;
 using Financ.Application.Mapeamento;
 using Financ.Domain.Entidades.ContasBancarias;
 using Financ.Domain.Enums;
+using Financ.Domain.Enums.Movimentações;
 using Financ.Domain.Interfaces;
 using Financ.Domain.Validacoes.ContasBancarias;
 using NetDevPack.SimpleMediator;
@@ -38,7 +39,9 @@ namespace Financ.Application.CQRS.Contas_.Handler
                 _unitOfWork.contasRepositorio.Atualiza(conta);
                 await _unitOfWork.Commit();
 
-                return Resultado<BasePost<RetornaContasDTO>>.GeraSucesso(ContasUsuariosMapper.ParaDTO(contaUsuario!, null));
+                var movimentacoes = await _unitOfWork.movimentacaoRepositorio.BuscarPorCondicao(m => m.IdConta == request.IdConta && m.Status == TipoStatusMovimentacao.Pendente);
+
+                return Resultado<BasePost<RetornaContasDTO>>.GeraSucesso(ContaUsuarioMapper.ParaDTO(contaUsuario!,movimentacoes, null));
             }
             catch (ContasValidacao contasExecao)
             {

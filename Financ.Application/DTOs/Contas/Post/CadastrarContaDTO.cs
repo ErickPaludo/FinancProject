@@ -8,5 +8,5 @@ using System.Threading.Tasks;
 
 namespace Financ.Application.DTOs.Contas.Get
 {
-    public sealed record CadastrarContaDTO(string Titulo, string Cor);
+    public sealed record CadastrarContaDTO(string Titulo, string? Cor);
 }

@@ -20,7 +20,7 @@ namespace Financ.TesteUnitarios.Domain
 
         private string NovoIdUsuario() => Guid.NewGuid().ToString();
 
-        private Movimentacao CriaMovimentacao(TipoMovimentacao tipo, ContaUsuario contaUsuario, Categoria? categoria, decimal valor, string titulo, string observacao, DateTime? dthrMovimentacao, int id = 1) =>  new Movimentacao(id, tipo, contaUsuario, categoria, valor, titulo, observacao, dthrMovimentacao);
+        private Movimentacao CriaMovimentacao(TipoMovimentacao tipo, ContaUsuario contaUsuario, Categoria? categoria, decimal valor, string titulo, string observacao, DateTime? dthrMovimentacao) =>  new Movimentacao(tipo, contaUsuario, categoria, valor, titulo, observacao, dthrMovimentacao,null);
     
 
         #region Construtor

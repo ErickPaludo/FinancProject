@@ -33,6 +33,9 @@ namespace Financ.Infra.Data.Migrations
                     b.Property<DateTime>("DthrReg")
                         .HasColumnType("datetime2");
 
+                    b.Property<decimal>("Saldo")
+                        .HasColumnType("Decimal(18,2)");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -133,7 +136,7 @@ namespace Financ.Infra.Data.Migrations
                     b.ToTable("fnc_convites", (string)null);
                 });
 
-            modelBuilder.Entity("Financ.Domain.Entidades.Movimentações.CategoriaMovimentacao", b =>
+            modelBuilder.Entity("Financ.Domain.Entidades.Movimentações.Categoria", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -164,26 +167,31 @@ namespace Financ.Infra.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("DthrPagamento")
+                    b.Property<DateTime?>("DthrConclusao")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DthrReg")
+                    b.Property<DateTime?>("DthrMovimentacao")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("IdCategoria")
+                    b.Property<DateTime?>("DthrReg")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("IdCategoria")
                         .HasColumnType("int");
 
                     b.Property<int>("IdConta")
                         .HasColumnType("int");
 
-                    b.Property<int>("IdContaUsuario")
-                        .HasColumnType("int");
-
                     b.Property<int>("IdFixo")
                         .HasColumnType("int");
 
+                    b.Property<int>("IdUsuarioCriador")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("IdUsuarioExecutor")
+                        .HasColumnType("int");
+
                     b.Property<string>("Observacao")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
@@ -203,9 +211,13 @@ namespace Financ.Infra.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("IdCategoria");
+
                     b.HasIndex("IdConta");
 
-                    b.HasIndex("IdContaUsuario");
+                    b.HasIndex("IdUsuarioCriador");
+
+                    b.HasIndex("IdUsuarioExecutor");
 
                     b.ToTable("fnc_movimentacoes", (string)null);
                 });
@@ -265,6 +277,30 @@ namespace Financ.Infra.Data.Migrations
                     b.ToTable("fnc_usuarios", (string)null);
                 });
 
+            modelBuilder.Entity("Financ.Domain.Entidades.ContasBancarias.Conta", b =>
+                {
+                    b.OwnsOne("Financ.Domain.Objetos_de_Valor.Cor", "Cor", b1 =>
+                        {
+                            b1.Property<int>("ContaId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("Valor")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Cor");
+
+                            b1.HasKey("ContaId");
+
+                            b1.ToTable("fnc_contas");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ContaId");
+                        });
+
+                    b.Navigation("Cor")
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Financ.Domain.Entidades.ContasBancarias.ContaUsuario", b =>
                 {
                     b.HasOne("Financ.Domain.Entidades.ContasBancarias.Conta", "Conta")
@@ -289,7 +325,7 @@ namespace Financ.Infra.Data.Migrations
                     b.HasOne("Financ.Domain.Entidades.ContasBancarias.Conta", "Conta")
                         .WithMany("Convites")
                         .HasForeignKey("IdConta")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Financ.Domain.Entidades.Usuarios.Usuario", "Destinatario")
@@ -311,7 +347,7 @@ namespace Financ.Infra.Data.Migrations
                     b.Navigation("Remetente");
                 });
 
-            modelBuilder.Entity("Financ.Domain.Entidades.Movimentações.CategoriaMovimentacao", b =>
+            modelBuilder.Entity("Financ.Domain.Entidades.Movimentações.Categoria", b =>
                 {
                     b.HasOne("Financ.Domain.Entidades.ContasBancarias.Conta", "Conta")
                         .WithMany()
@@ -319,26 +355,61 @@ namespace Financ.Infra.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.OwnsOne("Financ.Domain.Objetos_de_Valor.Cor", "Cor", b1 =>
+                        {
+                            b1.Property<int>("CategoriaId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("Valor")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Cor");
+
+                            b1.HasKey("CategoriaId");
+
+                            b1.ToTable("fnc_categorias");
+
+                            b1.WithOwner()
+                                .HasForeignKey("CategoriaId");
+                        });
+
                     b.Navigation("Conta");
+
+                    b.Navigation("Cor")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Financ.Domain.Entidades.Movimentações.Movimentacao", b =>
                 {
+                    b.HasOne("Financ.Domain.Entidades.Movimentações.Categoria", "Categoria")
+                        .WithMany()
+                        .HasForeignKey("IdCategoria")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Financ.Domain.Entidades.ContasBancarias.Conta", "Conta")
                         .WithMany()
                         .HasForeignKey("IdConta")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Financ.Domain.Entidades.ContasBancarias.ContaUsuario", "ContaUsuario")
+                    b.HasOne("Financ.Domain.Entidades.ContasBancarias.ContaUsuario", "ContaUsuarioCriador")
                         .WithMany()
-                        .HasForeignKey("IdContaUsuario")
+                        .HasForeignKey("IdUsuarioCriador")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Financ.Domain.Entidades.ContasBancarias.ContaUsuario", "ContaUsuarioExecutor")
+                        .WithMany()
+                        .HasForeignKey("IdUsuarioExecutor")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Categoria");
+
                     b.Navigation("Conta");
 
-                    b.Navigation("ContaUsuario");
+                    b.Navigation("ContaUsuarioCriador");
+
+                    b.Navigation("ContaUsuarioExecutor");
                 });
 
             modelBuilder.Entity("Financ.Domain.Entidades.Segurança.Autenticacao", b =>

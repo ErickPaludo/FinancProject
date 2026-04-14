@@ -57,7 +57,7 @@ namespace Financ.TesteUnitarios.Domain
             var dthrReg = DateTime.UtcNow;
 
             // Act
-            var movimentacao = new Movimentacao(1, tipo, contaUsuario, categoria, valor, titulo, observacao, dthrReg);
+            var movimentacao = new Movimentacao( tipo, contaUsuario, categoria, valor, titulo, observacao, dthrReg,null);
 
             // Assert
             movimentacao.Should().NotBeNull();
@@ -82,7 +82,7 @@ namespace Financ.TesteUnitarios.Domain
             var dthrReg = DateTime.UtcNow;
 
             // Act
-            Action act = () => new Movimentacao(1, tipoInvalido, contaUsuario, categoria, valor, titulo, observacao, dthrReg);
+            Action act = () => new Movimentacao(  tipoInvalido, contaUsuario, categoria, valor, titulo, observacao, dthrReg, null);
 
             // Assert
             act.Should().Throw<MovimentacaoValidacao>()
@@ -105,7 +105,7 @@ namespace Financ.TesteUnitarios.Domain
             var dthrReg = DateTime.UtcNow;
 
             // Act
-            Action act = () => new Movimentacao(1, tipo, contaUsuario, categoria, valor, tituloInvalido, observacao, dthrReg);
+            Action act = () => new Movimentacao(1, tipo, contaUsuario, categoria, valor, tituloInvalido, observacao, dthrReg, null);
 
             // Assert
             act.Should().Throw<MovimentacaoValidacao>()
@@ -125,7 +125,7 @@ namespace Financ.TesteUnitarios.Domain
             var dthrReg = DateTime.UtcNow;
 
             // Act
-            Action act = () => new Movimentacao(1, tipo, contaUsuario, categoria, valor, titulo, observacaoInvalida, dthrReg);
+            Action act = () => new Movimentacao(1, tipo, contaUsuario, categoria, valor, titulo, observacaoInvalida, dthrReg, null);
 
             // Assert
             act.Should().Throw<MovimentacaoValidacao>()
@@ -146,7 +146,7 @@ namespace Financ.TesteUnitarios.Domain
             var dthrReg = DateTime.UtcNow;
 
             // Act
-            Action act = () => new Movimentacao(1, tipo, contaUsuarioInvalida, categoria, valor, titulo, observacao, dthrReg);
+            Action act = () => new Movimentacao(1, tipo, contaUsuarioInvalida, categoria, valor, titulo, observacao, dthrReg, null);
 
             // Assert
             act.Should().Throw<MovimentacaoValidacao>()
@@ -166,7 +166,7 @@ namespace Financ.TesteUnitarios.Domain
             var dthrReg = DateTime.UtcNow;
 
             // Act
-            Action act = () => new Movimentacao(1, tipo, contaUsuarioInativa, categoria, valor, titulo, observacao, dthrReg);
+            Action act = () => new Movimentacao(1, tipo, contaUsuarioInativa, categoria, valor, titulo, observacao, dthrReg, null);
 
             // Assert
             act.Should().Throw<MovimentacaoValidacao>()
@@ -193,7 +193,7 @@ namespace Financ.TesteUnitarios.Domain
             var dthrReg = DateTime.UtcNow;
 
             // Act
-            Action act = () => new Movimentacao(1, tipo, contaUsuario, categoria, valor, titulo, observacao, dthrReg);
+            Action act = () => new Movimentacao(1, tipo, contaUsuario, categoria, valor, titulo, observacao, dthrReg, null);
 
             // Assert
             act.Should().Throw<MovimentacaoValidacao>()
@@ -213,7 +213,7 @@ namespace Financ.TesteUnitarios.Domain
             var dthrReg = DateTime.UtcNow;
 
             // Act
-            Action act = () => new Movimentacao(1, tipo, contaUsuarioSemPermissao, categoria, valor, titulo, observacao, dthrReg);
+            Action act = () => new Movimentacao(1, tipo, contaUsuarioSemPermissao, categoria, valor, titulo, observacao, dthrReg, null);
 
             // Assert
             act.Should().Throw<MovimentacaoValidacao>()

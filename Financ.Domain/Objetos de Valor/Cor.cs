@@ -12,17 +12,20 @@ namespace Financ.Domain.Objetos_de_Valor
     public class Cor
     {
         public string Valor { get; private set; }
-        private Cor(){}
+        private Cor() { }
 
-        public Cor(string valor)
+        public Cor(string? valor)
         {
             ValidaCor(valor);
-            Valor = valor;
         }
-        private void ValidaCor(string valor)
+        private void ValidaCor(string? valor)
         {
-            CorValidacao.Verifica(string.IsNullOrEmpty(valor), MensagemCor.COR_INVALIDA);
-            CorValidacao.Verifica(!Regex.IsMatch(valor, "^#([0-9A-Fa-f]{6})$"), MensagemCor.COR_INVALIDA);
+            if (valor is not null)
+            {
+                CorValidacao.Verifica(string.IsNullOrEmpty(valor), MensagemCor.COR_INVALIDA);
+                CorValidacao.Verifica(!Regex.IsMatch(valor, "^#([0-9A-Fa-f]{6})$"), MensagemCor.COR_INVALIDA);
+            }
+            Valor = valor is not null ? valor : "#44444";
         }
     }
 }

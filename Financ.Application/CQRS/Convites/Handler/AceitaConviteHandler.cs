@@ -1,5 +1,5 @@
 ﻿using Financ.Application.Comun.Resultado;
-using Financ.Application.CQRS.Convites_.Commands;
+using Financ.Application.CQRS.Convites.Commands;
 using Financ.Application.DTOs.Base;
 using Financ.Application.DTOs.ContasUsuarios.Get;
 using Financ.Application.DTOs.ContasUsuarios.Post;
@@ -16,7 +16,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Financ.Application.CQRS.Convites_.Handler
+namespace Financ.Application.CQRS.Convites.Handler
 {
     public class AceitaConviteHandler : IRequestHandler<AceitaConviteCommand, Resultado<BasePost<RetornaPostCadastroDTO>>>
     {
@@ -50,7 +50,7 @@ namespace Financ.Application.CQRS.Convites_.Handler
                 _unitOfWork.convitesRepostorio.Atualiza(convite);
 
                 await _unitOfWork.Commit();
-                return Resultado<BasePost<RetornaPostCadastroDTO>>.GeraSucesso(ContasUsuariosMapper.ParaDTO(convite, contaUsuario));
+                return Resultado<BasePost<RetornaPostCadastroDTO>>.GeraSucesso(ContaUsuarioMapper.ParaDTO(convite, contaUsuario));
             }
             catch (ContasUsuariosValidacao contasUsuariosExcessao)
             {

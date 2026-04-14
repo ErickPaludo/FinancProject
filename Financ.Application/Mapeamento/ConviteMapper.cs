@@ -11,10 +11,10 @@ using System.Threading.Tasks;
 
 namespace Financ.Application.Mapeamento
 {
-    public static class ConvitesMapper
+    public static class ConviteMapper
     {
         public static BasePost<GetCriaConviteDTO> ParaDTO(Convite convite) => new BasePost<GetCriaConviteDTO>(new GetCriaConviteDTO(convite.Id, convite.Acesso));
-        public static BaseGet<GetRetornaConvitesDTO> ParaDTO(IEnumerable<Convite>? convites, object? filtro)
+        public static BaseGetList<GetRetornaConvitesDTO> ParaDTO(IEnumerable<Convite>? convites, object? filtro)
         {
             List<GetRetornaConvitesDTO> listaConvites = new List<GetRetornaConvitesDTO>();
             if (convites != null)
@@ -31,19 +31,19 @@ namespace Financ.Application.Mapeamento
                             convite.IdConta,
                             convite.Conta.Titulo,
                             convite.Conta.TipoConta),
-                        new GetUsuarioConvite(
+                        new GetUsuario(
                             convite.IdUsuarioRemetente,
                             convite.Remetente.PrimeiroNome,
                             convite.Remetente.SegundoNome,
                             $"{convite.Remetente.PrimeiroNome} {convite.Remetente.SegundoNome}"),
-                          new GetUsuarioConvite(
+                          new GetUsuario(
                             convite.IdUsuarioDestinatario,
                             convite.Destinatario.PrimeiroNome,
                             convite.Destinatario.SegundoNome,
                             $"{convite.Destinatario.PrimeiroNome} {convite.Destinatario.SegundoNome}")
                         ));
                 }
-            return new BaseGet<GetRetornaConvitesDTO>(listaConvites, new Meta { filtros = filtro });
+            return new BaseGetList<GetRetornaConvitesDTO>(listaConvites, new Meta { filtros = filtro });
         }
     }
 }

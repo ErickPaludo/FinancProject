@@ -9,7 +9,7 @@ using NetDevPack.SimpleMediator;
 
 namespace Financ.Application.CQRS.Contas_Usuarios.Handler
 {
-    public class RetornaUsuariosAssociadosHandler : IRequestHandler<RetornaUsuariosAssociadosQuery, Resultado<BaseGet<RetornaUsuariosAssociadosDTO>>>
+    public class RetornaUsuariosAssociadosHandler : IRequestHandler<RetornaUsuariosAssociadosQuery, Resultado<BaseGetList<RetornaUsuariosAssociadosDTO>>>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -18,7 +18,7 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<Resultado<BaseGet<RetornaUsuariosAssociadosDTO>>> Handle(RetornaUsuariosAssociadosQuery request, CancellationToken cancellationToken)
+        public async Task<Resultado<BaseGetList<RetornaUsuariosAssociadosDTO>>> Handle(RetornaUsuariosAssociadosQuery request, CancellationToken cancellationToken)
         {
             if (await _unitOfWork.contasUsuariosRepositorio.BuscarObjetoUnico(x => x.IdConta == request.IdConta && x.IdUsuario == request.IdUsuario) != null)
             {
@@ -40,20 +40,20 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
                     foreach (var conta in contaUsuarios)
                     {
                         Usuario? usuario = await _unitOfWork.usuariosRepostorio.BuscarObjetoUnico(x => x.Id.Equals(conta.IdUsuario));
-                        listaUsuarios.Add(ContasUsuariosMapper.ParaUsuariosAssociadosDTO(conta, usuario));
+                        listaUsuarios.Add(ContaUsuarioMapper.ParaUsuariosAssociadosDTO(conta, usuario));
                     }
 
                     if (filtroNome)
                         listaUsuarios = listaUsuarios.Where(x => x.Nome.Contains(request.filtroConta.NomeUsuario)).ToList();
 
                 }
-                return Resultado<BaseGet<RetornaUsuariosAssociadosDTO>>.GeraSucesso(new BaseGet<RetornaUsuariosAssociadosDTO>(listaUsuarios, new Meta
+                return Resultado<BaseGetList<RetornaUsuariosAssociadosDTO>>.GeraSucesso(new BaseGetList<RetornaUsuariosAssociadosDTO>(listaUsuarios, new Meta
                 {
                     filtros = request.filtroConta != null && request.filtroConta.IdUsuario == null && request.filtroConta.NomeUsuario == null && request.filtroConta.Status == null ? null : request.filtroConta,
                 }));
 
             }
-            return Resultado<BaseGet<RetornaUsuariosAssociadosDTO>>.GeraFalha(Falha.NaoEncontrado("Conta não encontrada!"));
+            return Resultado<BaseGetList<RetornaUsuariosAssociadosDTO>>.GeraFalha(Falha.NaoEncontrado("Conta não encontrada!"));
         }
     }
 }

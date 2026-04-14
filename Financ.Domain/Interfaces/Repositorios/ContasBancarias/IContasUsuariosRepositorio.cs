@@ -12,5 +12,6 @@ namespace Financ.Domain.Interfaces.Repositorios.ContasBancarias
     public interface IContasUsuariosRepositorio : IBaseRepositorio<ContaUsuario>
     {
         Task<IEnumerable<ContaUsuario>> ObterContasDoUsuario(Expression<Func<ContaUsuario, bool>> predicado);
+        Task<ContaUsuario?> ObterContaUsuarioComUsuario(Expression<Func<ContaUsuario, bool>> predicado);
     }
 }

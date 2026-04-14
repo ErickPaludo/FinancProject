@@ -40,7 +40,7 @@ namespace Financ.Domain.Entidades.ContasBancarias
             ContasValidacao.Verifica(id <= 0, MensagensBase.ID_IGUAL_MENOR_ZERO);
             Id = id;
         }
-        public Conta(string titulo, string cor)
+        public Conta(string titulo, string? cor)
         {
             ValidaTitulo(titulo);
             ContaPadrao();
@@ -81,13 +81,25 @@ namespace Financ.Domain.Entidades.ContasBancarias
         {
             return ContaUsuarios.Any(x => x.IdUsuario == idUsuario);
         }
-        public void ProcessaMovimentacao(Movimentacao movimentacao, DateTime? dthrConclusao = null)
+        public void ProcessaMovimentacao(Movimentacao movimentacao)
         {
-            ContasValidacao.Verifica(movimentacao.Tipo.Equals(TipoMovimentacao.Saida) && movimentacao.Valor > Saldo, MensagensContas.SALDO_INSUFICIENTE);
-            Saldo = movimentacao.Tipo.Equals(TipoMovimentacao.Entrada) ? Saldo + movimentacao.Valor : Saldo - movimentacao.Valor;
-            movimentacao.ConcluiMovimentacao(dthrConclusao);
+            if (movimentacao.Status is TipoStatusMovimentacao.Concluido)
+            {
+                ContasValidacao.Verifica(movimentacao.Extorno, MensagensContas.NAO_PODE_PROCESSAR_MOVIMENTACAO_COM_EXTORNO);
+                ContasValidacao.Verifica(movimentacao.Tipo.Equals(TipoMovimentacao.Saida) && movimentacao.Valor > Saldo, MensagensContas.SALDO_INSUFICIENTE);
+                Saldo = movimentacao.Tipo.Equals(TipoMovimentacao.Entrada) ? Saldo + movimentacao.Valor : Saldo - movimentacao.Valor;
+            }
         }
-    
+        public void ProcessaExtornoMovimentacao(Movimentacao movimentacao)
+        {
+            ContasValidacao.Verifica(!movimentacao.Extorno, MensagensContas.NAO_PODE_PROCESSAR_MOVIMENTACAO_SEM_EXTORNO);
+            ContasValidacao.Verifica(movimentacao.Status is not TipoStatusMovimentacao.Pendente, MensagensContas.EXTORNO_DE_MOVIMENTACAO_COM_DATA_DE_CONCLUSAO);
+            ContasValidacao.Verifica(movimentacao.DthrConclusao is not null, MensagensContas.EXTORNO_DE_MOVIMENTACAO_COM_DATA_DE_CONCLUSAO);
+            ContasValidacao.Verifica(movimentacao.Tipo.Equals(TipoMovimentacao.Entrada) && movimentacao.Valor > Saldo, MensagensContas.SALDO_INSUFICIENTE);
+            Saldo = movimentacao.Tipo.Equals(TipoMovimentacao.Entrada) ? Saldo - movimentacao.Valor : Saldo + movimentacao.Valor;
+        }
+
+
         private void ContaPadrao()
         {
             Status = TiposStatusContas.Ativo;

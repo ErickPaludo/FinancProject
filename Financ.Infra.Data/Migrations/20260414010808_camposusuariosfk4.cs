@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Financ.Infra.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class iniciomovimentacoes : Migration
+    public partial class camposusuariosfk4 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -20,6 +20,8 @@ namespace Financ.Infra.Data.Migrations
                     Titulo = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     TipoConta = table.Column<int>(type: "int", nullable: false),
+                    Saldo = table.Column<decimal>(type: "Decimal(18,2)", nullable: false),
+                    Cor = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DthrReg = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -50,7 +52,8 @@ namespace Financ.Infra.Data.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     IdConta = table.Column<int>(type: "int", nullable: false),
-                    Nome = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                    Nome = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Cor = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -138,7 +141,7 @@ namespace Financ.Infra.Data.Migrations
                         column: x => x.IdConta,
                         principalTable: "fnc_contas",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_fnc_convites_fnc_usuarios_IdUsuarioDestinatario",
                         column: x => x.IdUsuarioDestinatario,
@@ -161,19 +164,28 @@ namespace Financ.Infra.Data.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Tipo = table.Column<int>(type: "int", nullable: false),
                     IdConta = table.Column<int>(type: "int", nullable: false),
-                    IdContaUsuario = table.Column<int>(type: "int", nullable: false),
-                    IdCategoria = table.Column<int>(type: "int", nullable: false),
+                    IdUsuarioCriador = table.Column<int>(type: "int", nullable: false),
+                    IdUsuarioExecutor = table.Column<int>(type: "int", nullable: true),
+                    IdCategoria = table.Column<int>(type: "int", nullable: true),
                     IdFixo = table.Column<int>(type: "int", nullable: false),
                     Valor = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     Titulo = table.Column<string>(type: "nvarchar(80)", maxLength: 80, nullable: false),
-                    Observacao = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    DthrReg = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DthrPagamento = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Observacao = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    DthrReg = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DthrMovimentacao = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DthrConclusao = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ContaUsuarioCriadorId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_fnc_movimentacoes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_fnc_movimentacoes_fnc_categorias_IdCategoria",
+                        column: x => x.IdCategoria,
+                        principalTable: "fnc_categorias",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_fnc_movimentacoes_fnc_contas_IdConta",
                         column: x => x.IdConta,
@@ -181,8 +193,14 @@ namespace Financ.Infra.Data.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_fnc_movimentacoes_fnc_contas_usuarios_IdContaUsuario",
-                        column: x => x.IdContaUsuario,
+                        name: "FK_fnc_movimentacoes_fnc_contas_usuarios_ContaUsuarioCriadorId",
+                        column: x => x.ContaUsuarioCriadorId,
+                        principalTable: "fnc_contas_usuarios",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_fnc_movimentacoes_fnc_contas_usuarios_IdUsuarioExecutor",
+                        column: x => x.IdUsuarioExecutor,
                         principalTable: "fnc_contas_usuarios",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -224,14 +242,24 @@ namespace Financ.Infra.Data.Migrations
                 column: "IdUsuarioRemetente");
 
             migrationBuilder.CreateIndex(
+                name: "IX_fnc_movimentacoes_ContaUsuarioCriadorId",
+                table: "fnc_movimentacoes",
+                column: "ContaUsuarioCriadorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_fnc_movimentacoes_IdCategoria",
+                table: "fnc_movimentacoes",
+                column: "IdCategoria");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_fnc_movimentacoes_IdConta",
                 table: "fnc_movimentacoes",
                 column: "IdConta");
 
             migrationBuilder.CreateIndex(
-                name: "IX_fnc_movimentacoes_IdContaUsuario",
+                name: "IX_fnc_movimentacoes_IdUsuarioExecutor",
                 table: "fnc_movimentacoes",
-                column: "IdContaUsuario");
+                column: "IdUsuarioExecutor");
         }
 
         /// <inheritdoc />
@@ -241,13 +269,13 @@ namespace Financ.Infra.Data.Migrations
                 name: "fnc_autenticacao");
 
             migrationBuilder.DropTable(
-                name: "fnc_categorias");
-
-            migrationBuilder.DropTable(
                 name: "fnc_convites");
 
             migrationBuilder.DropTable(
                 name: "fnc_movimentacoes");
+
+            migrationBuilder.DropTable(
+                name: "fnc_categorias");
 
             migrationBuilder.DropTable(
                 name: "fnc_contas_usuarios");

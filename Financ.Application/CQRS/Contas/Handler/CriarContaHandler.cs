@@ -4,6 +4,7 @@ using Financ.Application.DTOs.Base;
 using Financ.Application.DTOs.ContasUsuarios.Get;
 using Financ.Application.Mapeamento;
 using Financ.Domain.Entidades.ContasBancarias;
+using Financ.Domain.Enums.Movimentações;
 using Financ.Domain.Interfaces;
 using Financ.Domain.Validacoes.ContasBancarias;
 using NetDevPack.SimpleMediator;
@@ -33,7 +34,7 @@ namespace Financ.Application.CQRS.Contas_.Handler
                 await _unitOfWork.contasUsuariosRepositorio.Adicionar(contaUsuario); //Cria a conta e a conta usuario pois os objetos estão linkados
                 await _unitOfWork.Commit();
 
-                return Resultado<BasePost<RetornaContasDTO>>.GeraSucesso(ContasUsuariosMapper.ParaDTO(contaUsuario,null));
+                return Resultado<BasePost<RetornaContasDTO>>.GeraSucesso(ContaUsuarioMapper.ParaDTO(contaUsuario,null));
             }
             catch (ContasValidacao contasExecao)
             {

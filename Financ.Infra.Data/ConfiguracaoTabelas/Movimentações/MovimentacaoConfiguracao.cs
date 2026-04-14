@@ -18,7 +18,7 @@ namespace Financ.Infra.Data.ConfiguracaoTabelas.Movimentações
             builder.Property(e => e.Id).ValueGeneratedOnAdd();
             builder.Property(e => e.Tipo).IsRequired();
             builder.Property(e => e.IdConta).IsRequired();
-            builder.Property(e => e.IdContaUsuario).IsRequired();
+            builder.Property(e => e.IdUsuarioCriador).IsRequired();
 
             builder.Property(e => e.Titulo).HasMaxLength(80);
             builder.Property(e => e.Observacao).HasMaxLength(255);
@@ -29,9 +29,15 @@ namespace Financ.Infra.Data.ConfiguracaoTabelas.Movimentações
                 .HasForeignKey(e => e.IdConta)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasOne(e => e.ContaUsuario)
+            builder.HasOne(e => e.ContaUsuarioCriador)
             .WithMany()
-            .HasForeignKey(e => e.IdContaUsuario)
+            .HasForeignKey(e => e.IdUsuarioCriador)
+            .OnDelete(DeleteBehavior.Restrict);
+
+
+            builder.HasOne(e => e.ContaUsuarioExecutor)
+            .WithMany()
+            .HasForeignKey(e => e.IdUsuarioExecutor)
             .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(e => e.Categoria)

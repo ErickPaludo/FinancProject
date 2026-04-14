@@ -22,5 +22,10 @@ namespace Financ.Domain.Validacoes.ContasBancarias.Mensagens
         public const string ATUALIZA_CONTA_CREDITO_MAXIMO_NULO = "O limite de crédito está ativo, portanto deve ser informado o crédito máximo!";
         public const string CONTA_INATIVA = "Esta conta não está ativa.";
         public static string SALDO_INSUFICIENTE => "Saldo insuficiente";
+        public static string EXTORNO_DE_MOVIMENTACAO_COM_STATUS_PAGO = "Não foi possível extornar a movimentação pois a mesma possui data de conclusão.";
+        public static string EXTORNO_DE_MOVIMENTACAO_COM_DATA_DE_CONCLUSAO = "Não foi possível extornar a movimentação pois a mesma possui status diferente de pendente.";
+
+        public static string NAO_PODE_PROCESSAR_MOVIMENTACAO_COM_EXTORNO = "Não foi possível concluir a execução pois a mesma se trata de um extorno.";
+        public static string NAO_PODE_PROCESSAR_MOVIMENTACAO_SEM_EXTORNO = "A operação informada não é um extorno.";
     }
 }

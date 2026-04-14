@@ -1,4 +1,5 @@
 ﻿using Financ.Domain.Entidades.ContasBancarias;
+using Financ.Domain.Entidades.Movimentações;
 using Financ.Domain.Entidades.Segurança;
 using Financ.Domain.Entidades.Usuarios;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,7 @@ namespace Financ.Infra.Data.Contexto
         public DbSet<Convite> Convites { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Autenticacao> Autenticacao { get; set; }
+        public DbSet<Movimentacao> Movimentacao { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

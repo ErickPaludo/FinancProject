@@ -1,5 +1,5 @@
 ﻿using Financ.Application.Comun.Resultado;
-using Financ.Application.CQRS.Convites_.Commands;
+using Financ.Application.CQRS.Convites.Commands;
 using Financ.Application.DTOs.ContasUsuarios.Post;
 using Financ.Domain.Interfaces;
 using NetDevPack.SimpleMediator;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Financ.Application.CQRS.Convites_.Handler
+namespace Financ.Application.CQRS.Convites.Handler
 {
     public class RevogaConviteHandler : IRequestHandler<RevogaConviteCommand, Resultado<string>>
     {

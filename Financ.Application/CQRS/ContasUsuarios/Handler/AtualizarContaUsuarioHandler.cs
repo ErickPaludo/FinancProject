@@ -41,7 +41,7 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
                 _unitOfWork.contasUsuariosRepositorio.Atualiza(contaUsuarioDestinatario);
                 await _unitOfWork.Commit();
 
-                return Resultado<RetornaCadastroContasUsuariosDTO>.GeraSucesso(ContasUsuariosMapper.ParaDTO(contaUsuarioDestinatario));
+                return Resultado<RetornaCadastroContasUsuariosDTO>.GeraSucesso(ContaUsuarioMapper.ParaDTO(contaUsuarioDestinatario));
 
             }
             catch (ContasUsuariosValidacao ex)

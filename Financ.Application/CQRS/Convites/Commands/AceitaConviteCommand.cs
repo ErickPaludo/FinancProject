@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Financ.Application.CQRS.Convites_.Commands
+namespace Financ.Application.CQRS.Convites.Commands
 {
     public record AceitaConviteCommand(int IdConvite,bool aceito, string IdUsuario) : IRequest<Resultado<BasePost<RetornaPostCadastroDTO>>>;
 }

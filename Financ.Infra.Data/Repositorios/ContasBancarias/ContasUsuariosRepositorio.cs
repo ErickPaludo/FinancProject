@@ -1,4 +1,5 @@
 ﻿using Financ.Domain.Entidades.ContasBancarias;
+using Financ.Domain.Entidades.Usuarios;
 using Financ.Domain.Interfaces.Repositorios.ContasBancarias;
 using Financ.Infra.Data.Contexto;
 using Financ.Infra.Data.Repositorios.Base;
@@ -26,6 +27,11 @@ namespace Financ.Infra.Data.Repositorios.ContasBancarias
                 .Include(fcu => fcu.Conta) // ISSO GERA O INNER JOIN AUTOMÁTICO
                 .Where(predicado)
                 .ToListAsync();
+        }
+
+        public async Task<ContaUsuario?> ObterContaUsuarioComUsuario(Expression<Func<ContaUsuario, bool>> predicado)
+        {
+            return await _contexto.ContasUsuarios.Include(u => u.Usuario).FirstOrDefaultAsync(predicado);
         }
     }
 }

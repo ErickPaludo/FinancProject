@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Financ.Application.CQRS.Convites_.Commands
+namespace Financ.Application.CQRS.Convites.Commands
 {
     public record CriaConviteCommand(string idRemetente,string emailDestinatario,int idConta,TiposAcessos acesso, int? expiracaoContaUsuario) : IRequest<Resultado<BasePost<GetCriaConviteDTO>>>;
 }

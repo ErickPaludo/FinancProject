@@ -1,0 +1,52 @@
+﻿using Financ.Application.CQRS.Movimentação.Commands;
+using Financ.Application.CQRS.Movimentação.Querys;
+using Financ.Application.DTOs.Movimentações.Get.Filtros;
+using Financ.Application.DTOs.Movimentações.Post;
+using Financ.UI.Api.Extensao;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using NetDevPack.SimpleMediator;
+
+namespace Financ.UI.Api.Controllers
+{
+    [Route("api/Contas/[controller]")]
+    [ApiController]
+    [Authorize]
+    public class MovimentacoesController : ControllerBase
+    {
+        private readonly IMediator _mediator;
+        public MovimentacoesController(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
+        [HttpPost]
+        public async Task<IActionResult> CriarMovimentacao(CriaMovimentacaoDTO movimentacaoDTO)
+        {
+            var movimentacao = await _mediator.Send(new CriaMovimentacaoCommand(movimentacaoDTO.idConta,User.RetornaIdUsuario(),movimentacaoDTO.idCategoria, movimentacaoDTO.tipo, movimentacaoDTO.valor, movimentacaoDTO.concluido, movimentacaoDTO.titulo, movimentacaoDTO.observacao, movimentacaoDTO.dthrMovimentacao, movimentacaoDTO.dthrConclusao));
+
+            return movimentacao.RetornoAutomatico();
+        }
+        [HttpPost("{idMovimentacao}/Concluir")]
+        public async Task<IActionResult> ConcluirMovimentacao(int idMovimentacao, ConcluirMovimentacaoDTO movimentacaoDTO)
+        {
+            var movimentacao = await _mediator.Send(new ConcluirMovimentacaoCommand(User.RetornaIdUsuario(),idMovimentacao, movimentacaoDTO.dthrConclusao));
+
+            return movimentacao.RetornoAutomatico();
+        }
+        [HttpPost("{idMovimentacao}/Extornar")]
+        public async Task<IActionResult> ExtornarMovimentacao(int idMovimentacao)
+        {
+            var movimentacao = await _mediator.Send(new ExtornarMovimentacaoCommand(User.RetornaIdUsuario(), idMovimentacao));
+
+            return movimentacao.RetornoAutomatico();
+        }
+        [HttpGet("{idConta}/Retornar")]
+        public async Task<IActionResult> RetornaMovimentacao(int idConta, [FromQuery] FiltroRetornoMovimentacao filtro = null)
+        {
+            var movimentacao = await _mediator.Send(new RetornaMovimentacaoQuery(User.RetornaIdUsuario(), idConta,filtro));
+
+            return movimentacao.RetornoAutomatico();
+        }
+    }
+}

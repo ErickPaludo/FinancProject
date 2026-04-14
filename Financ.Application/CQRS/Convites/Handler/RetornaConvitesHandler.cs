@@ -8,13 +8,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Financ.Application.Mapeamento;
-using Financ.Application.CQRS.Convites_.Query;
 using Financ.Application.DTOs.Base;
 using Financ.Domain.Entidades.ContasBancarias;
+using Financ.Application.CQRS.Convites.Query;
 
-namespace Financ.Application.CQRS.Convites_.Handler
+namespace Financ.Application.CQRS.Convites.Handler
 {
-    public class RetornaConvitesHandler : IRequestHandler<RetornaConvitesQuery, Resultado<BaseGet<GetRetornaConvitesDTO>>>
+    public class RetornaConvitesHandler : IRequestHandler<RetornaConvitesQuery, Resultado<BaseGetList<GetRetornaConvitesDTO>>>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -23,14 +23,14 @@ namespace Financ.Application.CQRS.Convites_.Handler
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<Resultado<BaseGet<GetRetornaConvitesDTO>>> Handle(RetornaConvitesQuery request, CancellationToken cancellationToken)
+        public async Task<Resultado<BaseGetList<GetRetornaConvitesDTO>>> Handle(RetornaConvitesQuery request, CancellationToken cancellationToken)
         {
             IEnumerable<Convite?> convites = await _unitOfWork.convitesRepostorio.ObterConviteComRemetenteDestinatarioEContaAsync(request.RetornaConvitesRemetente ? r => r.IdUsuarioRemetente.Equals(request.IdUsuario) : d => d.IdUsuarioDestinatario.Equals(request.IdUsuario));
 
             if(!convites.Any())
-                return Resultado<BaseGet<GetRetornaConvitesDTO>>.GeraFalha(Falha.NaoEncontrado("Nenhum convite foi encontrado!"));
+                return Resultado<BaseGetList<GetRetornaConvitesDTO>>.GeraFalha(Falha.NaoEncontrado("Nenhum convite foi encontrado!"));
 
-             return Resultado<BaseGet<GetRetornaConvitesDTO>>.GeraSucesso(ConvitesMapper.ParaDTO(convites, request.RetornaConvitesRemetente));
+             return Resultado<BaseGetList<GetRetornaConvitesDTO>>.GeraSucesso(ConviteMapper.ParaDTO(convites, request.RetornaConvitesRemetente));
         }
     }
 }

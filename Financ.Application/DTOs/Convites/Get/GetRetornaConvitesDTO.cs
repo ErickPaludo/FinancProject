@@ -8,5 +8,5 @@ using System.Threading.Tasks;
 
 namespace Financ.Application.DTOs.Convites.Get
 {
-    public record GetRetornaConvitesDTO(GetConvite convite,GetContaConvite conta,GetUsuarioConvite usuarioRemetente,GetUsuarioConvite usuarioDestinatario);
+    public record GetRetornaConvitesDTO(GetConvite convite,GetContaConvite conta,GetUsuario usuarioRemetente,GetUsuario usuarioDestinatario);
 }

@@ -8,9 +8,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Financ.Application.CQRS.Convites_.Query
+namespace Financ.Application.CQRS.Convites.Query
 {
-    public class RetornaConvitesQuery : IRequest<Resultado<BaseGet<GetRetornaConvitesDTO>>>
+    public class RetornaConvitesQuery : IRequest<Resultado<BaseGetList<GetRetornaConvitesDTO>>>
     {
         public string IdUsuario { get; }
         public bool RetornaConvitesRemetente { get; }
