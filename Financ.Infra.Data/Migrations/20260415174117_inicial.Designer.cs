@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Financ.Infra.Data.Migrations
 {
     [DbContext(typeof(AppContextoData))]
-    [Migration("20260414010808_camposusuariosfk4")]
-    partial class camposusuariosfk4
+    [Migration("20260415174117_inicial")]
+    partial class inicial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -170,9 +170,6 @@ namespace Financ.Infra.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ContaUsuarioCriadorId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("DthrConclusao")
                         .HasColumnType("datetime2");
 
@@ -217,11 +214,11 @@ namespace Financ.Infra.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ContaUsuarioCriadorId");
-
                     b.HasIndex("IdCategoria");
 
                     b.HasIndex("IdConta");
+
+                    b.HasIndex("IdUsuarioCriador");
 
                     b.HasIndex("IdUsuarioExecutor");
 
@@ -387,12 +384,6 @@ namespace Financ.Infra.Data.Migrations
 
             modelBuilder.Entity("Financ.Domain.Entidades.Movimentações.Movimentacao", b =>
                 {
-                    b.HasOne("Financ.Domain.Entidades.ContasBancarias.ContaUsuario", "ContaUsuarioCriador")
-                        .WithMany()
-                        .HasForeignKey("ContaUsuarioCriadorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Financ.Domain.Entidades.Movimentações.Categoria", "Categoria")
                         .WithMany()
                         .HasForeignKey("IdCategoria")
@@ -401,6 +392,12 @@ namespace Financ.Infra.Data.Migrations
                     b.HasOne("Financ.Domain.Entidades.ContasBancarias.Conta", "Conta")
                         .WithMany()
                         .HasForeignKey("IdConta")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Financ.Domain.Entidades.ContasBancarias.ContaUsuario", "ContaUsuarioCriador")
+                        .WithMany()
+                        .HasForeignKey("IdUsuarioCriador")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

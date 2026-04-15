@@ -42,14 +42,18 @@ namespace Financ.Application.Mapeamento
             List<RetornaContasDTO> listaContas = new List<RetornaContasDTO>();
             foreach (var contaUsuario in contasUsuarios)
             {
+                decimal entradaPendente = movimentacaos.Where(m => m.IdConta == contaUsuario.Conta.Id && m.Tipo == TipoMovimentacao.Entrada).Sum(m => m.Valor);
+                decimal saidaPendente = movimentacaos.Where(m => m.IdConta == contaUsuario.Conta.Id && m.Tipo == TipoMovimentacao.Saida).Sum(m => m.Valor);
+                decimal saldoProjetado = contaUsuario.Conta.Saldo + entradaPendente - saidaPendente;
                 listaContas.Add(new RetornaContasDTO(
                     contaUsuario.Conta!.Id,
                     contaUsuario.Conta.Titulo!,
                     contaUsuario.Conta!.Cor.Valor,
                     contaUsuario.Conta.Status,
                     contaUsuario.Conta.Saldo,
-                    movimentacaos.Where(m => m.IdConta == contaUsuario.Conta.Id && m.Tipo == TipoMovimentacao.Entrada).Sum(m => m.Valor),
-                    movimentacaos.Where(m => m.IdConta == contaUsuario.Conta.Id && m.Tipo == TipoMovimentacao.Saida).Sum(m => m.Valor),
+                    saldoProjetado,
+                    entradaPendente,
+                    saidaPendente,
                     contaUsuario.Expiracao is not null ? contaUsuario.Expiracao < DateTime.UtcNow : null,
                     contaUsuario.Expiracao));
             }
@@ -58,16 +62,22 @@ namespace Financ.Application.Mapeamento
         }
         public static BasePost<RetornaContasDTO> ParaDTO(ContaUsuario contaUsuario, IEnumerable<Movimentacao> movimentacaos, FiltroContasUsuarioDTO? filtros)
         {
+            decimal entradaPendente = movimentacaos.Where(m => m.IdConta == contaUsuario.Conta.Id && m.Tipo == TipoMovimentacao.Entrada).Sum(m => m.Valor);
+            decimal saidaPendente = movimentacaos.Where(m => m.IdConta == contaUsuario.Conta.Id && m.Tipo == TipoMovimentacao.Saida).Sum(m => m.Valor);
+            decimal saldoProjetado = contaUsuario.Conta.Saldo + entradaPendente - saidaPendente;
+
             return new BasePost<RetornaContasDTO>(
-                new RetornaContasDTO(
+               new RetornaContasDTO(
                     contaUsuario.Conta!.Id,
                     contaUsuario.Conta.Titulo!,
                     contaUsuario.Conta!.Cor.Valor,
                     contaUsuario.Conta.Status,
                     contaUsuario.Conta.Saldo,
-                    movimentacaos.Where(m => m.IdConta == contaUsuario.Conta.Id && m.Tipo == TipoMovimentacao.Entrada).Sum(m => m.Valor),
-                    movimentacaos.Where(m => m.IdConta == contaUsuario.Conta.Id && m.Tipo == TipoMovimentacao.Saida).Sum(m => m.Valor),
-                    contaUsuario.Expiracao is not null ? contaUsuario.Expiracao < DateTime.UtcNow : null, contaUsuario.Expiracao));
+                    saldoProjetado,
+                    entradaPendente,
+                    saidaPendente,
+                    contaUsuario.Expiracao is not null ? contaUsuario.Expiracao < DateTime.UtcNow : null,
+                    contaUsuario.Expiracao));
         }
         public static BasePost<RetornaContasDTO> ParaDTO(ContaUsuario contaUsuario, FiltroContasUsuarioDTO? filtros)
         {
@@ -78,7 +88,7 @@ namespace Financ.Application.Mapeamento
                     contaUsuario.Conta!.Cor.Valor,
                     contaUsuario.Conta.Status,
                     contaUsuario.Conta.Saldo,
-                   0, 0,
+                    0,0, 0,
                     contaUsuario.Expiracao is not null ? contaUsuario.Expiracao < DateTime.UtcNow : null, contaUsuario.Expiracao));
         }
         public static RetornaCadastroContasUsuariosDTO ParaDTO(ContaUsuario contaUsuario) =>

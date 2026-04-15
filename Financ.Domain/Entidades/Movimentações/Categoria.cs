@@ -1,4 +1,5 @@
 ﻿using Financ.Domain.Entidades.ContasBancarias;
+using Financ.Domain.Enums.ContasBancarias;
 using Financ.Domain.Objetos_de_Valor;
 using Financ.Domain.Validacoes.Movimentações;
 using Financ.Domain.Validacoes.Movimentações.Mensagens;
@@ -18,18 +19,19 @@ namespace Financ.Domain.Entidades.Movimentações
         public Cor Cor { get; private set; }
         public Conta Conta { get; private set; }
         private Categoria() { }
-        public Categoria(Conta conta, string nome, string cor)
+        public Categoria(ContaUsuario? contaUsuario, string nome, string cor)
         {
-            IdConta = conta.Id;
-            Conta = conta;
+            CategoriaValidacao.Verifica(contaUsuario is null, "Usuário não encontrado");
+            CategoriaValidacao.Verifica(contaUsuario!.Conta is null, "Conta não encontrada");
+            CategoriaValidacao.Verifica(contaUsuario.Status is not TipoStatusContasUsuario.Ativo, "Usuário não está ativo!");
+            CategoriaValidacao.Verifica(contaUsuario.Acesso is not TiposAcessos.Mestre, "Usuário deve possuir acesso mestre para essa implementação.");
+
+            IdConta = contaUsuario!.Conta!.Id;
+            Conta = contaUsuario!.Conta!;
             ValidaNome(nome);
             Cor = new Cor(cor);
         }
-        public Categoria(string nome, string cor)
-        {
-            ValidaNome(nome);
-            Cor = new Cor(cor);
-        }
+
         private void ValidaNome(string valor)
         {
             MovimentacaoValidacao.Verifica(string.IsNullOrWhiteSpace(valor), MensagemCategoria.NOME_OBRIGATORIO);

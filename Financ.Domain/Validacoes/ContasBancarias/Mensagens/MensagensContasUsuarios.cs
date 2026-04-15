@@ -32,6 +32,8 @@ namespace Financ.Domain.Validacoes.ContasBancarias.Mensagens
             public const string ATUALIZANDO_TEMPO_LIMITE_PARA_USUARIO_MESTRE = "Não é permitido definir tempo limite para usuários mestres.";
             public const string CONFLITO_AO_EXPIRAR = "Informe apenas o tempo de expiração ou defina o usuário como expirado. ";
             public const string CONVITE_NAO_PODE_SER_NULO = "Informe o convite.";
+            public const string USUARIO_EXPIRADO = "Seu tempo na conta bancária está expirado.";
+            public const string CONTA_NÃO_ENCONTRADA = "Conta não encontrada.";
 
 
     }

@@ -1,4 +1,5 @@
-﻿using Financ.Domain.Enums.Movimentações;
+﻿using Financ.Domain.Entidades.Movimentações;
+using Financ.Domain.Enums.Movimentações;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,5 +8,5 @@ using System.Threading.Tasks;
 
 namespace Financ.Application.DTOs.Movimentações.Get.Filtros
 {
-    public sealed record FiltroRetornoMovimentacao(int? IdMovimentacao,bool? Concluido,TipoMovimentacao? TipoMovimentacao);
+    public sealed record FiltroRetornoMovimentacao(int? IdMovimentacao,bool? Concluido,TipoMovimentacao? TipoMovimentacao,int? IdCategoria, DateTime DthrMovimentacaoInicial,DateTime DthrMovimentacaoFinal, DateTime? DthrReg);
 }

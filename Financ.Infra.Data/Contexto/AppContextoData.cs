@@ -20,6 +20,7 @@ namespace Financ.Infra.Data.Contexto
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Autenticacao> Autenticacao { get; set; }
         public DbSet<Movimentacao> Movimentacao { get; set; }
+        public DbSet<Categoria> Categoria { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

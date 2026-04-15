@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Financ.Infra.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class camposusuariosfk4 : Migration
+    public partial class inicial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -174,8 +174,7 @@ namespace Financ.Infra.Data.Migrations
                     Observacao = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     DthrReg = table.Column<DateTime>(type: "datetime2", nullable: true),
                     DthrMovimentacao = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DthrConclusao = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ContaUsuarioCriadorId = table.Column<int>(type: "int", nullable: false)
+                    DthrConclusao = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -193,11 +192,11 @@ namespace Financ.Infra.Data.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_fnc_movimentacoes_fnc_contas_usuarios_ContaUsuarioCriadorId",
-                        column: x => x.ContaUsuarioCriadorId,
+                        name: "FK_fnc_movimentacoes_fnc_contas_usuarios_IdUsuarioCriador",
+                        column: x => x.IdUsuarioCriador,
                         principalTable: "fnc_contas_usuarios",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_fnc_movimentacoes_fnc_contas_usuarios_IdUsuarioExecutor",
                         column: x => x.IdUsuarioExecutor,
@@ -242,11 +241,6 @@ namespace Financ.Infra.Data.Migrations
                 column: "IdUsuarioRemetente");
 
             migrationBuilder.CreateIndex(
-                name: "IX_fnc_movimentacoes_ContaUsuarioCriadorId",
-                table: "fnc_movimentacoes",
-                column: "ContaUsuarioCriadorId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_fnc_movimentacoes_IdCategoria",
                 table: "fnc_movimentacoes",
                 column: "IdCategoria");
@@ -255,6 +249,11 @@ namespace Financ.Infra.Data.Migrations
                 name: "IX_fnc_movimentacoes_IdConta",
                 table: "fnc_movimentacoes",
                 column: "IdConta");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_fnc_movimentacoes_IdUsuarioCriador",
+                table: "fnc_movimentacoes",
+                column: "IdUsuarioCriador");
 
             migrationBuilder.CreateIndex(
                 name: "IX_fnc_movimentacoes_IdUsuarioExecutor",

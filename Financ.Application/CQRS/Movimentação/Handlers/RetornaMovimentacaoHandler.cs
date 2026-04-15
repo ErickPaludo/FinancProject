@@ -28,7 +28,15 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
         public async Task<Resultado<BaseGet<RetornaMovimentacaoDTO>>> Handle(RetornaMovimentacaoQuery request, CancellationToken cancellationToken)
         {
             Conta? conta = await _unitOfWork.contasRepositorio.BuscarContaComUsuarios(x => x.Id == request.IdConta);
+            if(conta is null)
+                return Resultado<BaseGet<RetornaMovimentacaoDTO>>.GeraFalha(Falha.NaoEncontrado("Conta não encontrada"));
+
             ContaUsuario? contaUsuario = conta!.ContaUsuarios.FirstOrDefault(x => x.IdUsuario == request.IdUsuario);
+
+            if(contaUsuario is null) return
+                    Resultado<BaseGet<RetornaMovimentacaoDTO>>.GeraFalha(Falha.NaoEncontrado("Usuário não pertence a conta!"));
+
+            contaUsuario!.ValidaSituacaoUsuarioParaConsulta();
 
             List<Movimentacao> movimentacoes = await MovimentacoesSelecionadas(request);
 
@@ -74,7 +82,7 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
             var queryable = _unitOfWork.movimentacaoRepositorio
                 .BuscaMovimentacaoComContasUsuarios();
 
-            queryable = queryable.Where(x => x.IdConta == request.IdConta);
+            queryable = queryable.Where(x => x.IdConta == request.IdConta && x.DthrMovimentacao >= filtro.DthrMovimentacaoInicial && x.DthrMovimentacao <= filtro.DthrMovimentacaoFinal);
 
             if (filtro?.IdMovimentacao.HasValue == true)
             {
@@ -96,6 +104,7 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
 
                 queryable = queryable.Where(x => x.Tipo == tipoMovimentacao);
             }
+
             return await queryable.ToListAsync();
         }
     }

@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Financ.Domain.Entidades.ContasBancarias
 {
@@ -23,7 +24,7 @@ namespace Financ.Domain.Entidades.ContasBancarias
 
         public Conta Conta { get; private set; }
 
-
+        #region Construtores
         public ContaUsuario() { }
         public ContaUsuario(int id, Conta conta, string idUsuario, TiposAcessos acesso, TipoStatusContasUsuario? status = null)
         {
@@ -69,25 +70,9 @@ namespace Financ.Domain.Entidades.ContasBancarias
             Status = TipoStatusContasUsuario.Ativo;
             Acesso = TiposAcessos.Mestre;
         }
-        private void ValidaEnums(TiposAcessos? acesso, TipoStatusContasUsuario? status)
-        {
+        #endregion
 
-            if (status.HasValue)
-                ContasUsuariosValidacao.Verifica(!Enum.IsDefined(typeof(TipoStatusContasUsuario), status), MensagensBase.STATUS_INVALIDO);
-
-            if (acesso.HasValue)
-                ContasUsuariosValidacao.Verifica(!Enum.IsDefined(typeof(TiposAcessos), acesso), MensagensContasUsuarios.ACESSO_INVALIDO);
-        }
-        private void ValidaContasUsuarios(Conta conta, string idUsuario)
-        {
-            ContasUsuariosValidacao.Verifica(conta is null, MensagensContasUsuarios.CONTA_NAO_PODE_SER_NULA);
-            ContasUsuariosValidacao.Verifica(conta!.Status != TiposStatusContas.Ativo, MensagensContasUsuarios.CONTA_NAO_ESTA_ATIVA);
-            ContasUsuariosValidacao.Verifica(string.IsNullOrEmpty(idUsuario), MensagensContasUsuarios.IDUSUARIO_INVALIDO);
-            Conta = conta;
-            //Usuario = usuario!;
-            IdUsuario = idUsuario;
-            DthrReg = DateTime.UtcNow;
-        }
+        #region Metodos Publicos
         public void AtualizaOutraContaUsuario(ContaUsuario? contasUsuarioRemetente, TiposAcessos? acesso, TipoStatusContasUsuario? status, int? expiracao = null, bool? expirado = null)
         {
 
@@ -172,22 +157,50 @@ namespace Financ.Domain.Entidades.ContasBancarias
         {
             return minutos < 15;
         }
+        public void ValidaSituacaoUsuarioParaConsulta()
+        {
+            ContasUsuariosValidacao.Verifica(Status is not TipoStatusContasUsuario.Ativo, MensagensContasUsuarios.ACESSO_NEGADO_POR_STATUS);
+            ContasUsuariosValidacao.Verifica(Expiracao < DateTime.UtcNow, MensagensContasUsuarios.USUARIO_EXPIRADO);
+        }
+        #endregion
 
+        #region Metodos Privados
+        private void ValidaEnums(TiposAcessos? acesso, TipoStatusContasUsuario? status)
+        {
+
+            if (status.HasValue)
+                ContasUsuariosValidacao.Verifica(!Enum.IsDefined(typeof(TipoStatusContasUsuario), status), MensagensBase.STATUS_INVALIDO);
+
+            if (acesso.HasValue)
+                ContasUsuariosValidacao.Verifica(!Enum.IsDefined(typeof(TiposAcessos), acesso), MensagensContasUsuarios.ACESSO_INVALIDO);
+        }
+        private void ValidaContasUsuarios(Conta conta, string idUsuario)
+        {
+            ContasUsuariosValidacao.Verifica(conta is null, MensagensContasUsuarios.CONTA_NAO_PODE_SER_NULA);
+            ContasUsuariosValidacao.Verifica(conta!.Status != TiposStatusContas.Ativo, MensagensContasUsuarios.CONTA_NAO_ESTA_ATIVA);
+            ContasUsuariosValidacao.Verifica(string.IsNullOrEmpty(idUsuario), MensagensContasUsuarios.IDUSUARIO_INVALIDO);
+            Conta = conta;
+            //Usuario = usuario!;
+            IdUsuario = idUsuario;
+            DthrReg = DateTime.UtcNow;
+        }
         private void ValidaUsuarioRemetenteMestreAtivoDaConta(ContaUsuario? usuario)
         {
             ValidaUsuarioPertenceConta(usuario);
             ValidaUsuarioMestreAtivo(usuario!);
         }
-
         private void ValidaUsuarioPertenceConta(ContaUsuario? usuario)
         {
             ContasUsuariosValidacao.Verifica(usuario is null || usuario.Conta != Conta, MensagensContasUsuarios.USUARIO_NAO_PERTENCE_A_CONTA);
         }
-
         private void ValidaUsuarioMestreAtivo(ContaUsuario usuario)
         {
             ContasUsuariosValidacao.Verifica(usuario.Acesso != TiposAcessos.Mestre, MensagensContasUsuarios.ACESSO_NEGADO);
             ContasUsuariosValidacao.Verifica(usuario.Status != TipoStatusContasUsuario.Ativo, MensagensContasUsuarios.ACESSO_NEGADO_POR_STATUS);
         }
+        #endregion
+      
+       
+     
     }
 }
