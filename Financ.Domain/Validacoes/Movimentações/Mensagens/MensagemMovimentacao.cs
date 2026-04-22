@@ -24,6 +24,8 @@ namespace Financ.Domain.Validacoes.Movimentações.Mensagens
         public static string MOVIMENTACAO_COM_STATUS_IGUAL_NA_EXECUCAO => "Movimentação já está concluída.";
         public static string MOVIMENTACAO_COM_STATUS_IGUAL_NO_EXTORNO => "Movimentação não está executada.";
         public static string MOVIMENTACAO_NAO_ESTA_CONCLUIDA => "Movimentação não está concluída, não foi possível registrar uma data de conclusão.";
+        public static string NAO_PODE_ALTERAR_VALOR_DE_MOVIMENTACAO_CONCLUIDA => "Não é possível alterar o valor da movimentação pois a mesma já está concluída.";
+        public static string NAO_PODE_ALTERAR_TIPO_DE_MOVIMENTACAO_CONCLUIDA => "Não é possível alterar o tipo de movimentação pois a mesma já está concluída.";
 
     }
 }

@@ -1,5 +1,4 @@
-﻿using Financ.Application.DTOs.Categorias.Get;
-using Financ.Application.DTOs.ContasUsuarios.Get;
+﻿using Financ.Application.DTOs.ContasUsuarios.Get;
 using Financ.Application.DTOs.Convites.Get.MicroDto;
 using Financ.Domain.Entidades.ContasBancarias;
 using Financ.Domain.Entidades.Movimentações;

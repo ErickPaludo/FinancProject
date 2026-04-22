@@ -27,7 +27,7 @@ namespace Financ.Application.CQRS.Contas_.Handler
         {
             try
             {
-                Conta? conta = await _unitOfWork.contasRepositorio.BuscarContaComUsuarios(x => x.Id == request.IdConta);
+                Conta? conta = await _unitOfWork.contasRepositorio.BuscarContaComUsuariosEConvintes(x => x.Id == request.IdConta);
 
                 if (conta is null)
                     return Resultado<BasePost<RetornaContasDTO>>.GeraFalha(Falha.NaoEncontrado("Conta não encontrada."));

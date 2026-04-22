@@ -15,6 +15,6 @@ namespace Financ.Application.DTOs.ContasUsuarios.Patch
         public TiposAcessos? acesso { get; set; }
         public TipoStatusContasUsuario? status { get; set; }
         public int? expiracao { get; set; }
-        public bool? expirado { get; set; }
+        public bool? removerExpiracao { get; set; }
     }
 }

@@ -47,7 +47,7 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
                     (string.IsNullOrEmpty(filtroTitulo) || x.Conta!.Titulo!.Contains(filtroTitulo)) &&
                     (!filtroStatus.HasValue || x.Conta!.Status == filtroStatus.Value)))
             );
-            return contasUsuario;
+            return contasUsuario.OrderByDescending(x => x.Id);
         }
     }
 }

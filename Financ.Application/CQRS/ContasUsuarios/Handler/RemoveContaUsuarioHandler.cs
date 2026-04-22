@@ -24,7 +24,7 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
             try
             {
 
-                Conta? conta = await _unitOfWork.contasRepositorio.BuscarContaComUsuarios(x => x.Id.Equals(request.idConta));
+                Conta? conta = await _unitOfWork.contasRepositorio.BuscarContaComUsuariosEConvintes(x => x.Id.Equals(request.idConta));
 
                 if (conta is null)
                     return Resultado<string>.GeraFalha(Falha.NaoEncontrado("A conta informada não existe ou já foi removida."));
@@ -36,7 +36,7 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
                     return Resultado<string>.GeraFalha(Falha.NaoEncontrado("O usuário destinatario não pertence a conta informada."));
 
                 contaUsuarioDestinatario.RemoverUsuarioDaConta(contaUsuarioRemetente);
-                _unitOfWork.contasUsuariosRepositorio.Delete(contaUsuarioDestinatario);
+                _unitOfWork.contasUsuariosRepositorio.Atualiza(contaUsuarioDestinatario);
                 await _unitOfWork.Commit();
                 return Resultado<string>.GeraSucesso("Usuário removido da conta com sucesso!");
             }

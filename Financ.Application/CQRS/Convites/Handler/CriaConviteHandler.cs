@@ -28,19 +28,19 @@ namespace Financ.Application.CQRS.Convites.Handler
         {
             try
             {
-                Usuario usuarioDestinatario = await _unitOfWork.usuariosRepostorio.BuscarObjetoUnico(x => x.Email.Equals(request.emailDestinatario!));
+                Usuario? usuarioDestinatario = await _unitOfWork.usuariosRepostorio.BuscarObjetoUnico(x => x.Email.Equals(request.emailDestinatario!));
 
                 if (usuarioDestinatario is null)
                     return Resultado<BasePost<GetCriaConviteDTO>>.GeraFalha(Falha.NaoEncontrado("Usuário destinatário não encontrado."));
 
-                var conta = await _unitOfWork.contasRepositorio.BuscarContaComUsuarios(x => x.Id == request.idConta && x.ContaUsuarios.Any(u => u.IdUsuario == request.idRemetente));
+                var conta = await _unitOfWork.contasRepositorio.BuscarContaComUsuariosEConvintes(x => x.Id == request.idConta && x.ContaUsuarios.Any(u => u.IdUsuario == request.idRemetente));
 
                 if (conta is null)
                     return Resultado<BasePost<GetCriaConviteDTO>>.GeraFalha(Falha.NaoEncontrado("Conta não encontrada."));
 
                 ContaUsuario? contaUsuarioRemetente = conta.ContaUsuarios.FirstOrDefault(x => x.IdUsuario == request.idRemetente);
 
-                Convite convite = new Convite(request.acesso, contaUsuarioRemetente, usuarioDestinatario,request.expiracaoContaUsuario);
+                Convite convite = new Convite(request.acesso, contaUsuarioRemetente, usuarioDestinatario, request.expiracaoContaUsuario);
                 await _unitOfWork.convitesRepostorio.Adicionar(convite);
                 await _unitOfWork.Commit();
 

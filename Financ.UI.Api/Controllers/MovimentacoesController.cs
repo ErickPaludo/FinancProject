@@ -1,6 +1,7 @@
 ﻿using Financ.Application.CQRS.Movimentação.Commands;
 using Financ.Application.CQRS.Movimentação.Querys;
 using Financ.Application.DTOs.Movimentações.Get.Filtros;
+using Financ.Application.DTOs.Movimentações.Patch;
 using Financ.Application.DTOs.Movimentações.Post;
 using Financ.UI.Api.Extensao;
 using Microsoft.AspNetCore.Authorization;
@@ -20,10 +21,10 @@ namespace Financ.UI.Api.Controllers
         {
             _mediator = mediator;
         }
-        [HttpPost]
-        public async Task<IActionResult> CriarMovimentacao(CriaMovimentacaoDTO movimentacaoDTO)
+        [HttpPost("/api/Contas/{idConta}/[controller]")]
+        public async Task<IActionResult> CriarMovimentacao(int idConta,CriaMovimentacaoDTO movimentacaoDTO)
         {
-            var movimentacao = await _mediator.Send(new CriaMovimentacaoCommand(movimentacaoDTO.idConta,User.RetornaIdUsuario(),movimentacaoDTO.idCategoria, movimentacaoDTO.tipo, movimentacaoDTO.valor, movimentacaoDTO.concluido, movimentacaoDTO.titulo, movimentacaoDTO.observacao, movimentacaoDTO.dthrMovimentacao, movimentacaoDTO.dthrConclusao));
+            var movimentacao = await _mediator.Send(new CriaMovimentacaoCommand(idConta,User.RetornaIdUsuario(),movimentacaoDTO.idCategoria, movimentacaoDTO.tipo, movimentacaoDTO.valor, movimentacaoDTO.concluido, movimentacaoDTO.titulo, movimentacaoDTO.observacao, movimentacaoDTO.dthrMovimentacao, movimentacaoDTO.dthrConclusao));
 
             return movimentacao.RetornoAutomatico();
         }
@@ -41,10 +42,33 @@ namespace Financ.UI.Api.Controllers
 
             return movimentacao.RetornoAutomatico();
         }
-        [HttpGet("{idConta}/Retornar")]
-        public async Task<IActionResult> RetornaMovimentacao(int idConta, [FromQuery] FiltroRetornoMovimentacao filtro = null)
+        [HttpGet("/api/Contas/{idConta}/[controller]/Retornar")]
+        public async Task<IActionResult> RetornaMovimentacao(int idConta, [FromQuery] FiltroRetornoMovimentacao filtro)
         {
             var movimentacao = await _mediator.Send(new RetornaMovimentacaoQuery(User.RetornaIdUsuario(), idConta,filtro));
+
+            return movimentacao.RetornoAutomatico();
+        }
+        [HttpPatch("{idMovimentacao}/Alterar")]
+        public async Task<IActionResult> AlterarMovimentacao(int idMovimentacao,AlterarMovimentacaoDTO movimentacaoDTO)
+        {
+            var movimentacao = await _mediator.Send(new AlterarMovimentacaoCommand(
+                idMovimentacao,
+                User.RetornaIdUsuario(),
+                movimentacaoDTO.titulo,
+                movimentacaoDTO.observacao,
+                movimentacaoDTO.idCategoria,
+                movimentacaoDTO.tipo,
+                movimentacaoDTO.valor,
+                movimentacaoDTO.dthrMovimentacao,
+                movimentacaoDTO.dthrConclusao));
+
+            return movimentacao.RetornoAutomatico();
+        }
+        [HttpDelete("{idMovimentacao}/Remover")]
+        public async Task<IActionResult> RemoverMovimentacao(int idMovimentacao)
+        {
+            var movimentacao = await _mediator.Send(new RemoverMovimentacaoCommand(User.RetornaIdUsuario(), idMovimentacao));
 
             return movimentacao.RetornoAutomatico();
         }

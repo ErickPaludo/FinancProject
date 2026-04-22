@@ -79,7 +79,7 @@ namespace Financ.Domain.Entidades.ContasBancarias
         }
         public bool UsuarioPertenceConta(string idUsuario)
         {
-            return ContaUsuarios.Any(x => x.IdUsuario == idUsuario);
+            return ContaUsuarios.Any(x => x.IdUsuario == idUsuario && x.Expiracao >= DateTime.UtcNow);
         }
         public void ProcessaMovimentacao(Movimentacao movimentacao)
         {
@@ -90,6 +90,7 @@ namespace Financ.Domain.Entidades.ContasBancarias
                 Saldo = movimentacao.Tipo.Equals(TipoMovimentacao.Entrada) ? Saldo + movimentacao.Valor : Saldo - movimentacao.Valor;
             }
         }
+
         public void ProcessaExtornoMovimentacao(Movimentacao movimentacao)
         {
             ContasValidacao.Verifica(!movimentacao.Extorno, MensagensContas.NAO_PODE_PROCESSAR_MOVIMENTACAO_SEM_EXTORNO);
@@ -99,6 +100,19 @@ namespace Financ.Domain.Entidades.ContasBancarias
             Saldo = movimentacao.Tipo.Equals(TipoMovimentacao.Entrada) ? Saldo - movimentacao.Valor : Saldo + movimentacao.Valor;
         }
 
+        public void RemoverMovimentacao(Movimentacao movimentacao)
+        {
+            if (movimentacao.Extorno)
+            {
+                if (movimentacao.Tipo.Equals(TipoMovimentacao.Entrada))
+                {
+                    ContasValidacao.Verifica(movimentacao.Valor > Saldo, MensagensContas.SALDO_INSUFICIENTE);
+                    Saldo -= movimentacao.Valor;
+                }
+                else
+                    Saldo += movimentacao.Valor;
+            }
+        }
 
         private void ContaPadrao()
         {

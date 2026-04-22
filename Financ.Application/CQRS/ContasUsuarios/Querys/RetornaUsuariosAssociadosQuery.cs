@@ -12,5 +12,5 @@ using System.Threading.Tasks;
 
 namespace Financ.Application.CQRS.Contas_Usuarios.Querys
 {
-    public record RetornaUsuariosAssociadosQuery(int IdConta, string? IdUsuario, FiltroUsuarioAssociado? filtroConta) : IRequest<Resultado<BaseGetList<RetornaUsuariosAssociadosDTO>>>;
+    public record RetornaUsuariosAssociadosQuery(int IdConta, string? IdUsuario, FiltroUsuarioAssociado filtroConta) : IRequest<Resultado<BaseGetList<RetornaUsuariosAssociadosDTO>>>;
 }

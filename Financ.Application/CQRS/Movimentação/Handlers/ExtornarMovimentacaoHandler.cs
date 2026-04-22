@@ -7,6 +7,7 @@ using Financ.Domain.Entidades.ContasBancarias;
 using Financ.Domain.Interfaces;
 using Financ.Domain.Validacoes.ContasBancarias;
 using Financ.Domain.Validacoes.Movimentações;
+using Microsoft.EntityFrameworkCore;
 using NetDevPack.SimpleMediator;
 using System;
 using System.Collections.Generic;
@@ -32,7 +33,7 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
                 if (movimentacao is null)
                     return Resultado<BasePost<MovimentacaoDTO>>.GeraFalha(Falha.NaoEncontrado("Movimentação não encontrada"));
 
-                ContaUsuario? usuarioExecutor = movimentacao.Conta.ContaUsuarios.FirstOrDefault(cu => cu.IdUsuario == request.idUsuario);
+                ContaUsuario? usuarioExecutor = await _unitOfWork.contasUsuariosRepositorio.ObterContaUsuarioComUsuario().FirstOrDefaultAsync(cu => cu.IdConta == movimentacao.IdConta && cu.IdUsuario == request.idUsuario);
 
                 movimentacao.ExtornaMovimentacao(usuarioExecutor);
 

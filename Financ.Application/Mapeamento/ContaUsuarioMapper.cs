@@ -19,14 +19,15 @@ namespace Financ.Application.Mapeamento
 {
     public static class ContaUsuarioMapper
     {
-        public static RetornaUsuariosAssociadosDTO ParaUsuariosAssociadosDTO(ContaUsuario contaUsuario, Usuario usuario) =>
+        public static RetornaUsuariosAssociadosDTO ParaUsuariosAssociadosDTO(ContaUsuario contaUsuario) =>
             new RetornaUsuariosAssociadosDTO(
+                          contaUsuario.Id,
                           contaUsuario.IdUsuario,
-                          usuario.NomeCompleto,
-                          usuario.Email,
+                          contaUsuario.Usuario.NomeCompleto,
+                          contaUsuario.Usuario.Email,
                           contaUsuario.Acesso,
                           contaUsuario.Status,
-                          contaUsuario.Expiracao,
+                          contaUsuario.Expiracao.HasValue ? DateTime.SpecifyKind(contaUsuario.Expiracao.Value, DateTimeKind.Utc) : null,
                           contaUsuario.Expiracao.HasValue && contaUsuario.Expiracao < DateTime.UtcNow);
         public static RetornaContaUsuarioDTO ParaUsuarioDTO(ContaUsuario contaUsuario) =>
             new RetornaContaUsuarioDTO(
@@ -36,6 +37,9 @@ namespace Financ.Application.Mapeamento
                           contaUsuario.Usuario.PrimeiroNome,
                           contaUsuario.Usuario.SegundoNome,
                           contaUsuario.Usuario.NomeCompleto);
+        public static List<RetornaUsuariosAssociadosDTO> ParaUsuarioDTO(List<ContaUsuario> contaUsuario) =>
+            contaUsuario.Select(ParaUsuariosAssociadosDTO).ToList();
+
 
         public static BaseGetList<RetornaContasDTO> ParaDTO(IEnumerable<ContaUsuario> contasUsuarios, IEnumerable<Movimentacao> movimentacaos, FiltroContasUsuarioDTO? filtros)
         {
@@ -54,8 +58,7 @@ namespace Financ.Application.Mapeamento
                     saldoProjetado,
                     entradaPendente,
                     saidaPendente,
-                    contaUsuario.Expiracao is not null ? contaUsuario.Expiracao < DateTime.UtcNow : null,
-                    contaUsuario.Expiracao));
+                     contaUsuario.Expiracao.HasValue ? DateTime.SpecifyKind(contaUsuario.Expiracao.Value, DateTimeKind.Utc) : null));
             }
 
             return new BaseGetList<RetornaContasDTO>(listaContas, new Meta { tamanho = listaContas.Count, filtros = filtros });
@@ -76,8 +79,7 @@ namespace Financ.Application.Mapeamento
                     saldoProjetado,
                     entradaPendente,
                     saidaPendente,
-                    contaUsuario.Expiracao is not null ? contaUsuario.Expiracao < DateTime.UtcNow : null,
-                    contaUsuario.Expiracao));
+                     contaUsuario.Expiracao.HasValue ? DateTime.SpecifyKind(contaUsuario.Expiracao.Value, DateTimeKind.Utc) : null));
         }
         public static BasePost<RetornaContasDTO> ParaDTO(ContaUsuario contaUsuario, FiltroContasUsuarioDTO? filtros)
         {
@@ -88,8 +90,8 @@ namespace Financ.Application.Mapeamento
                     contaUsuario.Conta!.Cor.Valor,
                     contaUsuario.Conta.Status,
                     contaUsuario.Conta.Saldo,
-                    0,0, 0,
-                    contaUsuario.Expiracao is not null ? contaUsuario.Expiracao < DateTime.UtcNow : null, contaUsuario.Expiracao));
+                    0, 0, 0,
+                     contaUsuario.Expiracao.HasValue ? DateTime.SpecifyKind(contaUsuario.Expiracao.Value, DateTimeKind.Utc) : null));
         }
         public static RetornaCadastroContasUsuariosDTO ParaDTO(ContaUsuario contaUsuario) =>
             new RetornaCadastroContasUsuariosDTO(

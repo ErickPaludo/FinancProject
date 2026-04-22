@@ -43,7 +43,7 @@ namespace Financ.Infra.Data.ConfiguracaoTabelas.Movimentações
             builder.HasOne(e => e.Categoria)
            .WithMany()
            .HasForeignKey(e => e.IdCategoria)
-           .OnDelete(DeleteBehavior.Restrict);
+           .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

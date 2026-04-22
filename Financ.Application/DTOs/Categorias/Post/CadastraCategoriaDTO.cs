@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Financ.Application.DTOs.Categorias.Get
+namespace Financ.Application.DTOs.Categoria.Post
 {
-    public record RetornaCategoriasDTO(int IdCategoria, string cor);
+    public record CadastraCategoriaDTO(string Nome,string? cor);
 }

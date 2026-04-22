@@ -14,6 +14,7 @@ namespace Financ.Domain.Validacoes.Base.Mensagens
         public const string STATUS_INVALIDO = "Status inválido.";
         public const string LIMITE_USUARIOS_MESTRES = "O limite de usuários mestres foi atingido. ";
         public const string USUARIO_INATIVO_NAO_PODE_SER_ATUALIZADO = "O usuário não está ativo!";
+        public const string LIMITE_DE_CONVITES_PARA_USUARIOS_MESTRE = "Numero máximo de convites para usuários mestres atingido.";
 
     }
 }

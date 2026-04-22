@@ -24,17 +24,18 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
         {
             try
             {
-                var conta = await _unitOfWork.contasRepositorio.BuscarContaComUsuarios(x => x.Id == request.idConta);
+                var conta = await _unitOfWork.contasRepositorio.BuscarContaComUsuariosEConvintes(x => x.Id == request.idConta);
 
                 if (conta is null)
                     return Resultado<string>.GeraFalha(Falha.NaoEncontrado("Conta não encontrada"));
 
                 ContaUsuario? contaUsuario = conta.ContaUsuarios.FirstOrDefault(x => x.IdUsuario.Equals(request.idUsuario));
+                if(contaUsuario is null)
+                    return Resultado<string>.GeraFalha(Falha.NaoEncontrado("Usuário não encontrado"));
 
-                conta.SairDaConta(contaUsuario);
+                contaUsuario.SairDaConta();
 
-                _unitOfWork.contasUsuariosRepositorio.Delete(contaUsuario!);
-                _unitOfWork.contasRepositorio.Atualiza(conta);
+                _unitOfWork.contasUsuariosRepositorio.Atualiza(contaUsuario!);
 
                 await _unitOfWork.Commit();
 

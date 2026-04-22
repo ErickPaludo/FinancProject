@@ -30,7 +30,7 @@ namespace Financ.Domain.Validacoes.ContasBancarias.Mensagens
             public const string TEMPO_MIN_EXPIRACAO = "O tempo mínimo de expiração é de 15 minutos.";
             public const string USUARIO_MESTRE_COM_TEMPO_LIMITE_JA_DEFINIDO = "Este usuário possui tempo limite definido. Remova o tempo limite antes de elevar o nível de acesso.";
             public const string ATUALIZANDO_TEMPO_LIMITE_PARA_USUARIO_MESTRE = "Não é permitido definir tempo limite para usuários mestres.";
-            public const string CONFLITO_AO_EXPIRAR = "Informe apenas o tempo de expiração ou defina o usuário como expirado. ";
+            public const string CONFLITO_AO_EXPIRAR = "Operação inválida! Não é possível definir tempo de expirãção e cancelar ao mesmo tempo.";
             public const string CONVITE_NAO_PODE_SER_NULO = "Informe o convite.";
             public const string USUARIO_EXPIRADO = "Seu tempo na conta bancária está expirado.";
             public const string CONTA_NÃO_ENCONTRADA = "Conta não encontrada.";

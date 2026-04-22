@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Financ.Infra.Data.Migrations
 {
     [DbContext(typeof(AppContextoData))]
-    [Migration("20260415174117_inicial")]
-    partial class inicial
+    [Migration("20260420023353_inicial2")]
+    partial class inicial2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -173,10 +173,10 @@ namespace Financ.Infra.Data.Migrations
                     b.Property<DateTime?>("DthrConclusao")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("DthrMovimentacao")
+                    b.Property<DateTime>("DthrMovimentacao")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("DthrReg")
+                    b.Property<DateTime>("DthrReg")
                         .HasColumnType("datetime2");
 
                     b.Property<int?>("IdCategoria")

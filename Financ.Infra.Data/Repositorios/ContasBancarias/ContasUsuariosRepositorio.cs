@@ -1,5 +1,6 @@
 ﻿using Financ.Domain.Entidades.ContasBancarias;
 using Financ.Domain.Entidades.Usuarios;
+using Financ.Domain.Enums.ContasBancarias;
 using Financ.Domain.Interfaces.Repositorios.ContasBancarias;
 using Financ.Infra.Data.Contexto;
 using Financ.Infra.Data.Repositorios.Base;
@@ -26,12 +27,22 @@ namespace Financ.Infra.Data.Repositorios.ContasBancarias
                 .AsNoTracking()
                 .Include(fcu => fcu.Conta) // ISSO GERA O INNER JOIN AUTOMÁTICO
                 .Where(predicado)
+                .Where(x => x.Expiracao == null || x.Expiracao >= DateTime.UtcNow)
                 .ToListAsync();
         }
 
-        public async Task<ContaUsuario?> ObterContaUsuarioComUsuario(Expression<Func<ContaUsuario, bool>> predicado)
+        public  IQueryable<ContaUsuario> ObterContaUsuarioComUsuario()
         {
-            return await _contexto.ContasUsuarios.Include(u => u.Usuario).FirstOrDefaultAsync(predicado);
+            return _contexto.ContasUsuarios.Where(x => x.Expiracao == null || x.Expiracao >= DateTime.UtcNow && x.Status != TipoStatusContasUsuario.Removido).Include(u => u.Usuario);
+        }
+
+        public async Task<ContaUsuario?> ObterContaUsuarioComUsuarioPredicado(Expression<Func<ContaUsuario, bool>> predicado)
+        {
+            return await _contexto.ContasUsuarios
+                .Where(x => x.Expiracao == null || x.Expiracao >= DateTime.UtcNow && x.Status != TipoStatusContasUsuario.Removido)
+                .Include(u => u.Usuario)
+                .Include(u => u.Conta)
+                .Where(predicado).FirstOrDefaultAsync();
         }
     }
 }

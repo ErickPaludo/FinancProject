@@ -3,8 +3,11 @@ using Financ.Application.CQRS.Contas_Usuarios.Querys;
 using Financ.Application.DTOs.Base;
 using Financ.Application.DTOs.ContasUsuarios.Get;
 using Financ.Application.Mapeamento;
+using Financ.Domain.Entidades.ContasBancarias;
 using Financ.Domain.Entidades.Usuarios;
+using Financ.Domain.Enums.ContasBancarias;
 using Financ.Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using NetDevPack.SimpleMediator;
 
 namespace Financ.Application.CQRS.Contas_Usuarios.Handler
@@ -20,40 +23,30 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
 
         public async Task<Resultado<BaseGetList<RetornaUsuariosAssociadosDTO>>> Handle(RetornaUsuariosAssociadosQuery request, CancellationToken cancellationToken)
         {
-            if (await _unitOfWork.contasUsuariosRepositorio.BuscarObjetoUnico(x => x.IdConta == request.IdConta && x.IdUsuario == request.IdUsuario) != null)
-            {
+            if (await _unitOfWork.contasRepositorio.BuscarObjetoUnico(x => x.Id == request.IdConta) is null)
+                return Resultado<BaseGetList<RetornaUsuariosAssociadosDTO>>.GeraFalha(Falha.NaoEncontrado("Conta não encontrada!"));
 
-                var filtroIdUsuario = !string.IsNullOrEmpty(request.filtroConta.IdUsuario);
-                var filtroStatus = request.filtroConta.Status.HasValue;
-                var filtroAcesso = request.filtroConta.Acesso.HasValue;
-                var filtroNome = !string.IsNullOrEmpty(request.filtroConta.NomeUsuario);
+            var filtro = request.filtroConta;
 
+            IQueryable<ContaUsuario> contaUsuarioQuery = _unitOfWork.contasUsuariosRepositorio.ObterContaUsuarioComUsuario();
 
-                var contaUsuarios = await _unitOfWork.contasUsuariosRepositorio.ObterContasDoUsuario(x => x.IdConta == request.IdConta
-                && (!filtroIdUsuario || x.IdUsuario.Equals(request.filtroConta.IdUsuario))
-                && (!filtroStatus || x.Status.Equals(request.filtroConta.Status))
-                && (!filtroAcesso || x.Acesso.Equals(request.filtroConta.Acesso)));
+            contaUsuarioQuery = contaUsuarioQuery.Where(x => x.IdConta == request.IdConta);
 
-                List<RetornaUsuariosAssociadosDTO> listaUsuarios = new List<RetornaUsuariosAssociadosDTO>();
-                if (contaUsuarios.Count() > 0)
-                {
-                    foreach (var conta in contaUsuarios)
-                    {
-                        Usuario? usuario = await _unitOfWork.usuariosRepostorio.BuscarObjetoUnico(x => x.Id.Equals(conta.IdUsuario));
-                        listaUsuarios.Add(ContaUsuarioMapper.ParaUsuariosAssociadosDTO(conta, usuario));
-                    }
+            if(filtro.IdUsuario is not null)
+                contaUsuarioQuery.Where(x => x.IdUsuario == filtro.IdUsuario);
 
-                    if (filtroNome)
-                        listaUsuarios = listaUsuarios.Where(x => x.Nome.Contains(request.filtroConta.NomeUsuario)).ToList();
+            if(filtro.Status.HasValue)
+                contaUsuarioQuery.Where(x => x.Status.Equals(filtro.Status.Value));
 
-                }
-                return Resultado<BaseGetList<RetornaUsuariosAssociadosDTO>>.GeraSucesso(new BaseGetList<RetornaUsuariosAssociadosDTO>(listaUsuarios, new Meta
-                {
-                    filtros = request.filtroConta != null && request.filtroConta.IdUsuario == null && request.filtroConta.NomeUsuario == null && request.filtroConta.Status == null ? null : request.filtroConta,
-                }));
+            if(filtro.Acesso.HasValue)
+                contaUsuarioQuery.Where(x => x.Acesso.Equals(filtro.Acesso.Value));
 
-            }
-            return Resultado<BaseGetList<RetornaUsuariosAssociadosDTO>>.GeraFalha(Falha.NaoEncontrado("Conta não encontrada!"));
+            if (filtro.NomeUsuario is not null)
+                contaUsuarioQuery.Where(x => x.Usuario.NomeCompleto.Contains(filtro.NomeUsuario));
+
+            var contaUsuarios = await contaUsuarioQuery.ToListAsync();
+
+            return Resultado<BaseGetList<RetornaUsuariosAssociadosDTO>>.GeraSucesso(new BaseGetList<RetornaUsuariosAssociadosDTO>(ContaUsuarioMapper.ParaUsuarioDTO(contaUsuarios)));
         }
     }
 }

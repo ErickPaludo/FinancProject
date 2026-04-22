@@ -170,10 +170,10 @@ namespace Financ.Infra.Data.Migrations
                     b.Property<DateTime?>("DthrConclusao")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("DthrMovimentacao")
+                    b.Property<DateTime>("DthrMovimentacao")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("DthrReg")
+                    b.Property<DateTime>("DthrReg")
                         .HasColumnType("datetime2");
 
                     b.Property<int?>("IdCategoria")
@@ -384,7 +384,7 @@ namespace Financ.Infra.Data.Migrations
                     b.HasOne("Financ.Domain.Entidades.Movimentações.Categoria", "Categoria")
                         .WithMany()
                         .HasForeignKey("IdCategoria")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("Financ.Domain.Entidades.ContasBancarias.Conta", "Conta")
                         .WithMany()

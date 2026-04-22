@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Financ.Domain.Validacoes.ContasBancarias;
 
 namespace Financ.Application.CQRS.Movimentação.Handlers
 {
@@ -27,56 +28,64 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
         }
         public async Task<Resultado<BaseGet<RetornaMovimentacaoDTO>>> Handle(RetornaMovimentacaoQuery request, CancellationToken cancellationToken)
         {
-            Conta? conta = await _unitOfWork.contasRepositorio.BuscarContaComUsuarios(x => x.Id == request.IdConta);
-            if(conta is null)
-                return Resultado<BaseGet<RetornaMovimentacaoDTO>>.GeraFalha(Falha.NaoEncontrado("Conta não encontrada"));
-
-            ContaUsuario? contaUsuario = conta!.ContaUsuarios.FirstOrDefault(x => x.IdUsuario == request.IdUsuario);
-
-            if(contaUsuario is null) return
-                    Resultado<BaseGet<RetornaMovimentacaoDTO>>.GeraFalha(Falha.NaoEncontrado("Usuário não pertence a conta!"));
-
-            contaUsuario!.ValidaSituacaoUsuarioParaConsulta();
-
-            List<Movimentacao> movimentacoes = await MovimentacoesSelecionadas(request);
-
-            decimal totalEntradaConcluidos = movimentacoes.Where(x => x.Tipo is TipoMovimentacao.Entrada && x.Status is TipoStatusMovimentacao.Concluido).Sum(x => x.Valor);
-            decimal totalSaidaConcluidos = movimentacoes.Where(x => x.Tipo == TipoMovimentacao.Saida && x.Status is TipoStatusMovimentacao.Concluido).Sum(x => x.Valor);
-
-            decimal totalEntradaPendentes = movimentacoes.Where(x => x.Tipo is TipoMovimentacao.Entrada && x.Status is TipoStatusMovimentacao.Pendente).Sum(x => x.Valor);
-            decimal totalSaidaPendentes = movimentacoes.Where(x => x.Tipo == TipoMovimentacao.Saida && x.Status is TipoStatusMovimentacao.Pendente).Sum(x => x.Valor);
-
-            decimal totalEntrada = totalEntradaConcluidos + totalEntradaPendentes;
-            decimal totalSaida = totalSaidaConcluidos + totalSaidaPendentes;
-
-            decimal saldoRealizado = totalEntradaConcluidos - totalSaidaConcluidos;
-            decimal saldoProjetado = (totalEntradaConcluidos + totalEntradaPendentes) - (totalSaidaConcluidos + totalSaidaPendentes);
-
-            if (request.Filtros.Concluido.HasValue)
+            try
             {
-                if (!request.Filtros.Concluido.Value)
+                Conta? conta = await _unitOfWork.contasRepositorio.BuscarContaComUsuarios(x => x.Id == request.IdConta);
+                if (conta is null)
+                    return Resultado<BaseGet<RetornaMovimentacaoDTO>>.GeraFalha(Falha.NaoEncontrado("Conta não encontrada"));
+
+                ContaUsuario? contaUsuario = conta!.ContaUsuarios.FirstOrDefault(x => x.IdUsuario == request.IdUsuario);
+
+                if (contaUsuario is null) return
+                        Resultado<BaseGet<RetornaMovimentacaoDTO>>.GeraFalha(Falha.NaoEncontrado("Usuário não pertence a conta!"));
+
+                contaUsuario!.ValidaSituacaoUsuarioParaConsulta();
+
+                List<Movimentacao> movimentacoes = await MovimentacoesSelecionadas(request);
+
+                decimal totalEntradaConcluidos = movimentacoes.Where(x => x.Tipo is TipoMovimentacao.Entrada && x.Status is TipoStatusMovimentacao.Concluido).Sum(x => x.Valor);
+                decimal totalSaidaConcluidos = movimentacoes.Where(x => x.Tipo == TipoMovimentacao.Saida && x.Status is TipoStatusMovimentacao.Concluido).Sum(x => x.Valor);
+
+                decimal totalEntradaPendentes = movimentacoes.Where(x => x.Tipo is TipoMovimentacao.Entrada && x.Status is TipoStatusMovimentacao.Pendente).Sum(x => x.Valor);
+                decimal totalSaidaPendentes = movimentacoes.Where(x => x.Tipo == TipoMovimentacao.Saida && x.Status is TipoStatusMovimentacao.Pendente).Sum(x => x.Valor);
+
+                decimal totalEntrada = totalEntradaConcluidos + totalEntradaPendentes;
+                decimal totalSaida = totalSaidaConcluidos + totalSaidaPendentes;
+
+                decimal saldoRealizado = totalEntradaConcluidos - totalSaidaConcluidos;
+                decimal saldoProjetado = (totalEntradaConcluidos + totalEntradaPendentes) - (totalSaidaConcluidos + totalSaidaPendentes);
+
+                if (request.Filtros.Concluido.HasValue)
                 {
-                    totalEntrada = totalEntradaPendentes;
-                    saldoRealizado = 0;
+                    if (!request.Filtros.Concluido.Value)
+                    {
+                        totalEntrada = totalEntradaPendentes;
+                        saldoRealizado = 0;
+                    }
+                    else
+                    {
+                        saldoRealizado = totalEntradaConcluidos - totalSaidaConcluidos;
+                        saldoProjetado = 0;
+                    }
                 }
-                else
-                {
-                    saldoRealizado = totalEntradaConcluidos - totalSaidaConcluidos;
-                    saldoProjetado = 0;
-                }
+
+
+
+                GrupoMovimentacaoDTO grupoEntrada = new GrupoMovimentacaoDTO(totalEntradaConcluidos, totalEntradaPendentes, totalEntrada);
+                GrupoMovimentacaoDTO grupoSaida = new GrupoMovimentacaoDTO(totalSaidaConcluidos, totalSaidaPendentes, totalSaida);
+
+                ResumoMovimentacoesDTO resumoDTO = new ResumoMovimentacoesDTO(saldoRealizado, saldoProjetado, grupoEntrada, grupoSaida);
+
+                return Resultado<BaseGet<RetornaMovimentacaoDTO>>.GeraSucesso(new BaseGet<RetornaMovimentacaoDTO>(MovimentacaoMapper.ParaDTO(resumoDTO, await MovimentacoesSelecionadas(request))));
             }
-
-
-
-            GrupoMovimentacaoDTO grupoEntrada = new GrupoMovimentacaoDTO(totalEntradaConcluidos, totalEntradaPendentes, totalEntrada);
-            GrupoMovimentacaoDTO grupoSaida = new GrupoMovimentacaoDTO(totalSaidaConcluidos, totalSaidaPendentes, totalSaida);
-
-            ResumoMovimentacoesDTO resumoDTO = new ResumoMovimentacoesDTO(saldoRealizado, saldoProjetado, grupoEntrada, grupoSaida);
-
-            return Resultado<BaseGet<RetornaMovimentacaoDTO>>.GeraSucesso(new BaseGet<RetornaMovimentacaoDTO>(MovimentacaoMapper.ParaDTO(resumoDTO, await MovimentacoesSelecionadas(request))));
+            catch (ContasUsuariosValidacao ex)
+            {
+                return Resultado<BaseGet<RetornaMovimentacaoDTO>>.GeraFalha(Falha.ErroOperacional(ex.Message));
+            }
         }
         private async Task<List<Movimentacao>> MovimentacoesSelecionadas(RetornaMovimentacaoQuery request)
         {
+
             var filtro = request.Filtros;
 
             var queryable = _unitOfWork.movimentacaoRepositorio
@@ -84,12 +93,12 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
 
             queryable = queryable.Where(x => x.IdConta == request.IdConta && x.DthrMovimentacao >= filtro.DthrMovimentacaoInicial && x.DthrMovimentacao <= filtro.DthrMovimentacaoFinal);
 
-            if (filtro?.IdMovimentacao.HasValue == true)
+            if (filtro!.IdMovimentacao.HasValue == true)
             {
                 queryable = queryable.Where(x => x.Id == filtro.IdMovimentacao.Value);
             }
 
-            if (filtro?.Concluido.HasValue == true)
+            if (filtro!.Concluido.HasValue == true)
             {
                 var status = filtro.Concluido.Value
                     ? TipoStatusMovimentacao.Concluido
@@ -98,14 +107,19 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
                 queryable = queryable.Where(x => x.Status == status);
             }
 
-            if (filtro?.TipoMovimentacao.HasValue == true)
+            if (filtro!.TipoMovimentacao.HasValue == true)
             {
                 var tipoMovimentacao = filtro.TipoMovimentacao.Value;
 
                 queryable = queryable.Where(x => x.Tipo == tipoMovimentacao);
             }
+            if (filtro!.IdCategoria.HasValue)
+            {
+                queryable = queryable.Where(x => x.IdCategoria == filtro!.IdCategoria.Value);
+            }
 
             return await queryable.ToListAsync();
+
         }
     }
 }

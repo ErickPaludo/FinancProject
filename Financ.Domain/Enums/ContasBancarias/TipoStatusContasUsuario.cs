@@ -9,7 +9,7 @@ namespace Financ.Domain.Enums.ContasBancarias
     public enum TipoStatusContasUsuario
     {
         Ativo,
-        Bloqueado,
         Inativo,
+        Removido,
     }
 }

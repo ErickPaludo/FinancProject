@@ -1,0 +1,56 @@
+﻿using Financ.Application.Comun.Resultado;
+using Financ.Application.CQRS.Categorias.Command;
+using Financ.Application.DTOs.Base;
+using Financ.Application.DTOs.Categoria.Get;
+using Financ.Application.Mapeamento;
+using Financ.Domain.Entidades.ContasBancarias;
+using Financ.Domain.Entidades.Movimentações;
+using Financ.Domain.Interfaces;
+using Financ.Domain.Validacoes.Movimentações;
+using NetDevPack.SimpleMediator;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Financ.Application.CQRS.Categorias.Handler
+{
+    public class AlterarCategoriaHandler : IRequestHandler<AlterarCategoriaCommand, Resultado<BasePost<CategoriaDTO>>>
+    {
+        private readonly IUnitOfWork _unitOfWork;
+
+        public AlterarCategoriaHandler(IUnitOfWork unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+        }
+
+        public async Task<Resultado<BasePost<CategoriaDTO>>> Handle(AlterarCategoriaCommand request, CancellationToken cancellationToken)
+        {
+            try
+            {
+
+                Categoria? categoria = await _unitOfWork.categoriaRepositorio.ObterCategoriaComConta(c => c.Id == request.IdCategoria);
+
+                if (categoria is null)
+                    return Resultado<BasePost<CategoriaDTO>>.GeraFalha(Falha.NaoEncontrado("Categoria não encontrada"));
+
+
+                if (request.Nome is not null && (await _unitOfWork.categoriaRepositorio.BuscarPorCondicao(x => x.Nome.Equals(request.Nome.Trim()) && x.Id != request.IdCategoria)).Any())
+                    return Resultado<BasePost<CategoriaDTO>>.GeraFalha(Falha.ErroOperacional("Já existe uma categoria cadastrada com este nome."));
+
+                ContaUsuario? contaUsuario = categoria.Conta.ContaUsuarios.FirstOrDefault(c => c.IdUsuario == request.IdUsuario);
+
+                categoria.Alterar(contaUsuario, request.Nome, request.Cor);
+
+                _unitOfWork.categoriaRepositorio.Atualiza(categoria);
+                await _unitOfWork.Commit();
+                return Resultado<BasePost<CategoriaDTO>>.GeraSucesso(new BasePost<CategoriaDTO>(CategoriaMapper.ParaDTO(categoria)));
+            }
+            catch (CategoriaValidacao ex)
+            {
+                return Resultado<BasePost<CategoriaDTO>>.GeraFalha(Falha.ErroOperacional(ex.Message));
+            }
+        }
+    }
+}

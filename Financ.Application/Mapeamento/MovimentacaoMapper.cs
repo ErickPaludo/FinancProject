@@ -1,5 +1,5 @@
-﻿using Financ.Application.DTOs.Categorias.Get;
-using Financ.Application.DTOs.Movimentações.Get;
+﻿using Financ.Application.DTOs.Movimentações.Get;
+using Financ.Domain.Entidades.ContasBancarias;
 using Financ.Domain.Entidades.Movimentações;
 using Financ.Domain.Enums.Movimentações;
 using System;
@@ -23,10 +23,10 @@ namespace Financ.Application.Mapeamento
             movimentacao.Valor,
             movimentacao.Titulo,
             movimentacao.Observacao,
-            movimentacao.DthrReg ?? DateTime.MinValue,
-            movimentacao.DthrMovimentacao ?? DateTime.MinValue,
-            movimentacao.DthrConclusao,
-            ContaUsuarioMapper.ParaUsuarioDTO(movimentacao.ContaUsuarioCriador),
+            DateTime.SpecifyKind(movimentacao.DthrReg, DateTimeKind.Utc),
+            DateTime.SpecifyKind(movimentacao.DthrMovimentacao, DateTimeKind.Utc),
+            movimentacao.DthrConclusao.HasValue ? DateTime.SpecifyKind(movimentacao.DthrConclusao.Value, DateTimeKind.Utc) : null,
+ContaUsuarioMapper.ParaUsuarioDTO(movimentacao.ContaUsuarioCriador),
             (movimentacao.ContaUsuarioExecutor is null ? null : ContaUsuarioMapper.ParaUsuarioDTO(movimentacao.ContaUsuarioExecutor)),
             (movimentacao.IdCategoria is null || movimentacao.Categoria is null) ? null : CategoriaMapper.ParaDTO(movimentacao.Categoria));
         }

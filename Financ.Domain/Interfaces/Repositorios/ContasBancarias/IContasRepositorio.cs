@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 namespace Financ.Domain.Interfaces.Repositorios.ContasBancarias
 {
     public interface IContasRepositorio : IBaseRepositorio<Conta>{
+        Task<Conta?> BuscarContaComUsuariosEConvintes(Expression<Func<Conta, bool>> predicado);
         Task<Conta?> BuscarContaComUsuarios(Expression<Func<Conta, bool>> predicado);
     }
 }

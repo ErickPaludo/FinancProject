@@ -40,12 +40,21 @@ namespace Financ.Application.CQRS.Convites.Handler
                 {
                     _unitOfWork.convitesRepostorio.Atualiza(convite);
                     await _unitOfWork.Commit();
-                    return Resultado<BasePost<RetornaPostCadastroDTO>>.GeraSucesso(new BasePost<RetornaPostCadastroDTO>(new RetornaPostCadastroDTO(request.aceito, null,convite.Observacao)));
+                    return Resultado<BasePost<RetornaPostCadastroDTO>>.GeraSucesso(new BasePost<RetornaPostCadastroDTO>(new RetornaPostCadastroDTO(request.aceito, null, convite.Observacao)));
                 }
 
-                var contaUsuario = new ContaUsuario(convite);
+                ContaUsuario? contaUsuario = await _unitOfWork.contasUsuariosRepositorio.BuscarObjetoUnico(x => x.IdConta == convite.IdConta && x.IdUsuario.Equals(request.IdUsuario));
+                if (contaUsuario is null)
+                {
+                    contaUsuario = new ContaUsuario(convite);
+                    contaUsuario = await _unitOfWork.contasUsuariosRepositorio.Adicionar(contaUsuario);
+                }
+                else
+                {
+                    contaUsuario.RetornaParaConta(convite);
+                    _unitOfWork.contasUsuariosRepositorio.Atualiza(contaUsuario);
+                }
 
-                contaUsuario = await _unitOfWork.contasUsuariosRepositorio.Adicionar(contaUsuario);
 
                 _unitOfWork.convitesRepostorio.Atualiza(convite);
 

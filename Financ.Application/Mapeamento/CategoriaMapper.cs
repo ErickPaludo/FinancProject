@@ -1,4 +1,4 @@
-﻿using Financ.Application.DTOs.Categorias.Get;
+﻿using Financ.Application.DTOs.Categoria.Get;
 using Financ.Application.DTOs.ContasUsuarios.Get;
 using Financ.Domain.Entidades.Movimentações;
 using System;
@@ -11,9 +11,8 @@ namespace Financ.Application.Mapeamento
 {
     public static class CategoriaMapper
     {
-        public static RetornaCategoriasDTO ParaDTO(Categoria categoria)
-        {
-            return new RetornaCategoriasDTO(categoria.Id, categoria.Cor.Valor);
-        }
+        public static CategoriaDTO ParaDTO(Categoria categoria) => new CategoriaDTO(categoria.Id, categoria.Nome, categoria.Cor.Valor);
+        public static List<CategoriaDTO> ParaListDTO(IEnumerable<Categoria> categoria) => categoria.Select(ParaDTO).ToList();
+
     }
 }

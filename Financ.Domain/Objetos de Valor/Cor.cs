@@ -17,6 +17,7 @@ namespace Financ.Domain.Objetos_de_Valor
         public Cor(string? valor)
         {
             ValidaCor(valor);
+            Valor = valor is not null ? valor : "#1d293db3";
         }
         private void ValidaCor(string? valor)
         {
@@ -25,7 +26,6 @@ namespace Financ.Domain.Objetos_de_Valor
                 CorValidacao.Verifica(string.IsNullOrEmpty(valor), MensagemCor.COR_INVALIDA);
                 CorValidacao.Verifica(!Regex.IsMatch(valor, "^#([0-9A-Fa-f]{6})$"), MensagemCor.COR_INVALIDA);
             }
-            Valor = valor is not null ? valor : "#1d293db3";
         }
     }
 }
