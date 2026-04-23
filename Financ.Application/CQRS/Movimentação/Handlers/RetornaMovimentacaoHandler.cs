@@ -118,7 +118,7 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
                 queryable = queryable.Where(x => x.IdCategoria == filtro!.IdCategoria.Value);
             }
 
-            return await queryable.ToListAsync();
+            return await queryable.OrderBy(x => x.DthrMovimentacao).ToListAsync();
 
         }
     }

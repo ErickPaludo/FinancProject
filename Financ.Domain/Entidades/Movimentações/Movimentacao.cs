@@ -77,10 +77,10 @@ namespace Financ.Domain.Entidades.Movimentações
         {
             ValidaContaUsuario(contaUsuario);
             ValidaConta(contaUsuario!.Conta);
-            ValidaDataConclusao(dthrConclusao);
-
             MovimentacaoValidacao.Verifica(Status is TipoStatusMovimentacao.Concluido, MensagemMovimentacao.MOVIMENTACAO_COM_STATUS_IGUAL_NA_EXECUCAO);
             Status = TipoStatusMovimentacao.Concluido;
+            ValidaDataConclusao(dthrConclusao);
+
             ContaUsuarioExecutor = contaUsuario;
             IdUsuarioExecutor = contaUsuario.Id;
             ContaUsuarioExecutor = contaUsuario;

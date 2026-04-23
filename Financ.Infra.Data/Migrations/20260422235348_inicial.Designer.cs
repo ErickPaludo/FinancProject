@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Financ.Infra.Data.Migrations
 {
     [DbContext(typeof(AppContextoData))]
-    [Migration("20260420023353_inicial2")]
-    partial class inicial2
+    [Migration("20260422235348_inicial")]
+    partial class inicial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -387,7 +387,7 @@ namespace Financ.Infra.Data.Migrations
                     b.HasOne("Financ.Domain.Entidades.Movimentações.Categoria", "Categoria")
                         .WithMany()
                         .HasForeignKey("IdCategoria")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("Financ.Domain.Entidades.ContasBancarias.Conta", "Conta")
                         .WithMany()
