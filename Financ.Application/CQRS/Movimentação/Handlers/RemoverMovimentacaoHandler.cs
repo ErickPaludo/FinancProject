@@ -35,13 +35,16 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
 
                 ContaUsuario? usuarioExecutor = await _unitOfWork.contasUsuariosRepositorio.ObterContaUsuarioComUsuario().FirstOrDefaultAsync(cu => cu.IdConta == movimentacao.IdConta && cu.IdUsuario == request.idUsuario);
 
-
                 movimentacao.ExcluiMovimentacao(usuarioExecutor);
 
                 Conta conta = movimentacao.Conta;
                 conta.RemoverMovimentacao(movimentacao);
 
-                _unitOfWork.movimentacaoRepositorio.Delete(movimentacao);
+                if (movimentacao.Extorno)
+                    _unitOfWork.movimentacaoRepositorio.Atualiza(movimentacao);
+                else
+                    _unitOfWork.movimentacaoRepositorio.Delete(movimentacao);
+
                 _unitOfWork.contasRepositorio.Atualiza(conta);
                 await _unitOfWork.Commit();
 

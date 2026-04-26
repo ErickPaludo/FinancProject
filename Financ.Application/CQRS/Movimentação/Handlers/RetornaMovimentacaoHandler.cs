@@ -43,6 +43,7 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
 
                 List<Movimentacao> movimentacoes = await MovimentacoesSelecionadas(request);
 
+
                 decimal totalEntradaConcluidos = movimentacoes.Where(x => x.Tipo is TipoMovimentacao.Entrada && x.Status is TipoStatusMovimentacao.Concluido).Sum(x => x.Valor);
                 decimal totalSaidaConcluidos = movimentacoes.Where(x => x.Tipo == TipoMovimentacao.Saida && x.Status is TipoStatusMovimentacao.Concluido).Sum(x => x.Valor);
 
@@ -92,6 +93,9 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
                 .BuscaMovimentacaoComContasUsuarios();
 
             queryable = queryable.Where(x => x.IdConta == request.IdConta && x.DthrMovimentacao >= filtro.DthrMovimentacaoInicial && x.DthrMovimentacao <= filtro.DthrMovimentacaoFinal);
+
+            if(1 == 1) //Não retorna movimentacoes excluidas
+                queryable = queryable.Where(x => x.Status != TipoStatusMovimentacao.Excluido);
 
             if (filtro!.IdMovimentacao.HasValue == true)
             {

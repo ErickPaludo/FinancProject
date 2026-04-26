@@ -68,7 +68,7 @@ namespace Financ.Domain.Entidades.Movimentações
             DthrMovimentacao = dthrMovimentacao is null ? DthrReg : dthrMovimentacao.Value; //data em que a movimentacao deve/foi feita
 
             ValidaDataConclusao(dthrConclusao);
-            DthrConclusao = dthrConclusao ?? dthrConclusao;
+            DthrConclusao = dthrConclusao ?? dthrMovimentacao;
         }
         #endregion
 
@@ -103,6 +103,7 @@ namespace Financ.Domain.Entidades.Movimentações
             ValidaContaUsuario(contaUsuario);
             ValidaConta(contaUsuario!.Conta);
             Extorno = Status is TipoStatusMovimentacao.Concluido ? true : false;
+            Status = Extorno ? TipoStatusMovimentacao.Excluido : Status;
         }
         public void AlterarMovimentacao(ContaUsuario? contaUsuario, decimal? valor, TipoMovimentacao? tipo, string? titulo, string? observacao,int? idCategoria, Categoria? categoria, DateTime? dthrMovimentacao, DateTime? dthrConclusao)
         {

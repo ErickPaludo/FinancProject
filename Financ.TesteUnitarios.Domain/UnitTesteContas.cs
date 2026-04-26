@@ -2,211 +2,260 @@
 using Financ.Domain.Entidades.Movimentações;
 using Financ.Domain.Enums.ContasBancarias;
 using Financ.Domain.Enums.Movimentações;
+using Financ.Domain.Validacoes.Base.Mensagens;
+using Financ.Domain.Validacoes.ContasBancarias;
+using Financ.Domain.Validacoes.ContasBancarias.Mensagens;
 using FluentAssertions;
-using System.Drawing;
+using System;
+using System.Linq;
 using Xunit;
 
 namespace Financ.TesteUnitarios.Domain
 {
-    public class ContaTests
+    public class UnitTesteContas
     {
-        private ContaUsuario CriarContaUsuario(Conta conta, string idUsuario, TiposAcessos acesso, TipoStatusContasUsuario status = TipoStatusContasUsuario.Ativo)
-                => new ContaUsuario(
-                    1,
-                    conta,
-                    idUsuario,
-                    acesso,
-                    status);
+        private Conta CriarContaValida(int id = 1) => new Conta(id, "Conta Teste", "#FFFFFF");
 
-        private string NovoIdUsuario() => Guid.NewGuid().ToString();
+        private ContaUsuario CriarUsuarioMestreAtivo(Conta conta, string idUsuario = "user-123")
+        {
+            var usuario = new ContaUsuario(conta, idUsuario);
+            conta.AddUsuario(usuario);
+            return usuario;
+        }
 
-        private Movimentacao CriaMovimentacao(TipoMovimentacao tipo, ContaUsuario contaUsuario, Categoria? categoria, decimal valor, string titulo, string observacao, DateTime? dthrMovimentacao) =>  new Movimentacao(tipo, contaUsuario, categoria, valor, titulo, observacao, dthrMovimentacao,null);
-    
+        private Movimentacao CriarMovimentacao(TipoMovimentacao tipo, decimal valor, ContaUsuario usuario, bool concluido = true)
+        {
+            return new Movimentacao(tipo, usuario, null, valor, "Teste", null, DateTime.UtcNow, concluido ? DateTime.UtcNow : null, concluido);
+        }
 
         #region Construtor
 
-        // Testes de Sucesso
         [Fact]
-        public void Deve_Criar_Conta_Valida()
+        public void Conta_DeveCriarComSucesso_QuandoDadosForemValidos()
         {
-            var conta = new Conta("Conta Teste", "#FFFFFF");
+            // Arrange
+            var titulo = "Minha Conta";
+            var cor = "#ABCDEF";
 
-            conta.Titulo.Should().Be("Conta Teste");
+            // Act
+            var conta = new Conta(titulo, cor);
+
+            // Assert
+            conta.Titulo.Should().Be(titulo);
+            conta.Cor.Valor.Should().Be(cor);
             conta.Status.Should().Be(TiposStatusContas.Ativo);
             conta.TipoConta.Should().Be(TipoConta.Corrente);
+            conta.Saldo.Should().Be(0);
         }
 
-        // Testes de Erro
         [Fact]
-        public void Deve_Lancar_Excecao_Quando_Id_Menor_Igual_Zero()
+        public void Conta_DeveLancarExcecao_QuandoIdForInvalido()
         {
-            Action act = () => new Conta(0, "Conta", "#FFFFFF");
+            // Act
+            Action action = () => new Conta(0, "Teste", "#FFFFFF");
 
-            act.Should().Throw<Exception>();
+            // Assert
+            action.Should().Throw<ContasValidacao>()
+                .WithMessage(MensagensBase.ID_IGUAL_MENOR_ZERO);
         }
 
         [Theory]
         [InlineData("")]
         [InlineData("  ")]
-        public void Deve_Lancar_Excecao_Quando_Titulo_Invalido(string titulo)
+        [InlineData(null)]
+        public void Conta_DeveLancarExcecao_QuandoTituloForVazio(string tituloInvalido)
         {
-            Action act = () => new Conta(titulo, "#FFFFFF");
+            // Act
+            Action action = () => new Conta(tituloInvalido, "#FFFFFF");
 
-            act.Should().Throw<Exception>();
-        }
-
-        [Fact]
-        public void Deve_Lancar_Excecao_Quando_Titulo_Menor_Que_3()
-        {
-            Action act = () => new Conta("ab", "#FFFFFF");
-
-            act.Should().Throw<Exception>();
-        }
-
-        #endregion
-
-        #region AtualizaConta
-
-        // Testes de Sucesso
-        [Fact]
-        public void Deve_Atualizar_Titulo_Quando_Usuario_Tiver_Permissao()
-        {
-            var conta = new Conta("Conta Antiga", "#FFFFFF");
-
-            var usuario = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
-
-            conta.AtualizaConta(usuario, "Conta Nova", null);
-
-            conta.Titulo.Should().Be("Conta Nova");
-        }
-
-        [Fact]
-        public void Deve_Atualizar_Status_Quando_Informado()
-        {
-            var conta = new Conta("Conta Teste", "#FFFFFF");
-
-            var usuario = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
-
-
-            conta.AtualizaConta(usuario, null, TiposStatusContas.Inativo);
-
-            conta.Status.Should().Be(TiposStatusContas.Inativo);
-        }
-
-        [Fact]
-        public void Nao_Deve_Alterar_Nada_Quando_Titulo_E_Status_Nulos()
-        {
-            var conta = new Conta("Conta Teste", "#FFFFFF");
-
-            var usuario = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
-
-            conta.AtualizaConta(usuario, null, null);
-
-            conta.Titulo.Should().Be("Conta Teste");
-            conta.Status.Should().Be(TiposStatusContas.Ativo);
-        }
-
-        [Fact]
-        public void Deve_Atualizar_Titulo_E_Status_Juntos()
-        {
-            var conta = new Conta("Conta Antiga", "#FFFFFF");
-
-            var usuario = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
-
-            conta.AtualizaConta(usuario, "Conta Nova", TiposStatusContas.Inativo);
-
-            conta.Titulo.Should().Be("Conta Nova");
-            conta.Status.Should().Be(TiposStatusContas.Inativo);
-        }
-
-        // Testes de Erro
-        [Fact]
-        public void Deve_Lancar_Excecao_Quando_Usuario_Nulo()
-        {
-            var conta = new Conta("Conta Teste", "#FFFFFF");
-
-            Action act = () => conta.AtualizaConta(null!, "Novo Titulo", null);
-
-            act.Should().Throw<Exception>();
-        }
-
-        [Fact]
-        public void Deve_Lancar_Excecao_Quando_Usuario_For_Visualizador()
-        {
-            var conta = new Conta("Conta Teste", "#FFFFFF");
-
-            var usuario = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Visualizador);
-
-
-            Action act = () => conta.AtualizaConta(usuario, "Novo Titulo", null);
-
-            act.Should().Throw<Exception>();
+            // Assert
+            action.Should().Throw<ContasValidacao>()
+                .WithMessage(MensagensContas.TITULO_OBRIGATORIO);
         }
 
         [Theory]
-        [InlineData(TipoStatusContasUsuario.Inativo)]
-        [InlineData(TipoStatusContasUsuario.Bloqueado)]
-        public void Deve_Lancar_Excecao_Quando_Usuario_Nao_For_Ativo(TipoStatusContasUsuario status)
+        [InlineData("Ab")] // Menor que 3
+        [InlineData("Este título de conta é propositalmente muito longo para testar o limite de cem caracteres definidos na regra de negócio do sistema financeiro")] // Maior que 100
+        public void Conta_DeveLancarExcecao_QuandoTituloTiverTamanhoInvalido(string tituloInvalido)
         {
-            var conta = new Conta("Conta Teste", "#FFFFFF");
+            // Act
+            Action action = () => new Conta(tituloInvalido, "#FFFFFF");
 
-            var usuario = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre, status);
-
-
-            Action act = () => conta.AtualizaConta(usuario, "Novo Titulo", null);
-
-            act.Should().Throw<Exception>();
-        }
-
-        [Fact]
-        public void Deve_Lancar_Excecao_Quando_Usuario_Pertencer_A_Otra_Conta()
-        {
-            var conta1 = new Conta("Conta 1", "#FFFFFF");
-            var conta2 = new Conta("Conta 2", "#FFFFFF");
-
-            var usuario = CriarContaUsuario(conta2, NovoIdUsuario(), TiposAcessos.Mestre);
-
-            Action act = () => conta1.AtualizaConta(usuario, "Novo Titulo", null);
-
-            act.Should().Throw<Exception>();
-        }
-
-        [Fact]
-        public void Deve_Lancar_Excecao_Quando_Titulo_Invalido_Na_Atualizacao()
-        {
-            var conta = new Conta("Conta Teste", "#FFFFFF");
-
-            var usuario = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
-
-            Action act = () => conta.AtualizaConta(usuario, "", null);
-
-            act.Should().Throw<Exception>();
-        }
-
-        [Fact]
-        public void Deve_Lancar_Excecao_Quando_Usuario_For_Administrador()
-        {
-            var conta = new Conta("Conta Teste", "#FFFFFF");
-
-            var usuario = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Administrador);
-
-            Action act = () => conta.AtualizaConta(usuario, "Novo Titulo", null);
-
-            act.Should().Throw<Exception>();
+            // Assert
+            action.Should().Throw<ContasValidacao>()
+                .WithMessage(MensagensContas.TITULO_TAMANHO_INVALIDO);
         }
 
         #endregion
-        #region Movimentaçoes
-        [Fact]
-        public void Conclui_Movimentaca_De_Entrada_com_Sucesso()
-        {
-            var conta = new Conta(1, "Conta Teste", "#FFFFFF");
 
-            var usuario = CriarContaUsuario(conta, NovoIdUsuario(), TiposAcessos.Mestre);
-            var movimentacao = CriaMovimentacao(TipoMovimentacao.Entrada, usuario, null, 100, "Salário", "Recebimento do salário", DateTime.UtcNow);
-            conta.ProcessaMovimentacao(movimentacao);
-            conta.Should();
+        #region Atualizacao
+
+        [Fact]
+        public void AtualizaConta_DeveAlterarDados_QuandoUsuarioForMestreAtivo()
+        {
+            // Arrange
+            var conta = CriarContaValida();
+            var usuarioMestre = CriarUsuarioMestreAtivo(conta);
+            var novoTitulo = "Novo Titulo";
+            var novoStatus = TiposStatusContas.Inativo;
+
+            // Act
+            conta.AtualizaConta(usuarioMestre, novoTitulo, novoStatus, "#000000");
+
+            // Assert
+            conta.Titulo.Should().Be(novoTitulo);
+            conta.Status.Should().Be(novoStatus);
+            conta.Cor.Valor.Should().Be("#000000");
         }
+
+        [Fact]
+        public void AtualizaConta_DeveLancarExcecao_QuandoUsuarioNaoPertencerAConta()
+        {
+            // Arrange
+            var conta1 = CriarContaValida(1);
+            var conta2 = CriarContaValida(2);
+            var usuarioConta2 = CriarUsuarioMestreAtivo(conta2);
+
+            // Act
+            Action action = () => conta1.AtualizaConta(usuarioConta2, "Novo", null);
+
+            // Assert
+            action.Should().Throw<ContasValidacao>()
+                .WithMessage(MensagensContasUsuarios.USUARIO_NAO_PERTENCE_A_CONTA);
+        }
+
+        [Fact]
+        public void AtualizaConta_DeveLancarExcecao_QuandoUsuarioNaoForMestre()
+        {
+            // Arrange
+            var conta = CriarContaValida();
+            var usuarioComum = new ContaUsuario(1, conta, "user-123", TiposAcessos.Administrador, TipoStatusContasUsuario.Ativo);
+            conta.AddUsuario(usuarioComum);
+
+            // Act
+            Action action = () => conta.AtualizaConta(usuarioComum, "Novo", null);
+
+            // Assert
+            action.Should().Throw<ContasValidacao>()
+                .WithMessage(MensagensContas.ATUALIZA_CONTA_USUARIO_SEM_PERMISSAO);
+        }
+
+        #endregion
+
+        #region Saldo e Movimentacoes
+
+        [Fact]
+        public void ProcessaMovimentacao_DeveAumentarSaldo_EmEntradaConcluida()
+        {
+            // Arrange
+            var conta = CriarContaValida();
+            var usuario = CriarUsuarioMestreAtivo(conta);
+            var movimentacao = CriarMovimentacao(TipoMovimentacao.Entrada, 100, usuario);
+
+            // Act
+            conta.ProcessaMovimentacao(movimentacao);
+
+            // Assert
+            conta.Saldo.Should().Be(100);
+        }
+
+        [Fact]
+        public void ProcessaMovimentacao_DeveDiminuirSaldo_EmSaidaConcluida()
+        {
+            // Arrange
+            var conta = CriarContaValida();
+            var usuario = CriarUsuarioMestreAtivo(conta);
+            var movimentacaoInicar = CriarMovimentacao(TipoMovimentacao.Entrada, 500, usuario);
+            conta.ProcessaMovimentacao(movimentacaoInicar);
+
+            var movimentacao = CriarMovimentacao(TipoMovimentacao.Saida, 100, usuario);
+
+            // Act
+            conta.ProcessaMovimentacao(movimentacao);
+
+            // Assert
+            conta.Saldo.Should().Be(400);
+        }
+
+        [Fact]
+        public void ProcessaMovimentacao_DeveLancarExcecao_QuandoSaldoForInsuficiente()
+        {
+            // Arrange
+            var conta = CriarContaValida();
+            var usuario = CriarUsuarioMestreAtivo(conta);
+            var movimentacaoInicial = CriarMovimentacao(TipoMovimentacao.Entrada, 50, usuario);
+            conta.ProcessaMovimentacao(movimentacaoInicial);
+
+            var movimentacao = CriarMovimentacao(TipoMovimentacao.Saida, 100, usuario);
+
+            // Act
+            Action action = () => conta.ProcessaMovimentacao(movimentacao);
+
+            // Assert
+            action.Should().Throw<ContasValidacao>()
+                .WithMessage(MensagensContas.SALDO_INSUFICIENTE);
+        }
+
+        [Fact]
+        public void ProcessaExtornoMovimentacao_DeveReverterSaldo_Corretamente()
+        {
+            // Arrange
+            var conta = CriarContaValida();
+            var usuario = CriarUsuarioMestreAtivo(conta);
+
+            // Simula uma entrada que será estornada
+            var movimentacaoInicial = CriarMovimentacao(TipoMovimentacao.Entrada, 800, usuario, concluido: false);
+            movimentacaoInicial.ExecutarMovimentacao(usuario);
+            conta.ProcessaMovimentacao(movimentacaoInicial);
+
+            var movimentacao = CriarMovimentacao(TipoMovimentacao.Entrada, 200, usuario, concluido: false);
+            movimentacao.ExecutarMovimentacao(usuario);
+            conta.ProcessaMovimentacao(movimentacao);
+
+            movimentacao.ExtornaMovimentacao(usuario); // Define Extorno = true e Status = Pendente
+
+            // Act
+            conta.ProcessaExtornoMovimentacao(movimentacao);
+
+            // Assert
+            conta.Saldo.Should().Be(800); // 1000 - 200
+        }
+
+        #endregion
+
+        #region Gestao de Usuarios
+
+        [Fact]
+        public void SairDaConta_DeveRemoverUsuario_EDesativarContaSeForUltimo()
+        {
+            // Arrange
+            var conta = CriarContaValida();
+            var usuario = CriarUsuarioMestreAtivo(conta);
+
+            // Act
+            conta.SairDaConta(usuario);
+
+            // Assert
+            conta.ContaUsuarios.Should().BeEmpty();
+            conta.Status.Should().Be(TiposStatusContas.Inativo);
+            usuario.Status.Should().Be(TipoStatusContasUsuario.Removido);
+        }
+
+        [Fact]
+        public void UsuarioPertenceConta_DeveRetornarVerdadeiro_ParaUsuarioAtivo()
+        {
+            // Arrange
+            var conta = CriarContaValida();
+            var idUsuario = "user-123";
+            var usuario = CriarUsuarioMestreAtivo(conta, idUsuario);
+
+            // Act
+            var pertence = conta.UsuarioPertenceConta(idUsuario);
+
+            // Assert
+            pertence.Should().BeTrue();
+        }
+
         #endregion
     }
 }

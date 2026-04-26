@@ -9,6 +9,7 @@ namespace Financ.Domain.Enums.Movimentações
     public enum TipoStatusMovimentacao
     {
         Pendente,
-        Concluido
+        Concluido,
+        Excluido,
     }
 }

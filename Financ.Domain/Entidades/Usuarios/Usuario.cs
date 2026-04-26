@@ -45,6 +45,12 @@ namespace Financ.Domain.Entidades.Usuarios
             UsuariosValidacoes.Verifica(string.IsNullOrWhiteSpace(primeiroNome), MensagensUsuarios.PRIMEIRO_NOME_OBRIGATORIO);
             UsuariosValidacoes.Verifica(string.IsNullOrWhiteSpace(segundoNome), MensagensUsuarios.SEGUNDO_NOME_OBRIGATORIO);
 
+            // Verifica espaços inválidos
+            UsuariosValidacoes.Verifica(primeiroNome.StartsWith(" ") || primeiroNome.EndsWith(" ") || primeiroNome.Contains("  "),
+                MensagensUsuarios.PRIMEIRO_NOME_INVALIDO);
+            UsuariosValidacoes.Verifica(segundoNome.StartsWith(" ") || segundoNome.EndsWith(" ") || segundoNome.Contains("  "),
+                MensagensUsuarios.SEGUNDO_NOME_INVALIDO);
+
             // Verifica comprimento mínimo e máximo
             UsuariosValidacoes.Verifica(primeiroNome.Length > 100, MensagensUsuarios.PRIMEIRO_NOME_MAXIMO);
             UsuariosValidacoes.Verifica(primeiroNome.Length < 3, MensagensUsuarios.PRIMEIRO_NOME_MINIMO);
@@ -58,11 +64,6 @@ namespace Financ.Domain.Entidades.Usuarios
             UsuariosValidacoes.Verifica(!segundoNome.All(c => char.IsLetter(c) || c == '-' || c == '\'' || c == ' '),
                 MensagensUsuarios.SEGUNDO_NOME_INVALIDO);
 
-            // Verifica espaços inválidos
-            UsuariosValidacoes.Verifica(primeiroNome.StartsWith(" ") || primeiroNome.EndsWith(" ") || primeiroNome.Contains("  "),
-                MensagensUsuarios.PRIMEIRO_NOME_INVALIDO);
-            UsuariosValidacoes.Verifica(segundoNome.StartsWith(" ") || segundoNome.EndsWith(" ") || segundoNome.Contains("  "),
-                MensagensUsuarios.SEGUNDO_NOME_INVALIDO);
 
             // Atribuição final
             PrimeiroNome = primeiroNome;

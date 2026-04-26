@@ -38,6 +38,8 @@ namespace Financ.Infra.Data.ConfiguracaoTabelas.ContasBancarias
                    .HasColumnName("Cor")
                    .IsRequired();
             });
+
+            builder.Property(x => x.RowVersion).IsRowVersion();
         }
     }
 }

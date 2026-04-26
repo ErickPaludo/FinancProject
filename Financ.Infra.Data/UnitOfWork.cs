@@ -10,6 +10,7 @@ using Financ.Infra.Data.Repositorios.ContasBancarias;
 using Financ.Infra.Data.Repositorios.Movimentações;
 using Financ.Infra.Data.Repositorios.Segurança;
 using Financ.Infra.Data.Repositorios.Usuarios;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
 
@@ -41,7 +42,14 @@ namespace Financ.Infra.Data
         public ICategoriaRepositorio categoriaRepositorio { get { return _categoriaRepositorio = _categoriaRepositorio ?? new CategoriaRepositorio(_contexto); } }
         public async Task Commit()
         {
-            await _contexto.SaveChangesAsync();
+            try
+            {
+                await _contexto.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw new Exception("Conflito de concorrência. Os dados foram alterados por outro processo.");
+            }
         }
     }
 }

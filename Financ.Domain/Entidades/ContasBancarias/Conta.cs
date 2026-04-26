@@ -22,8 +22,9 @@ namespace Financ.Domain.Entidades.ContasBancarias
         public string Titulo { get; private set; }
         public TiposStatusContas Status { get; private set; }
         public TipoConta TipoConta { get; private set; }
-        public decimal Saldo { get; set; }
+        public decimal Saldo { get; private set; }
         public Cor Cor { get; private set; }
+        public byte[] RowVersion { get; private set; }
         private readonly List<ContaUsuario> _contasUsuarios = new();
         public IReadOnlyCollection<ContaUsuario> ContaUsuarios => _contasUsuarios;
         private readonly List<Convite> _convites = new();
@@ -79,7 +80,7 @@ namespace Financ.Domain.Entidades.ContasBancarias
         }
         public bool UsuarioPertenceConta(string idUsuario)
         {
-            return ContaUsuarios.Any(x => x.IdUsuario == idUsuario && x.Expiracao >= DateTime.UtcNow);
+            return ContaUsuarios.Any(x => x.IdUsuario == idUsuario && x.Expiracao is null || x.Expiracao <= DateTime.UtcNow);
         }
         public void ProcessaMovimentacao(Movimentacao movimentacao)
         {

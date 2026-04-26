@@ -1,68 +1,48 @@
 version: '3.8'
 
 services:
-  caddy:
-    image: caddy:latest
-    container_name: caddy-proxy
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - caddy_data:/data
-      - caddy_config:/config
-    networks:
-      - financ-network
-
   financapi:
     build:
       context: .
       dockerfile: Financ.UI.Api/Dockerfile
     container_name: financ-api
+    ports:
+      - "5000:5000"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:5000
-      - ConnectionStrings:SqlServer=Server=sqlserver;Database=dbfinanc;User Id=sa;Password=F1n4c+P1d22;TrustServerCertificate=True
+      - 'ASPNETCORE_URLS=http://+:5000'
+      - 'ConnectionStrings:SqlServer=Server=sqlserver;Database=dbfinanc;User Id=sa;Password=F1n4c+P1d22;TrustServerCertificate=True'
     depends_on:
       - sqlserver
     restart: on-failure
     networks:
       - financ-network
 
-  ef-migrations:
-    build:
-      context: .
-      dockerfile: Financ.UI.Api/Dockerfile
-      target: build
-    container_name: financ-migrations
-    environment:
-      - ConnectionStrings:SqlServer=Server=sqlserver;Database=dbfinanc;User Id=sa;Password=F1n4c+P1d22;TrustServerCertificate=True
-    depends_on:
-      - sqlserver
-    entrypoint: >
-      bash -c "dotnet tool install --global dotnet-ef &&
-               export PATH=\"$$PATH:/root/.dotnet/tools\" &&
-               dotnet ef database update --project Financ.Infra.Data --startup-project Financ.UI.Api"
-    networks:
-      - financ-network
-
   sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
+    image: 'mcr.microsoft.com/mssql/server:2022-latest'
     container_name: financ-sqlserver
+    ports:
+      - "1433:1433"
     environment:
       - ACCEPT_EULA=Y
       - MSSQL_SA_PASSWORD=F1n4c+P1d22
       - MSSQL_PID=Developer
-    ports:
-      - "0.0.0.0:1433:1433"
     networks:
       - financ-network
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    # Usar network_mode host resolve todos os problemas de comunicação interna
+    network_mode: "host"
+    command: tunnel run --token eyJhIjoiMmI2MzI0NDkxMTFlMzI2MjkyN2Q4ZTU2N2YxOTVmZjIiLCJ0IjoiOGUyZDIwZjgtZDUwYy00NzE3LTlkMjQtMDU3ODM2NzBhYTlmIiwicyI6Ik1HUTROekV4TlRJdFkySTNNQzAwT0dZd0xXSTFNamd0TlROa1pHSTFOV1l6WlRReCJ9
 
 networks:
   financ-network:
     driver: bridge
 
 volumes:
-  caddy_data:
-  caddy_config:
+  sqlserver_data:
