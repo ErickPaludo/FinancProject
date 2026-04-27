@@ -8,5 +8,5 @@ using System.Threading.Tasks;
 
 namespace Financ.Application.DTOs.Movimentações.Get.Filtros
 {
-    public sealed record FiltroRetornoMovimentacao(int? IdMovimentacao,bool? Concluido,TipoMovimentacao? TipoMovimentacao,int? IdCategoria, DateTime DthrMovimentacaoInicial,DateTime DthrMovimentacaoFinal, DateTime? DthrReg);
+    public sealed record FiltroRetornoMovimentacao(int? IdMovimentacao,bool? Concluido,string? Titulo, TipoMovimentacao? TipoMovimentacao, int[]? IdCategoria, DateTime DthrMovimentacaoInicial,DateTime DthrMovimentacaoFinal, DateTime? DthrReg);
 }

@@ -81,6 +81,7 @@ namespace Financ.Application.Mapeamento
                     saidaPendente,
                      contaUsuario.Expiracao.HasValue ? DateTime.SpecifyKind(contaUsuario.Expiracao.Value, DateTimeKind.Utc) : null));
         }
+
         public static BasePost<RetornaContasDTO> ParaDTO(ContaUsuario contaUsuario, FiltroContasUsuarioDTO? filtros)
         {
             return new BasePost<RetornaContasDTO>(

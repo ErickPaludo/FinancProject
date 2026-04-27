@@ -94,8 +94,13 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
 
             queryable = queryable.Where(x => x.IdConta == request.IdConta && x.DthrMovimentacao >= filtro.DthrMovimentacaoInicial && x.DthrMovimentacao <= filtro.DthrMovimentacaoFinal);
 
-            if(1 == 1) //Não retorna movimentacoes excluidas
+            if (1 == 1) //Não retorna movimentacoes excluidas
                 queryable = queryable.Where(x => x.Status != TipoStatusMovimentacao.Excluido);
+
+            if (filtro!.Titulo is not null)
+            {
+                queryable = queryable.Where(x => x.Titulo.Contains(filtro.Titulo));
+            }
 
             if (filtro!.IdMovimentacao.HasValue == true)
             {
@@ -117,12 +122,12 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
 
                 queryable = queryable.Where(x => x.Tipo == tipoMovimentacao);
             }
-            if (filtro!.IdCategoria.HasValue)
+            if (filtro?.IdCategoria?.Any() == true)
             {
-                queryable = queryable.Where(x => x.IdCategoria == filtro!.IdCategoria.Value);
+                queryable = queryable.Where(x => filtro!.IdCategoria.Contains(x.IdCategoria!.Value));
             }
 
-            return await queryable.OrderBy(x => x.DthrMovimentacao).ToListAsync();
+            return await queryable.OrderByDescending(x => x.DthrMovimentacao).ToListAsync();
 
         }
     }

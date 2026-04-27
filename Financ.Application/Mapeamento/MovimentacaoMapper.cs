@@ -35,6 +35,6 @@ ContaUsuarioMapper.ParaUsuarioDTO(movimentacao.ContaUsuarioCriador),
             List<MovimentacaoDTO> listaMovimentacoes = movimentacao?.Select(ParaDTO).ToList() ?? new List<MovimentacaoDTO>();
             return new RetornaMovimentacaoDTO(resumoDTO, listaMovimentacoes);
         }
-
     }
+
 }

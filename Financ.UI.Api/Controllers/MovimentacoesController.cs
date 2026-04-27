@@ -1,4 +1,5 @@
 ﻿using Financ.Application.CQRS.Movimentação.Commands;
+using Financ.Application.CQRS.Movimentação.Handlers;
 using Financ.Application.CQRS.Movimentação.Querys;
 using Financ.Application.DTOs.Movimentações.Get.Filtros;
 using Financ.Application.DTOs.Movimentações.Patch;
@@ -46,6 +47,14 @@ namespace Financ.UI.Api.Controllers
         public async Task<IActionResult> RetornaMovimentacao(int idConta, [FromQuery] FiltroRetornoMovimentacao filtro)
         {
             var movimentacao = await _mediator.Send(new RetornaMovimentacaoQuery(User.RetornaIdUsuario(), idConta,filtro));
+
+            return movimentacao.RetornoAutomatico();
+        }
+
+        [HttpGet("/api/Contas/{idConta}/[controller]/Dash")]
+        public async Task<IActionResult> RetornaMovimentacaoDash(int idConta)
+        {
+            var movimentacao = await _mediator.Send(new DashMovimentacoesTotaisCommand(idConta, User.RetornaIdUsuario()));
 
             return movimentacao.RetornoAutomatico();
         }
