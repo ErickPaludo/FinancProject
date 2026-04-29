@@ -33,7 +33,7 @@ namespace Financ.Domain.Entidades.ContasBancarias
 
         public void AddUsuario(ContaUsuario usuario) => _contasUsuarios.Add(usuario);
         public void AddConvite(Convite convite) => _convites.Add(convite);
-        public Conta(int id, string titulo, string cor)
+        public Conta(int id, string titulo, string cor, bool favorito = false)
         {
             ValidaTitulo(titulo);
             ContaPadrao();
@@ -91,7 +91,6 @@ namespace Financ.Domain.Entidades.ContasBancarias
                 Saldo = movimentacao.Tipo.Equals(TipoMovimentacao.Entrada) ? Saldo + movimentacao.Valor : Saldo - movimentacao.Valor;
             }
         }
-
         public void ProcessaExtornoMovimentacao(Movimentacao movimentacao)
         {
             ContasValidacao.Verifica(!movimentacao.Extorno, MensagensContas.NAO_PODE_PROCESSAR_MOVIMENTACAO_SEM_EXTORNO);

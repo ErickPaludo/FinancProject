@@ -52,6 +52,7 @@ namespace Financ.Application.Mapeamento
                 listaContas.Add(new RetornaContasDTO(
                     contaUsuario.Conta!.Id,
                     contaUsuario.Conta.Titulo!,
+                    contaUsuario.ContaFavorita,
                     contaUsuario.Conta!.Cor.Valor,
                     contaUsuario.Conta.Status,
                     contaUsuario.Conta.Saldo,
@@ -63,7 +64,30 @@ namespace Financ.Application.Mapeamento
 
             return new BaseGetList<RetornaContasDTO>(listaContas, new Meta { tamanho = listaContas.Count, filtros = filtros });
         }
-        public static BasePost<RetornaContasDTO> ParaDTO(ContaUsuario contaUsuario, IEnumerable<Movimentacao> movimentacaos, FiltroContasUsuarioDTO? filtros)
+
+        public static BaseGet<RetornaContasDTO> ParaGetDTO(ContaUsuario contaUsuario, IEnumerable<Movimentacao> movimentacaos)
+        {
+          
+                decimal entradaPendente = movimentacaos.Where(m => m.IdConta == contaUsuario.Conta.Id && m.Tipo == TipoMovimentacao.Entrada).Sum(m => m.Valor);
+                decimal saidaPendente = movimentacaos.Where(m => m.IdConta == contaUsuario.Conta.Id && m.Tipo == TipoMovimentacao.Saida).Sum(m => m.Valor);
+                decimal saldoProjetado = contaUsuario.Conta.Saldo + entradaPendente - saidaPendente;
+
+               RetornaContasDTO dto = new RetornaContasDTO(
+                    contaUsuario.Conta!.Id,
+                    contaUsuario.Conta.Titulo!,
+                    contaUsuario.ContaFavorita,
+                    contaUsuario.Conta!.Cor.Valor,
+                    contaUsuario.Conta.Status,
+                    contaUsuario.Conta.Saldo,
+                    saldoProjetado,
+                    entradaPendente,
+                    saidaPendente,
+                    contaUsuario.Expiracao.HasValue ? DateTime.SpecifyKind(contaUsuario.Expiracao.Value, DateTimeKind.Utc):null);
+            
+
+            return new BaseGet<RetornaContasDTO>(dto);
+        }
+        public static BasePost<RetornaContasDTO> ParaPostDTO(ContaUsuario contaUsuario, IEnumerable<Movimentacao> movimentacaos)
         {
             decimal entradaPendente = movimentacaos.Where(m => m.IdConta == contaUsuario.Conta.Id && m.Tipo == TipoMovimentacao.Entrada).Sum(m => m.Valor);
             decimal saidaPendente = movimentacaos.Where(m => m.IdConta == contaUsuario.Conta.Id && m.Tipo == TipoMovimentacao.Saida).Sum(m => m.Valor);
@@ -73,6 +97,7 @@ namespace Financ.Application.Mapeamento
                new RetornaContasDTO(
                     contaUsuario.Conta!.Id,
                     contaUsuario.Conta.Titulo!,
+                    contaUsuario.ContaFavorita,
                     contaUsuario.Conta!.Cor.Valor,
                     contaUsuario.Conta.Status,
                     contaUsuario.Conta.Saldo,
@@ -88,6 +113,7 @@ namespace Financ.Application.Mapeamento
                 new RetornaContasDTO(
                     contaUsuario.Conta!.Id,
                     contaUsuario.Conta.Titulo!,
+                    contaUsuario.ContaFavorita,
                     contaUsuario.Conta!.Cor.Valor,
                     contaUsuario.Conta.Status,
                     contaUsuario.Conta.Saldo,

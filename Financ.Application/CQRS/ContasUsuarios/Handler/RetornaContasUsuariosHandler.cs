@@ -5,6 +5,7 @@ using Financ.Application.DTOs.ContasUsuarios.Get;
 using Financ.Application.Mapeamento;
 using Financ.Domain.Entidades.ContasBancarias;
 using Financ.Domain.Entidades.Movimentações;
+using Financ.Domain.Enums.ContasBancarias;
 using Financ.Domain.Enums.Movimentações;
 using Financ.Domain.Interfaces;
 using NetDevPack.SimpleMediator;
@@ -24,8 +25,7 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
         {
             var contasUsuarios = await ContasUsuariosSelecionadas(request);
             var idsContas = contasUsuarios.Select(c => c.Conta.Id).ToList();
-            var movimentacoes = await _unitOfWork.movimentacaoRepositorio.BuscarPorCondicao(m => idsContas.Contains(m.IdConta) && m.Status == TipoStatusMovimentacao.Pendente
-);
+            var movimentacoes = await _unitOfWork.movimentacaoRepositorio.BuscarPorCondicao(m => idsContas.Contains(m.IdConta) && m.Status == TipoStatusMovimentacao.Pendente);
             if (contasUsuarios.Count() == 0)
                 return Resultado<BaseGetList<RetornaContasDTO>>.GeraFalha(Falha.NaoEncontrado("Nenhuma conta foi encontrada!"));
 
@@ -41,13 +41,13 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
             var possuiFiltros = filtros.Filtros != null;
 
             var contasUsuario = await _unitOfWork.contasUsuariosRepositorio.ObterContasDoUsuario(
-                x => x.IdUsuario == filtros.IdUsuario
+                x => x.IdUsuario == filtros.IdUsuario && x.Status == TipoStatusContasUsuario.Ativo
                 && (!possuiFiltros || (
                     (!filtroId.HasValue || x.IdConta == filtroId.Value) &&
                     (string.IsNullOrEmpty(filtroTitulo) || x.Conta!.Titulo!.Contains(filtroTitulo)) &&
                     (!filtroStatus.HasValue || x.Conta!.Status == filtroStatus.Value)))
             );
-            return contasUsuario.OrderByDescending(x => x.Id);
+            return contasUsuario.OrderByDescending(x => x.ContaFavorita).ThenByDescending(x => x.DthrReg).ToList();
         }
     }
 }

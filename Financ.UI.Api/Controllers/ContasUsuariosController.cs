@@ -1,5 +1,6 @@
 ﻿using Financ.Application.CQRS.Contas_Usuarios.Commands;
 using Financ.Application.CQRS.Contas_Usuarios.Querys;
+using Financ.Application.CQRS.ContasUsuarios.Commands;
 using Financ.Application.DTOs.Autenticação.Post;
 using Financ.Application.DTOs.ContasUsuarios.Get.Filtros;
 using Financ.Application.DTOs.ContasUsuarios.Patch;
@@ -62,6 +63,13 @@ namespace Financ.UI.Api.Controllers
         {
             var convite = await _mediator.Send(new RemoveContaUsuarioCommand(User.RetornaIdUsuario(),contaUsuarioDTO.idUsuarioDestinatario,idConta));
             return convite.RetornoAutomatico();
+        }
+
+        [HttpPost("{idConta}/Favorita")]
+        public async Task<IActionResult> ContaFavorita([FromRoute] int idConta)
+        {
+            var conta = await _mediator.Send(new FavoritaContaUsuarioCommand(idConta, User.RetornaIdUsuario()));
+            return conta.RetornoAutomatico();
         }
     }
 }

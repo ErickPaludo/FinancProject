@@ -18,5 +18,5 @@ namespace Financ.Application.CQRS.Contas_Commands
           TiposStatusContas? Status,
           string? Titulo,
           string? Cor
-      ) : IRequest<Resultado<BasePost<RetornaContasDTO>>>;
+      ) : IRequest<Resultado<BaseGet<RetornaContasDTO>>>;
 }

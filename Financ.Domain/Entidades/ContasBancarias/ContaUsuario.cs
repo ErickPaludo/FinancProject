@@ -20,6 +20,7 @@ namespace Financ.Domain.Entidades.ContasBancarias
         public TiposAcessos Acesso { get; private set; }
         public TipoStatusContasUsuario Status { get; private set; }
         public DateTime? Expiracao { get; private set; }
+        public bool ContaFavorita { get; private set; } = false;
         public Usuario Usuario { get; private set; }
 
         public Conta Conta { get; private set; }
@@ -39,7 +40,6 @@ namespace Financ.Domain.Entidades.ContasBancarias
             DthrReg = DateTime.UtcNow; ValidaEnums(acesso, status);
             Status = status.HasValue ? status.Value : TipoStatusContasUsuario.Ativo;
             Acesso = acesso;
-
         }
         public ContaUsuario(Convite convite)
         {
@@ -49,7 +49,6 @@ namespace Financ.Domain.Entidades.ContasBancarias
             IdUsuario = convite.IdUsuarioDestinatario;
             DthrReg = DateTime.UtcNow;
             ValidaEnums(convite.Acesso, null);
-
 
             Acesso = convite.Acesso;
 
@@ -177,6 +176,11 @@ namespace Financ.Domain.Entidades.ContasBancarias
             {
                 Expiracao = null;
             }
+        }
+        public void FavoritarConta()
+        {
+            ContaFavorita = !ContaFavorita;
+            DthrReg = DateTime.UtcNow;
         }
         #endregion
 

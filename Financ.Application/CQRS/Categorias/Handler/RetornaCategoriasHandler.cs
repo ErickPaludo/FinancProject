@@ -35,7 +35,7 @@ namespace Financ.Application.CQRS.Categorias.Handler
                 return Resultado<BaseGetList<CategoriaDTO>>.GeraFalha(Falha.ErroOperacional("Usuário não pertence a está conta."));
 
             var categorias = await _unitOfWork.categoriaRepositorio.BuscarPorCondicao(x => x.IdConta == request.IdConta);
-            return Resultado<BaseGetList<CategoriaDTO>>.GeraSucesso(new BaseGetList<CategoriaDTO>(CategoriaMapper.ParaListDTO(categorias)));
+            return Resultado<BaseGetList<CategoriaDTO>>.GeraSucesso(new BaseGetList<CategoriaDTO>(CategoriaMapper.ParaListDTO(categorias.OrderBy(x => x.Nome))));
         }
     }
 }

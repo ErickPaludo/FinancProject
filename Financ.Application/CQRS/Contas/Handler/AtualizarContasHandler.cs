@@ -4,6 +4,7 @@ using Financ.Application.DTOs.Base;
 using Financ.Application.DTOs.ContasUsuarios.Get;
 using Financ.Application.Mapeamento;
 using Financ.Domain.Entidades.ContasBancarias;
+using Financ.Domain.Entidades.Movimentações;
 using Financ.Domain.Enums;
 using Financ.Domain.Enums.Movimentações;
 using Financ.Domain.Interfaces;
@@ -16,21 +17,21 @@ using System.Text;
 using System.Threading.Tasks;
 namespace Financ.Application.CQRS.Contas_.Handler
 {
-    public class AtualizarContasHandler : IRequestHandler<AtualizarContaCommand, Resultado<BasePost<RetornaContasDTO>>>
+    public class AtualizarContasHandler : IRequestHandler<AtualizarContaCommand, Resultado<BaseGet<RetornaContasDTO>>>
     {
         private readonly IUnitOfWork _unitOfWork;
         public AtualizarContasHandler(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
-        public async Task<Resultado<BasePost<RetornaContasDTO>>> Handle(AtualizarContaCommand request, CancellationToken cancellationToken)
+        public async Task<Resultado<BaseGet<RetornaContasDTO>>> Handle(AtualizarContaCommand request, CancellationToken cancellationToken)
         {
             try
             {
                 Conta? conta = await _unitOfWork.contasRepositorio.BuscarContaComUsuariosEConvintes(x => x.Id == request.IdConta);
 
                 if (conta is null)
-                    return Resultado<BasePost<RetornaContasDTO>>.GeraFalha(Falha.NaoEncontrado("Conta não encontrada."));
+                    return Resultado<BaseGet<RetornaContasDTO>>.GeraFalha(Falha.NaoEncontrado("Conta não encontrada."));
 
                 ContaUsuario? contaUsuario = conta.ContaUsuarios.FirstOrDefault(x => x.IdUsuario == request.IdUsuario);
 
@@ -39,13 +40,13 @@ namespace Financ.Application.CQRS.Contas_.Handler
                 _unitOfWork.contasRepositorio.Atualiza(conta);
                 await _unitOfWork.Commit();
 
-                var movimentacoes = await _unitOfWork.movimentacaoRepositorio.BuscarPorCondicao(m => m.IdConta == request.IdConta && m.Status == TipoStatusMovimentacao.Pendente);
+                IEnumerable<Movimentacao> movimentacoes = await _unitOfWork.movimentacaoRepositorio.BuscarPorCondicao(m => m.IdConta == request.IdConta && m.Status == TipoStatusMovimentacao.Pendente);
 
-                return Resultado<BasePost<RetornaContasDTO>>.GeraSucesso(ContaUsuarioMapper.ParaDTO(contaUsuario!,movimentacoes, null));
+                return Resultado<BaseGet<RetornaContasDTO>>.GeraSucesso(ContaUsuarioMapper.ParaGetDTO(contaUsuario,movimentacoes));
             }
             catch (ContasValidacao contasExecao)
             {
-                return Resultado<BasePost<RetornaContasDTO>>.GeraFalha(Falha.ErroOperacional(contasExecao.Message));
+                return Resultado<BaseGet<RetornaContasDTO>>.GeraFalha(Falha.ErroOperacional(contasExecao.Message));
             }
         }
     }
