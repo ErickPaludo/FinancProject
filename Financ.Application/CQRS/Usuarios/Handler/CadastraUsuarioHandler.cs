@@ -32,6 +32,9 @@ namespace Financ.Application.CQRS.Usuarios.Handler
                 if (await _unitOfWork.usuariosRepostorio.ExisteId(x => x.Email == request.Email))
                     return Resultado<string>.GeraFalha(Falha.ErroOperacional("Já existe um usuário cadastrado com esse e-mail."));
 
+                if(request.Senha != request.ConfirmarSenha)
+                    return Resultado<string>.GeraFalha(Falha.ErroOperacional("A senha e a confirmação de senha não coincidem.")); //Não é bom validar nessa camada, deverá alterar futuramente
+
                 var converteSenha = _passService.CriaSenhaArgon(request.Senha);
                 Usuario usuario = new Usuario(request.PrimeiroNome, request.SegundoNome, request.Email, converteSenha.salt, converteSenha.hash);
                 await _unitOfWork.usuariosRepostorio.Adicionar(usuario);

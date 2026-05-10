@@ -25,7 +25,7 @@ namespace Financ.UI.Api.Controllers
         [HttpPost("/api/Contas/{idConta}/[controller]")]
         public async Task<IActionResult> CriarMovimentacao(int idConta,CriaMovimentacaoDTO movimentacaoDTO)
         {
-            var movimentacao = await _mediator.Send(new CriaMovimentacaoCommand(idConta,User.RetornaIdUsuario(),movimentacaoDTO.idCategoria, movimentacaoDTO.tipo, movimentacaoDTO.valor, movimentacaoDTO.concluido, movimentacaoDTO.titulo, movimentacaoDTO.observacao, movimentacaoDTO.dthrMovimentacao, movimentacaoDTO.dthrConclusao));
+            var movimentacao = await _mediator.Send(new CriaMovimentacaoCommand(idConta,User.RetornaIdUsuario(),null,movimentacaoDTO.IdsCategoria, movimentacaoDTO.tipo, movimentacaoDTO.valor, movimentacaoDTO.concluido, movimentacaoDTO.titulo, movimentacaoDTO.observacao, movimentacaoDTO.dthrMovimentacao, movimentacaoDTO.dthrConclusao));
 
             return movimentacao.RetornoAutomatico();
         }

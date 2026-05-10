@@ -4,6 +4,7 @@ using Financ.Infra.Data.Contexto;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Financ.Infra.Data.Migrations
 {
     [DbContext(typeof(AppContextoData))]
-    partial class AppContextoDataModelSnapshot : ModelSnapshot
+    [Migration("20260508193031_TabelaDeLinhasMovCategorias")]
+    partial class TabelaDeLinhasMovCategorias
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -68,6 +71,9 @@ namespace Financ.Infra.Data.Migrations
 
                     b.Property<int>("Acesso")
                         .HasColumnType("int");
+
+                    b.Property<bool>("ContaFavorita")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("DthrReg")
                         .HasColumnType("datetime2");
@@ -182,6 +188,9 @@ namespace Financ.Infra.Data.Migrations
                     b.Property<DateTime>("DthrReg")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("IdCategoria")
+                        .HasColumnType("int");
+
                     b.Property<int>("IdConta")
                         .HasColumnType("int");
 
@@ -213,6 +222,8 @@ namespace Financ.Infra.Data.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("IdCategoria");
 
                     b.HasIndex("IdConta");
 
@@ -405,6 +416,11 @@ namespace Financ.Infra.Data.Migrations
 
             modelBuilder.Entity("Financ.Domain.Entidades.Movimentações.Movimentacao", b =>
                 {
+                    b.HasOne("Financ.Domain.Entidades.Movimentações.Categoria", "Categoria")
+                        .WithMany()
+                        .HasForeignKey("IdCategoria")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("Financ.Domain.Entidades.ContasBancarias.Conta", "Conta")
                         .WithMany()
                         .HasForeignKey("IdConta")
@@ -422,6 +438,8 @@ namespace Financ.Infra.Data.Migrations
                         .HasForeignKey("IdUsuarioExecutor")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.Navigation("Categoria");
+
                     b.Navigation("Conta");
 
                     b.Navigation("ContaUsuarioCriador");
@@ -438,7 +456,7 @@ namespace Financ.Infra.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("Financ.Domain.Entidades.Movimentações.Movimentacao", "Movimentacao")
-                        .WithMany("CategoriasMovimentacao")
+                        .WithMany()
                         .HasForeignKey("IdMovimentacao")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -464,11 +482,6 @@ namespace Financ.Infra.Data.Migrations
                     b.Navigation("ContaUsuarios");
 
                     b.Navigation("Convites");
-                });
-
-            modelBuilder.Entity("Financ.Domain.Entidades.Movimentações.Movimentacao", b =>
-                {
-                    b.Navigation("CategoriasMovimentacao");
                 });
 #pragma warning restore 612, 618
         }

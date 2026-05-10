@@ -37,16 +37,24 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
 
                 ContaUsuario? contasUsuario = conta.ContaUsuarios.FirstOrDefault(u => u.IdUsuario == request.idUsuario);
 
-                Categoria? categoria = await _unitOfWork.categoriaRepositorio.BuscarObjetoUnico(c => c.Id == request.idCategoria && c.IdConta == request.idConta);
-
-                if(request.idCategoria is not null && categoria is null)
-                    return Resultado<BasePost<MovimentacaoDTO>>.GeraFalha(Falha.NaoEncontrado("Categoria não encontrada"));
-
-                Movimentacao movimentacao = new Movimentacao(request.tipo, contasUsuario, categoria, request.valor, request.titulo, request.observacao, request.dthrMovimentacao, request.dthrConclusao, request.concluido);
-
-                conta.ProcessaMovimentacao(movimentacao);
+                Movimentacao movimentacao = new Movimentacao(request.tipo, contasUsuario, request.valor, request.titulo, request.observacao, request.dthrMovimentacao, request.dthrConclusao, request.concluido);
 
                 await _unitOfWork.movimentacaoRepositorio.Adicionar(movimentacao);
+
+                if (request.IdsCategoria is not null)
+                {
+                    foreach (var idCategoria in request.IdsCategoria)
+                    {
+                        Categoria? categoria = await _unitOfWork.categoriaRepositorio.BuscarObjetoUnico(c => c.Id == idCategoria && c.IdConta == request.idConta);
+                        if (categoria is null)
+                            return Resultado<BasePost<MovimentacaoDTO>>.GeraFalha(Falha.NaoEncontrado($"Categoria com id {idCategoria} não encontrada"));
+
+                        MovimentacaoCategoria movimentacaoCategoria = new MovimentacaoCategoria(movimentacao, categoria);
+                        movimentacao.AdicionarCategoria(movimentacaoCategoria);
+                        await _unitOfWork.movimentacaoCategoriaRepositorio.Adicionar(movimentacaoCategoria);
+                    }
+                }
+
                 _unitOfWork.contasRepositorio.Atualiza(conta);
                 await _unitOfWork.Commit();
 

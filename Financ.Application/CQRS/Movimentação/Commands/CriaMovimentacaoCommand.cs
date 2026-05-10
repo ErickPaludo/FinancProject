@@ -11,5 +11,5 @@ using System.Threading.Tasks;
 
 namespace Financ.Application.CQRS.Movimentação.Commands
 {
-    public record CriaMovimentacaoCommand(int idConta, string idUsuario, int? idCategoria, TipoMovimentacao tipo, decimal valor, bool concluido, string titulo, string? observacao, DateTime? dthrMovimentacao, DateTime? dthrConclusao) : IRequest<Resultado<BasePost<MovimentacaoDTO>>>;
+    public record CriaMovimentacaoCommand(int idConta, string idUsuario, int? idCategoria, int[]? IdsCategoria, TipoMovimentacao tipo, decimal valor, bool concluido, string titulo, string? observacao, DateTime? dthrMovimentacao, DateTime? dthrConclusao) : IRequest<Resultado<BasePost<MovimentacaoDTO>>>;
 }

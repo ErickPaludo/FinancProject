@@ -26,6 +26,7 @@ namespace Financ.Infra.Data
         private IAutenticacoesRepositorio _autenticacoesRepositorio;
         private IMovimentacaoRepositorio _movimentacaoRepositorio;
         private ICategoriaRepositorio _categoriaRepositorio;
+        private IMovimentacaoCategoriaRepositorio _movimentacaoCategoriaRepositorio;
 
         private readonly IConfiguration _configuration;
         public UnitOfWork(AppContextoData contexto, IConfiguration configuration)
@@ -40,6 +41,7 @@ namespace Financ.Infra.Data
         public IAutenticacoesRepositorio autenticacoesRepositorio { get { return _autenticacoesRepositorio = _autenticacoesRepositorio ?? new AutenticacoesRepositorio(_contexto); } }
         public IMovimentacaoRepositorio movimentacaoRepositorio { get { return _movimentacaoRepositorio = _movimentacaoRepositorio ?? new MovimentacaoRepositorio(_contexto); } }
         public ICategoriaRepositorio categoriaRepositorio { get { return _categoriaRepositorio = _categoriaRepositorio ?? new CategoriaRepositorio(_contexto); } }
+        public IMovimentacaoCategoriaRepositorio movimentacaoCategoriaRepositorio { get { return _movimentacaoCategoriaRepositorio = _movimentacaoCategoriaRepositorio ?? new MovimentacaoCategoriaRepositorio(_contexto); } }
         public async Task Commit()
         {
             try

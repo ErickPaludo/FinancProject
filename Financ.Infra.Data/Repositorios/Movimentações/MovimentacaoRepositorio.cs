@@ -31,7 +31,8 @@ namespace Financ.Infra.Data.Repositorios.Movimentações
         public IQueryable<Movimentacao> BuscaMovimentacaoComContasUsuarios()
         {
             return _contexto.Movimentacao
-                           .Include(c => c.Categoria)
+                           .Include(mc => mc.CategoriasMovimentacao)
+                            .ThenInclude(c => c.Categoria)
                            .Include(u => u.ContaUsuarioCriador).ThenInclude(u => u.Usuario)
                            .Include(u => u.ContaUsuarioExecutor).ThenInclude(u => u!.Usuario)
                            .Include(c => c.Conta.ContaUsuarios);

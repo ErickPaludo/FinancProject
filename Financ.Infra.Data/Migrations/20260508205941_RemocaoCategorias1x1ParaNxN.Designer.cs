@@ -4,6 +4,7 @@ using Financ.Infra.Data.Contexto;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Financ.Infra.Data.Migrations
 {
     [DbContext(typeof(AppContextoData))]
-    partial class AppContextoDataModelSnapshot : ModelSnapshot
+    [Migration("20260508205941_RemocaoCategorias1x1ParaNxN")]
+    partial class RemocaoCategorias1x1ParaNxN
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -68,6 +71,9 @@ namespace Financ.Infra.Data.Migrations
 
                     b.Property<int>("Acesso")
                         .HasColumnType("int");
+
+                    b.Property<bool>("ContaFavorita")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("DthrReg")
                         .HasColumnType("datetime2");
@@ -438,7 +444,7 @@ namespace Financ.Infra.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("Financ.Domain.Entidades.Movimentações.Movimentacao", "Movimentacao")
-                        .WithMany("CategoriasMovimentacao")
+                        .WithMany()
                         .HasForeignKey("IdMovimentacao")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -464,11 +470,6 @@ namespace Financ.Infra.Data.Migrations
                     b.Navigation("ContaUsuarios");
 
                     b.Navigation("Convites");
-                });
-
-            modelBuilder.Entity("Financ.Domain.Entidades.Movimentações.Movimentacao", b =>
-                {
-                    b.Navigation("CategoriasMovimentacao");
                 });
 #pragma warning restore 612, 618
         }

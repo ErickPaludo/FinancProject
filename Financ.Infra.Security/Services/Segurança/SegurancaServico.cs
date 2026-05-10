@@ -24,7 +24,6 @@ namespace Financ.Application.Services.Segurança
         }
         public (string salt, string hash) CriaSenhaArgon(string senha, string? salt = null)
         {
-
             ValidaNivelDeSegurancaSenha(senha);
             byte[] senhaBytes = Encoding.UTF8.GetBytes(senha);
 
