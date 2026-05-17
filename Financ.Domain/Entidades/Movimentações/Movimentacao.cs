@@ -106,7 +106,7 @@ namespace Financ.Domain.Entidades.Movimentações
             Extorno = Status is TipoStatusMovimentacao.Concluido ? true : false;
             Status = Extorno ? TipoStatusMovimentacao.Excluido : Status;
         }
-        public void AlterarMovimentacao(ContaUsuario? contaUsuario, decimal? valor, TipoMovimentacao? tipo, string? titulo, string? observacao, int? idCategoria, Categoria? categoria, DateTime? dthrMovimentacao, DateTime? dthrConclusao)
+        public void AlterarMovimentacao(ContaUsuario? contaUsuario, decimal? valor, TipoMovimentacao? tipo, string? titulo, string? observacao, DateTime? dthrMovimentacao, DateTime? dthrConclusao)
         {
             ValidaContaUsuario(contaUsuario);
             ValidaConta(contaUsuario!.Conta);
@@ -120,11 +120,7 @@ namespace Financ.Domain.Entidades.Movimentações
             {
                 ValidaObservacao(observacao);
                 Observacao = observacao;
-            }
-            if (idCategoria is not null)
-            {
-                MovimentacaoValidacao.Verifica(categoria is null || categoria!.Conta != Conta, MensagemMovimentacao.CATEGORIA_NAO_PERTENCA_A_CONTA);
-            }
+            }   
             if (dthrMovimentacao is not null)
             {
                 DthrMovimentacao = dthrMovimentacao.Value;
@@ -150,6 +146,10 @@ namespace Financ.Domain.Entidades.Movimentações
                 MovimentacaoValidacao.Verifica(Status is TipoStatusMovimentacao.Concluido, MensagemMovimentacao.NAO_PODE_ALTERAR_TIPO_DE_MOVIMENTACAO_CONCLUIDA);
                 Tipo = tipo.Value;
             }
+        }
+        public void AlteraCategoriaMovimentacao(ContaUsuario? contaUsuario)
+        {
+            ValidaContaUsuario(contaUsuario);
         }
         #endregion
         #region Metodos Privados
@@ -186,10 +186,6 @@ namespace Financ.Domain.Entidades.Movimentações
         private void ValidaConta(Conta? conta)
         {
             MovimentacaoValidacao.Verifica(conta is null, MensagemMovimentacao.CONTA_NAO_ENCONTRADA);
-        }
-        private void ValidaCategoria(Categoria? categoria, Conta conta)
-        {
-            MovimentacaoValidacao.Verifica(categoria is not null && categoria!.Conta != conta, MensagemMovimentacao.CATEGORIA_NAO_PERTENCA_A_CONTA);
         }
         private void ValidaValor(decimal valor)
         {

@@ -16,7 +16,6 @@ namespace Financ.Application.CQRS.Movimentação.Commands
         string idUsuario,
         string? titulo,
         string? observacao,
-        int? idCategoria,
         TipoMovimentacao? tipo,
         decimal? valor,
         DateTime? dthrMovimentacao,

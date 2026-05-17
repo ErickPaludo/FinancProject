@@ -54,7 +54,7 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
                         await _unitOfWork.movimentacaoCategoriaRepositorio.Adicionar(movimentacaoCategoria);
                     }
                 }
-
+                conta.ProcessaMovimentacao(movimentacao);
                 _unitOfWork.contasRepositorio.Atualiza(conta);
                 await _unitOfWork.Commit();
 
