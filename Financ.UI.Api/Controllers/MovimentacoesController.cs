@@ -1,6 +1,7 @@
 ﻿using Financ.Application.CQRS.Movimentação.Commands;
 using Financ.Application.CQRS.Movimentação.Handlers;
 using Financ.Application.CQRS.Movimentação.Querys;
+using Financ.Application.DTOs.ContasUsuarios.Put;
 using Financ.Application.DTOs.Movimentações.Get.Filtros;
 using Financ.Application.DTOs.Movimentações.Patch;
 using Financ.Application.DTOs.Movimentações.Post;
@@ -25,7 +26,7 @@ namespace Financ.UI.Api.Controllers
         [HttpPost("/api/Contas/{idConta}/[controller]")]
         public async Task<IActionResult> CriarMovimentacao(int idConta,CriaMovimentacaoDTO movimentacaoDTO)
         {
-            var movimentacao = await _mediator.Send(new CriaMovimentacaoCommand(idConta,User.RetornaIdUsuario(),movimentacaoDTO.idCategoria, movimentacaoDTO.tipo, movimentacaoDTO.valor, movimentacaoDTO.concluido, movimentacaoDTO.titulo, movimentacaoDTO.observacao, movimentacaoDTO.dthrMovimentacao, movimentacaoDTO.dthrConclusao));
+            var movimentacao = await _mediator.Send(new CriaMovimentacaoCommand(idConta,User.RetornaIdUsuario(),null,movimentacaoDTO.IdsCategoria, movimentacaoDTO.tipo, movimentacaoDTO.valor, movimentacaoDTO.concluido, movimentacaoDTO.titulo, movimentacaoDTO.observacao, movimentacaoDTO.dthrMovimentacao, movimentacaoDTO.dthrConclusao));
 
             return movimentacao.RetornoAutomatico();
         }
@@ -66,12 +67,18 @@ namespace Financ.UI.Api.Controllers
                 User.RetornaIdUsuario(),
                 movimentacaoDTO.titulo,
                 movimentacaoDTO.observacao,
-                movimentacaoDTO.idCategoria,
                 movimentacaoDTO.tipo,
                 movimentacaoDTO.valor,
                 movimentacaoDTO.dthrMovimentacao,
                 movimentacaoDTO.dthrConclusao));
 
+            return movimentacao.RetornoAutomatico();
+        }
+
+        [HttpPut("{idMovimentacao}/Alterar/Categoria")]
+        public async Task<IActionResult> AlterarCategoriaMovimentacao(int idMovimentacao, AlterarMovimentacaoCategoriaDTO movimentacaoDTO)
+        {
+            var movimentacao = await _mediator.Send(new AlterarCategoriaMovimentacaoCommand(idMovimentacao, User.RetornaIdUsuario(), movimentacaoDTO.categorias));
             return movimentacao.RetornoAutomatico();
         }
         [HttpDelete("{idMovimentacao}/Remover")]

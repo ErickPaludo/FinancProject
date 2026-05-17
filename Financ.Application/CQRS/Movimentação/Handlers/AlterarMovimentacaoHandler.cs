@@ -38,9 +38,8 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
 
                 ContaUsuario? contaUsuario = await _unitOfWork.contasUsuariosRepositorio.ObterContaUsuarioComUsuario().FirstOrDefaultAsync(cu => cu.IdConta == movimentacao.IdConta && cu.IdUsuario == request.idUsuario);
 
-                Categoria? categoria = await _unitOfWork.categoriaRepositorio.BuscarObjetoUnico(x => x.Id == request.idCategoria);
 
-                movimentacao.AlterarMovimentacao(contaUsuario,request.valor,request.tipo,request.titulo,request.observacao,request.idCategoria, categoria,request.dthrMovimentacao,request.dthrConclusao);
+                movimentacao.AlterarMovimentacao(contaUsuario,request.valor,request.tipo,request.titulo,request.observacao,request.dthrMovimentacao,request.dthrConclusao);
 
                 _unitOfWork.movimentacaoRepositorio.Atualiza(movimentacao);
                 await _unitOfWork.Commit();

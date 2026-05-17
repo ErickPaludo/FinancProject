@@ -28,11 +28,12 @@ namespace Financ.Application.Mapeamento
             movimentacao.DthrConclusao.HasValue ? DateTime.SpecifyKind(movimentacao.DthrConclusao.Value, DateTimeKind.Utc) : null,
 ContaUsuarioMapper.ParaUsuarioDTO(movimentacao.ContaUsuarioCriador),
             (movimentacao.ContaUsuarioExecutor is null ? null : ContaUsuarioMapper.ParaUsuarioDTO(movimentacao.ContaUsuarioExecutor)),
-            (movimentacao.IdCategoria is null || movimentacao.Categoria is null) ? null : CategoriaMapper.ParaDTO(movimentacao.Categoria));
+            movimentacao.CategoriasMovimentacao is not null ? movimentacao.CategoriasMovimentacao.Select(mc => CategoriaMapper.ParaDTO(mc.Categoria)).ToList() : null
+            );
         }
         public static RetornaMovimentacaoDTO ParaDTO(ResumoMovimentacoesDTO resumoDTO, IEnumerable<Movimentacao>? movimentacao)
         {
-            List<MovimentacaoDTO> listaMovimentacoes = movimentacao?.Select(ParaDTO).ToList() ?? new List<MovimentacaoDTO>();
+            List<MovimentacaoDTO> listaMovimentacoes = movimentacao?.Select(m => ParaDTO(m)).ToList() ?? new List<MovimentacaoDTO>();
             return new RetornaMovimentacaoDTO(resumoDTO, listaMovimentacoes);
         }
     }

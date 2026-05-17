@@ -19,6 +19,7 @@ namespace Financ.Domain.Interfaces
         IAutenticacoesRepositorio autenticacoesRepositorio { get; }
         IMovimentacaoRepositorio movimentacaoRepositorio { get; }
         ICategoriaRepositorio categoriaRepositorio { get; }
+        IMovimentacaoCategoriaRepositorio movimentacaoCategoriaRepositorio { get; }
         Task Commit();
     }
 }

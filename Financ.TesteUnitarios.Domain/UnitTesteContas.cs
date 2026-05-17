@@ -25,7 +25,7 @@ namespace Financ.TesteUnitarios.Domain
 
         private Movimentacao CriarMovimentacao(TipoMovimentacao tipo, decimal valor, ContaUsuario usuario, bool concluido = true)
         {
-            return new Movimentacao(tipo, usuario, null, valor, "Teste", null, DateTime.UtcNow, concluido ? DateTime.UtcNow : null, concluido);
+            return new Movimentacao(tipo, usuario, valor, "Teste", null, DateTime.UtcNow, concluido ? DateTime.UtcNow : null, concluido);
         }
 
         #region Construtor

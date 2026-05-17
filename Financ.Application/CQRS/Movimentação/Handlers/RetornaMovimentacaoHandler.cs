@@ -124,7 +124,10 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
             }
             if (filtro?.IdCategoria?.Any() == true)
             {
-                queryable = queryable.Where(x => filtro!.IdCategoria.Contains(x.IdCategoria!.Value));
+                queryable = queryable.Where(x => x.CategoriasMovimentacao.Any(mc => filtro!.IdCategoria.Contains(mc.IdCategoria)))
+                     .Include(x => x.CategoriasMovimentacao
+                     .Where(mc => filtro.IdCategoria.Contains(mc.IdCategoria)))
+                     .ThenInclude(mc => mc.Categoria);
             }
 
             return await queryable.OrderByDescending(x => x.DthrMovimentacao).ToListAsync();

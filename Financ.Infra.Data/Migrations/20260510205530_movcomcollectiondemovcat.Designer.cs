@@ -4,6 +4,7 @@ using Financ.Infra.Data.Contexto;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Financ.Infra.Data.Migrations
 {
     [DbContext(typeof(AppContextoData))]
-    partial class AppContextoDataModelSnapshot : ModelSnapshot
+    [Migration("20260510205530_movcomcollectiondemovcat")]
+    partial class movcomcollectiondemovcat
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -240,11 +243,16 @@ namespace Financ.Infra.Data.Migrations
                     b.Property<int>("IdMovimentacao")
                         .HasColumnType("int");
 
+                    b.Property<int?>("MovimentacaoId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("IdCategoria");
 
                     b.HasIndex("IdMovimentacao");
+
+                    b.HasIndex("MovimentacaoId");
 
                     b.ToTable("fnc_movimentacao_categorias", (string)null);
                 });
@@ -441,10 +449,14 @@ namespace Financ.Infra.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("Financ.Domain.Entidades.Movimentações.Movimentacao", "Movimentacao")
-                        .WithMany("CategoriasMovimentacao")
+                        .WithMany()
                         .HasForeignKey("IdMovimentacao")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Financ.Domain.Entidades.Movimentações.Movimentacao", null)
+                        .WithMany("CategoriasMovimentacao")
+                        .HasForeignKey("MovimentacaoId");
 
                     b.Navigation("Categoria");
 

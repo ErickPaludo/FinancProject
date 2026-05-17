@@ -21,7 +21,7 @@ namespace Financ.Infra.Data.Contexto
         public DbSet<Autenticacao> Autenticacao { get; set; }
         public DbSet<Movimentacao> Movimentacao { get; set; }
         public DbSet<Categoria> Categoria { get; set; }
-
+        public DbSet<MovimentacaoCategoria> MovimentacaoCategoria { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

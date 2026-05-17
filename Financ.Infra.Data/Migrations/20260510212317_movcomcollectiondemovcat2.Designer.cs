@@ -4,6 +4,7 @@ using Financ.Infra.Data.Contexto;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Financ.Infra.Data.Migrations
 {
     [DbContext(typeof(AppContextoData))]
-    partial class AppContextoDataModelSnapshot : ModelSnapshot
+    [Migration("20260510212317_movcomcollectiondemovcat2")]
+    partial class movcomcollectiondemovcat2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -43,7 +43,7 @@ namespace Financ.TesteUnitarios.Domain
             var titulo = "Supermercado";
 
             // Act
-            var movimentacao = new Movimentacao(TipoMovimentacao.Saida, usuario, categoria, valor, titulo, "Compras do mês", DateTime.UtcNow, null, false);
+            var movimentacao = new Movimentacao(TipoMovimentacao.Saida, usuario, valor, titulo, "Compras do mês", DateTime.UtcNow, null, false);
 
             // Assert
             movimentacao.Tipo.Should().Be(TipoMovimentacao.Saida);
@@ -61,7 +61,7 @@ namespace Financ.TesteUnitarios.Domain
             var usuario = CriarUsuarioAtivo(conta);
 
             // Act
-            Action action = () => new Movimentacao(TipoMovimentacao.Entrada, usuario, null, 0, "Teste", null, null, null, false);
+            Action action = () => new Movimentacao(TipoMovimentacao.Entrada, usuario, 0, "Teste", null, null, null, false);
 
             // Assert
             action.Should().Throw<MovimentacaoValidacao>()
@@ -79,7 +79,7 @@ namespace Financ.TesteUnitarios.Domain
             var usuario = CriarUsuarioAtivo(conta);
 
             // Act
-            Action action = () => new Movimentacao(TipoMovimentacao.Entrada, usuario, null, 100, tituloInvalido, null, null, null, false);
+            Action action = () => new Movimentacao(TipoMovimentacao.Entrada, usuario, 100, tituloInvalido, null, null, null, false);
 
             // Assert
             action.Should().Throw<MovimentacaoValidacao>();
@@ -93,7 +93,7 @@ namespace Financ.TesteUnitarios.Domain
             var visualizador = CriarUsuarioAtivo(conta, TiposAcessos.Visualizador);
 
             // Act
-            Action action = () => new Movimentacao(TipoMovimentacao.Entrada, visualizador, null, 100, "Teste", null, null, null, false);
+            Action action = () => new Movimentacao(TipoMovimentacao.Entrada, visualizador, 100, "Teste", null, null, null, false);
 
             // Assert
             action.Should().Throw<MovimentacaoValidacao>()
@@ -110,7 +110,7 @@ namespace Financ.TesteUnitarios.Domain
             // Arrange
             var conta = CriarContaAtiva();
             var usuario = CriarUsuarioAtivo(conta);
-            var movimentacao = new Movimentacao(TipoMovimentacao.Saida, usuario, null, 50, "Lanche", null, DateTime.UtcNow, null, false);
+            var movimentacao = new Movimentacao(TipoMovimentacao.Saida, usuario, 50, "Lanche", null, DateTime.UtcNow, null, false);
 
             // Act
             movimentacao.ExecutarMovimentacao(usuario, DateTime.UtcNow);
@@ -126,7 +126,7 @@ namespace Financ.TesteUnitarios.Domain
             // Arrange
             var conta = CriarContaAtiva();
             var usuario = CriarUsuarioAtivo(conta);
-            var movimentacao = new Movimentacao(TipoMovimentacao.Saida, usuario, null, 50, "Lanche", null, DateTime.UtcNow, DateTime.UtcNow, true);
+            var movimentacao = new Movimentacao(TipoMovimentacao.Saida, usuario, 50, "Lanche", null, DateTime.UtcNow, DateTime.UtcNow, true);
 
             // Act
             Action action = () => movimentacao.ExecutarMovimentacao(usuario, DateTime.UtcNow);
@@ -142,7 +142,7 @@ namespace Financ.TesteUnitarios.Domain
             // Arrange
             var conta = CriarContaAtiva();
             var usuario = CriarUsuarioAtivo(conta);
-            var movimentacao = new Movimentacao(TipoMovimentacao.Saida, usuario, null, 50, "Lanche", null, DateTime.UtcNow, DateTime.UtcNow, true);
+            var movimentacao = new Movimentacao(TipoMovimentacao.Saida, usuario, 50, "Lanche", null, DateTime.UtcNow, DateTime.UtcNow, true);
 
             // Act
             movimentacao.ExtornaMovimentacao(usuario);
@@ -163,7 +163,7 @@ namespace Financ.TesteUnitarios.Domain
             // Arrange
             var conta = CriarContaAtiva();
             var usuario = CriarUsuarioAtivo(conta);
-            var movimentacao = new Movimentacao(TipoMovimentacao.Saida, usuario, null, 50, "Lanche", null, DateTime.UtcNow, DateTime.UtcNow, true);
+            var movimentacao = new Movimentacao(TipoMovimentacao.Saida, usuario, 50, "Lanche", null, DateTime.UtcNow, DateTime.UtcNow, true);
 
             // Act
             Action action = () => movimentacao.AlterarMovimentacao(usuario, 100m, null, null, null, null, null, null, null);
