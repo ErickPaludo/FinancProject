@@ -34,11 +34,7 @@ namespace Financ.Application.CQRS.Categorias.Handler
 
                 if (categoria is null)
                     return Resultado<BasePost<CategoriaDTO>>.GeraFalha(Falha.NaoEncontrado("Categoria não encontrada"));
-
-
-                if (request.Nome is not null && (await _unitOfWork.categoriaRepositorio.BuscarPorCondicao(x => x.Nome.Equals(request.Nome.Trim()) && x.Id != request.IdCategoria)).Any())
-                    return Resultado<BasePost<CategoriaDTO>>.GeraFalha(Falha.ErroOperacional("Já existe uma categoria cadastrada com este nome."));
-
+      
                 ContaUsuario? contaUsuario = categoria.Conta.ContaUsuarios.FirstOrDefault(c => c.IdUsuario == request.IdUsuario);
 
                 categoria.Alterar(contaUsuario, request.Nome, request.Cor);
