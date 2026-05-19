@@ -11,7 +11,7 @@ namespace Financ.Domain.Interfaces.Repositorios.ContasBancarias
 {
     public interface IConvitesRepostorio : IBaseRepositorio<Convite>
     {
-        Task<Convite> BuscarConviteComContasEContasUsuarios(Expression<Func<Convite, bool>> predicado);
+        Task<Convite?> BuscarConviteComContasEContasUsuarios(Expression<Func<Convite, bool>> predicado);
 
         Task<IEnumerable<Convite>> ObterConviteComRemetenteDestinatarioEContaAsync(Expression<Func<Convite, bool>> predicado);
     }

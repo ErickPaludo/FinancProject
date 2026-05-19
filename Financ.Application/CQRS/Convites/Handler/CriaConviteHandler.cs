@@ -28,7 +28,7 @@ namespace Financ.Application.CQRS.Convites.Handler
         {
             try
             {
-                Usuario? usuarioDestinatario = await _unitOfWork.usuariosRepostorio.BuscarObjetoUnico(x => x.Email.Equals(request.emailDestinatario!));
+                Usuario? usuarioDestinatario = await _unitOfWork.usuariosRepostorio.BuscarObjetoUnico(x => x.Email.Equals(request.emailDestinatario!.Trim()));
 
                 if (usuarioDestinatario is null)
                     return Resultado<BasePost<GetCriaConviteDTO>>.GeraFalha(Falha.NaoEncontrado("Usuário destinatário não encontrado."));
