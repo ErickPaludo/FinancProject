@@ -33,11 +33,13 @@ namespace Financ.Application.Mapeamento
                             convite.Conta.TipoConta),
                         new GetUsuario(
                             convite.IdUsuarioRemetente,
+                            convite.Remetente.Email,
                             convite.Remetente.PrimeiroNome,
                             convite.Remetente.SegundoNome,
                             $"{convite.Remetente.PrimeiroNome} {convite.Remetente.SegundoNome}"),
                           new GetUsuario(
                             convite.IdUsuarioDestinatario,
+                            convite.Destinatario.Email,
                             convite.Destinatario.PrimeiroNome,
                             convite.Destinatario.SegundoNome,
                             $"{convite.Destinatario.PrimeiroNome} {convite.Destinatario.SegundoNome}")

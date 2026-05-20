@@ -62,6 +62,10 @@ namespace Financ.Infra.IoC
                         {
                             context.Fail("Sessão inválida");
                         }
+                        if (usuario!.ExpirationRefresh < DateTimeOffset.UtcNow.ToUnixTimeSeconds())
+                        {
+                            context.Fail("Sessão expirada");
+                        }
                     }
                 };
             });

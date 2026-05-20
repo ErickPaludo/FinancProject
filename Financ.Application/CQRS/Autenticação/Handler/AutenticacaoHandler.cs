@@ -31,14 +31,16 @@ namespace Financ.Application.CQRS.Autenticação.Handler
 
         public async Task<Resultado<RetornaTokenDTO>> Handle(AutenticacaoCommand request, CancellationToken cancellationToken)
         {
+            try
+            {
             request.Email = request.Email.Trim();
             var usuario = await _unitOfWork.usuariosRepostorio.BuscarObjetoUnico(x => x.Email == request.Email);
 
             if (usuario is null)
-                return Resultado<RetornaTokenDTO>.GeraFalha(Falha.NaoEncontrado("Usuário não encontrado!"));
+                return Resultado<RetornaTokenDTO>.GeraFalha(Falha.NaoEncontrado("Usuário ou senha inválidos!"));
 
             if (!_segurancaServico.ValidaSenhaArgon(usuario.HashPass, request.Senha, usuario.Salt))
-                return Resultado<RetornaTokenDTO>.GeraFalha(Falha.NaoAutorizado("Senha inválida."));
+                return Resultado<RetornaTokenDTO>.GeraFalha(Falha.NaoAutorizado("Usuário ou senha inválidos!"));
 
 
             var autenticacao = await _unitOfWork.autenticacoesRepositorio.BuscarAuthComUsuarios(x => x.Usuario.Id.Equals(usuario.Id));
@@ -64,6 +66,12 @@ namespace Financ.Application.CQRS.Autenticação.Handler
                 RefreshToken = tokenJwt.refreshToken,
                 Token = tokenJwt.token
             });
+
+            }
+            catch(Exception ex)
+            {
+                return Resultado<RetornaTokenDTO>.GeraFalha(Falha.ErroOperacional(ex.Message));
+            }
         }
     }
 }
