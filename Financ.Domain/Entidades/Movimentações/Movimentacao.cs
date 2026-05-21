@@ -193,8 +193,8 @@ namespace Financ.Domain.Entidades.Movimentações
         }
         private void ValidaDataConclusao(DateTime? dthrConclusao)
         {
-            ContasValidacao.Verifica(dthrConclusao is not null && Status is not TipoStatusMovimentacao.Concluido, MensagemMovimentacao.MOVIMENTACAO_NAO_ESTA_CONCLUIDA);
-            ContasValidacao.Verifica(dthrConclusao is not null && dthrConclusao < DthrMovimentacao, MensagemMovimentacao.DATAS_MOV_INVALIDAS);
+            MovimentacaoValidacao.Verifica(dthrConclusao is not null && Status is not TipoStatusMovimentacao.Concluido, MensagemMovimentacao.MOVIMENTACAO_NAO_ESTA_CONCLUIDA);
+            MovimentacaoValidacao.Verifica(dthrConclusao is not null && dthrConclusao < DthrMovimentacao, MensagemMovimentacao.DATAS_MOV_INVALIDAS);
         }
         #endregion
     }
