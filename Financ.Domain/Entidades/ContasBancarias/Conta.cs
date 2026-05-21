@@ -80,7 +80,7 @@ namespace Financ.Domain.Entidades.ContasBancarias
         }
         public bool UsuarioPertenceConta(string idUsuario)
         {
-            return ContaUsuarios.Any(x => x.IdUsuario == idUsuario && x.Expiracao is null || x.Expiracao >= DateTime.UtcNow);
+            return ContaUsuarios.Any(x => x.IdUsuario == idUsuario && (x.Expiracao is null || x.Expiracao >= DateTime.UtcNow));
         }
         public void ProcessaMovimentacao(Movimentacao movimentacao)
         {

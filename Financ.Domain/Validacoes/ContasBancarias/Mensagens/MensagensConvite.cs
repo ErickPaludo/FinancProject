@@ -15,7 +15,7 @@ namespace Financ.Domain.Validacoes.ContasBancarias.Mensagens
         public const string USUARIO_CONTA_REMETENTE_INATIVO = "Seu usuário está inativo nesta conta.";
         public const string CONTA_JA_POSSUI_UM_USUARIO_MESTRES = "A conta já possui um usuário com acesso mestre.";
 
-        public const string CONVITE_JA_VISUALIZADO = "Este convite já foi visualizado.";
+        public const string CONVITE_JA_VISUALIZADO = "Este convite já foi ";
         public const string CONVITE_EXPIRADO = "O convite expirou.";
         public const string USUARIO_REMETENTE_NAO_AUTORIZADO = "Você não é o remetente deste convite.";
 

@@ -27,7 +27,7 @@ namespace Financ.Infra.Data.Repositorios.ContasBancarias
         {
             return await _contexto.Convites.Include(c => c.Conta)
                 .ThenInclude(c => c.ContaUsuarios)
-                .Where(x => x.Aceito == null && x.Expiracao >= DateTime.UtcNow).FirstOrDefaultAsync(predicado);
+                .Where(x => x.Expiracao >= DateTime.UtcNow).FirstOrDefaultAsync(predicado);
         }
 
         public async Task<IEnumerable<Convite>> ObterConviteComRemetenteDestinatarioEContaAsync(Expression<Func<Convite, bool>> predicado)
@@ -35,7 +35,7 @@ namespace Financ.Infra.Data.Repositorios.ContasBancarias
             return await _contexto.Convites.Include(c => c.Conta)
                            .Include(u => u.Remetente)
                            .Include(u => u.Destinatario)
-                          .Where(x => (x.Aceito == null || x.Aceito == false) && x.Expiracao >= DateTime.UtcNow).Where(predicado).ToListAsync();
+                           .Where(x =>  x.Expiracao >= DateTime.UtcNow).Where(predicado).ToListAsync();
         }
     }
 }
