@@ -25,12 +25,12 @@ namespace Financ.Application.CQRS.Convites.Handler
 
         public async Task<Resultado<BaseGetList<GetRetornaConvitesDTO>>> Handle(RetornaConvitesQuery request, CancellationToken cancellationToken)
         {
-            IEnumerable<Convite?> convites = await _unitOfWork.convitesRepostorio.ObterConviteComRemetenteDestinatarioEContaAsync(request.RetornaConvitesRemetente ? r => r.IdUsuarioRemetente.Equals(request.IdUsuario) : d => d.IdUsuarioDestinatario.Equals(request.IdUsuario));
+            IEnumerable<Convite>? convites = await _unitOfWork.convitesRepostorio.ObterConviteComRemetenteDestinatarioEContaAsync(request.RetornaConvitesRemetente ? r => r.IdUsuarioRemetente.Equals(request.IdUsuario) : d => d.IdUsuarioDestinatario.Equals(request.IdUsuario));
 
             if(!convites.Any())
                 return Resultado<BaseGetList<GetRetornaConvitesDTO>>.GeraFalha(Falha.NaoEncontrado("Nenhum convite foi encontrado!"));
 
-             return Resultado<BaseGetList<GetRetornaConvitesDTO>>.GeraSucesso(ConviteMapper.ParaDTO(convites, request.RetornaConvitesRemetente));
+             return Resultado<BaseGetList<GetRetornaConvitesDTO>>.GeraSucesso(ConviteMapper.ParaDTO(convites.OrderByDescending(c => c.Expiracao).ThenBy(c => c.Aceito), request.RetornaConvitesRemetente));
         }
     }
 }
