@@ -4,12 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Financ.Domain.Enums.ContasBancarias
+namespace Financ.Application.DTOs.Movimentações.Fixas.Get
 {
-    public enum TipoStatusContasUsuario
+    internal class GetMovimentacaoFixaDTO
     {
-        Ativo,
-        Inativo,
-        Removido,
     }
 }

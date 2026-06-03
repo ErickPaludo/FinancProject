@@ -1,5 +1,7 @@
-﻿using Financ.Domain.Entidades.ContasBancarias;
+﻿using Financ.Domain.Entidades.Categorias;
+using Financ.Domain.Entidades.ContasBancarias;
 using Financ.Domain.Entidades.Movimentações;
+using Financ.Domain.Entidades.Movimentações.Fixas;
 using Financ.Domain.Entidades.Segurança;
 using Financ.Domain.Entidades.Usuarios;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +24,8 @@ namespace Financ.Infra.Data.Contexto
         public DbSet<Movimentacao> Movimentacao { get; set; }
         public DbSet<Categoria> Categoria { get; set; }
         public DbSet<MovimentacaoCategoria> MovimentacaoCategoria { get; set; }
+        public DbSet<MovimentacaoFixa> MovimentacaoFixa { get; set; }
+        public DbSet<MovimentacaoFixaDiaria> MovimentacaoFixaDiaria { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

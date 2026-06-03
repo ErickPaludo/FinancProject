@@ -40,10 +40,8 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
                 Conta conta = movimentacao.Conta;
                 conta.RemoverMovimentacao(movimentacao);
 
-                if (movimentacao.Extorno)
-                    _unitOfWork.movimentacaoRepositorio.Atualiza(movimentacao);
-                else
-                    _unitOfWork.movimentacaoRepositorio.Delete(movimentacao);
+               
+                _unitOfWork.movimentacaoRepositorio.Atualiza(movimentacao);
 
                 _unitOfWork.contasRepositorio.Atualiza(conta);
                 await _unitOfWork.Commit();

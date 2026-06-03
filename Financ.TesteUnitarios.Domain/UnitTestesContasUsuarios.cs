@@ -39,7 +39,7 @@ namespace Financ.TesteUnitarios.Domain
 
             // Assert
             contaUsuario.Acesso.Should().Be(TiposAcessos.Mestre);
-            contaUsuario.Status.Should().Be(TipoStatusContasUsuario.Ativo);
+            contaUsuario.Status.Should().Be(StatusContasUsuario.Ativo);
             contaUsuario.IdUsuario.Should().Be(idUsuario);
             contaUsuario.Conta.Should().Be(conta);
         }
@@ -72,7 +72,7 @@ namespace Financ.TesteUnitarios.Domain
 
             // Assert
             contaUsuario.Acesso.Should().Be(TiposAcessos.Administrador);
-            contaUsuario.Status.Should().Be(TipoStatusContasUsuario.Ativo);
+            contaUsuario.Status.Should().Be(StatusContasUsuario.Ativo);
             contaUsuario.Expiracao.Should().NotBeNull();
             contaUsuario.IdUsuario.Should().Be(destinatario.Id);
         }
@@ -87,15 +87,15 @@ namespace Financ.TesteUnitarios.Domain
             // Arrange
             var conta = CriarContaAtiva();
             var remetente = CriarMestreAtivo(conta, "mestre");
-            var alvo = new ContaUsuario(1, conta, "alvo", TiposAcessos.Visualizador, TipoStatusContasUsuario.Ativo);
+            var alvo = new ContaUsuario(1, conta, "alvo", TiposAcessos.Visualizador, StatusContasUsuario.Ativo);
             conta.AddUsuario(alvo);
 
             // Act
-            alvo.AtualizaOutraContaUsuario(remetente, TiposAcessos.Administrador, TipoStatusContasUsuario.Inativo);
+            alvo.AtualizaOutraContaUsuario(remetente, TiposAcessos.Administrador, StatusContasUsuario.Inativo);
 
             // Assert
             alvo.Acesso.Should().Be(TiposAcessos.Administrador);
-            alvo.Status.Should().Be(TipoStatusContasUsuario.Inativo);
+            alvo.Status.Should().Be(StatusContasUsuario.Inativo);
         }
 
         [Fact]
@@ -119,8 +119,8 @@ namespace Financ.TesteUnitarios.Domain
         {
             // Arrange
             var conta = CriarContaAtiva();
-            var remetenteComum = new ContaUsuario(1, conta, "admin", TiposAcessos.Administrador, TipoStatusContasUsuario.Ativo);
-            var alvo = new ContaUsuario(2, conta, "alvo", TiposAcessos.Visualizador, TipoStatusContasUsuario.Ativo);
+            var remetenteComum = new ContaUsuario(1, conta, "admin", TiposAcessos.Administrador, StatusContasUsuario.Ativo);
+            var alvo = new ContaUsuario(2, conta, "alvo", TiposAcessos.Visualizador, StatusContasUsuario.Ativo);
             conta.AddUsuario(remetenteComum);
             conta.AddUsuario(alvo);
 
@@ -138,7 +138,7 @@ namespace Financ.TesteUnitarios.Domain
             // Arrange
             var conta = CriarContaAtiva();
             var remetente = CriarMestreAtivo(conta);
-            var alvo = new ContaUsuario(1, conta, "alvo", TiposAcessos.Visualizador, TipoStatusContasUsuario.Ativo);
+            var alvo = new ContaUsuario(1, conta, "alvo", TiposAcessos.Visualizador, StatusContasUsuario.Ativo);
             conta.AddUsuario(alvo);
 
             // Act
@@ -162,7 +162,7 @@ namespace Financ.TesteUnitarios.Domain
 
             // Adiciona outro usuário (não mestre) para que a conta não fique vazia, 
             // mas o mestre continue sendo o único com poder administrativo.
-            var outroUsuario = new ContaUsuario(2, conta, "user-comum", TiposAcessos.Visualizador, TipoStatusContasUsuario.Ativo);
+            var outroUsuario = new ContaUsuario(2, conta, "user-comum", TiposAcessos.Visualizador, StatusContasUsuario.Ativo);
             conta.AddUsuario(outroUsuario);
 
             // Act
@@ -179,14 +179,14 @@ namespace Financ.TesteUnitarios.Domain
             // Arrange
             var conta = CriarContaAtiva();
             var remetente = CriarMestreAtivo(conta);
-            var alvo = new ContaUsuario(1, conta, "alvo", TiposAcessos.Visualizador, TipoStatusContasUsuario.Ativo);
+            var alvo = new ContaUsuario(1, conta, "alvo", TiposAcessos.Visualizador, StatusContasUsuario.Ativo);
             conta.AddUsuario(alvo);
 
             // Act
             alvo.RemoverUsuarioDaConta(remetente);
 
             // Assert
-            alvo.Status.Should().Be(TipoStatusContasUsuario.Removido);
+            alvo.Status.Should().Be(StatusContasUsuario.Removido);
         }
 
         [Fact]

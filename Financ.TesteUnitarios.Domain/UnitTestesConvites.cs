@@ -51,7 +51,7 @@ namespace Financ.TesteUnitarios.Domain
         {
             // Arrange
             var conta = CriarContaAtiva();
-            var remetenteComum = new ContaUsuario(1, conta, "admin", TiposAcessos.Administrador, TipoStatusContasUsuario.Ativo);
+            var remetenteComum = new ContaUsuario(1, conta, "admin", TiposAcessos.Administrador, StatusContasUsuario.Ativo);
             conta.AddUsuario(remetenteComum);
             var destinatario = CriarUsuario("dest-1");
 

@@ -1,5 +1,7 @@
-﻿using Financ.Domain.Interfaces.Repositorios.ContasBancarias;
+﻿using Financ.Domain.Interfaces.Repositorios.Categorias;
+using Financ.Domain.Interfaces.Repositorios.ContasBancarias;
 using Financ.Domain.Interfaces.Repositorios.Movimentações;
+using Financ.Domain.Interfaces.Repositorios.Movimentações.Fixas;
 using Financ.Domain.Interfaces.Repositorios.Segurança;
 using Financ.Domain.Interfaces.Repositorios.Usuarios;
 using System;
@@ -20,6 +22,9 @@ namespace Financ.Domain.Interfaces
         IMovimentacaoRepositorio movimentacaoRepositorio { get; }
         ICategoriaRepositorio categoriaRepositorio { get; }
         IMovimentacaoCategoriaRepositorio movimentacaoCategoriaRepositorio { get; }
+        IMovimentacaoFixaRespositorio movimentacaoFixaRepositorio { get; }
+        IMovimentacaoFixaDiariaRespositorio movimentacaoFixaDiariaRepositorio { get; }
+
         Task Commit();
     }
 }

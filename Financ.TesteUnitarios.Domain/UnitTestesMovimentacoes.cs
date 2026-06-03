@@ -1,4 +1,5 @@
-﻿using Financ.Domain.Entidades.ContasBancarias;
+﻿using Financ.Domain.Entidades.Categorias;
+using Financ.Domain.Entidades.ContasBancarias;
 using Financ.Domain.Entidades.Movimentações;
 using Financ.Domain.Enums.ContasBancarias;
 using Financ.Domain.Enums.Movimentações;
@@ -16,7 +17,7 @@ namespace Financ.TesteUnitarios.Domain
 
         private ContaUsuario CriarUsuarioAtivo(Conta conta, TiposAcessos acesso = TiposAcessos.Administrador)
         {
-            var usuario = new ContaUsuario(1, conta, "user-123", acesso, TipoStatusContasUsuario.Ativo);
+            var usuario = new ContaUsuario(1, conta, "user-123", acesso, StatusContasUsuario.Ativo);
             conta.AddUsuario(usuario);
             return usuario;
         }
@@ -49,7 +50,7 @@ namespace Financ.TesteUnitarios.Domain
             movimentacao.Tipo.Should().Be(TipoMovimentacao.Saida);
             movimentacao.Valor.Should().Be(valor);
             movimentacao.Titulo.Should().Be(titulo);
-            movimentacao.Status.Should().Be(TipoStatusMovimentacao.Pendente);
+            movimentacao.Status.Should().Be(StatusMovimentacao.Pendente);
             movimentacao.Conta.Should().Be(conta);
         }
 
@@ -116,7 +117,7 @@ namespace Financ.TesteUnitarios.Domain
             movimentacao.ExecutarMovimentacao(usuario, DateTime.UtcNow);
 
             // Assert
-            movimentacao.Status.Should().Be(TipoStatusMovimentacao.Concluido);
+            movimentacao.Status.Should().Be(StatusMovimentacao.Concluido);
             movimentacao.DthrConclusao.Should().NotBeNull();
         }
 
@@ -148,7 +149,7 @@ namespace Financ.TesteUnitarios.Domain
             movimentacao.ExtornaMovimentacao(usuario);
 
             // Assert
-            movimentacao.Status.Should().Be(TipoStatusMovimentacao.Pendente);
+            movimentacao.Status.Should().Be(StatusMovimentacao.Pendente);
             movimentacao.Extorno.Should().BeTrue();
             movimentacao.DthrConclusao.Should().BeNull();
         }
@@ -166,7 +167,7 @@ namespace Financ.TesteUnitarios.Domain
             var movimentacao = new Movimentacao(TipoMovimentacao.Saida, usuario, 50, "Lanche", null, DateTime.UtcNow, DateTime.UtcNow, true);
 
             // Act
-            Action action = () => movimentacao.AlterarMovimentacao(usuario, 100m, null, null, null, null, null, null, null);
+            Action action = () => movimentacao.AlterarMovimentacao(usuario, 100m, null, null, null, null, null);
 
             // Assert
             action.Should().Throw<MovimentacaoValidacao>()

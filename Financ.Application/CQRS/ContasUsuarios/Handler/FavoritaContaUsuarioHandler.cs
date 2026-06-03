@@ -36,7 +36,7 @@ namespace Financ.Application.CQRS.ContasUsuarios.Handler
             contaUsuario.FavoritarConta();
              _unitOfWork.contasUsuariosRepositorio.Atualiza(contaUsuario);
             await _unitOfWork.Commit();
-            IEnumerable<Movimentacao>? movimentacao = await _unitOfWork.movimentacaoRepositorio.BuscarPorCondicao(m => m.IdConta == request.IdConta && m.Status == TipoStatusMovimentacao.Pendente);
+            IEnumerable<Movimentacao>? movimentacao = await _unitOfWork.movimentacaoRepositorio.BuscarPorCondicao(m => m.IdConta == request.IdConta && m.Status == StatusMovimentacao.Pendente);
 
 
 

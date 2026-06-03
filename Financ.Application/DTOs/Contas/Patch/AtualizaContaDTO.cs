@@ -9,5 +9,5 @@ using System.Threading.Tasks;
 
 namespace Financ.Application.DTOs.Contas.Ptch
 {
-    public record AtualizaContaDTO (string? Titulo, TiposStatusContas? Status, string? Cor);
+    public record AtualizaContaDTO (string? Titulo, StatusContas? Status, string? Cor);
 }

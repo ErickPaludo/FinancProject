@@ -13,7 +13,7 @@ namespace Financ.Application.DTOs.ContasUsuarios.Patch
         [Required]
         public string? idUsuarioAlterado { get; set; }
         public TiposAcessos? acesso { get; set; }
-        public TipoStatusContasUsuario? status { get; set; }
+        public StatusContasUsuario? status { get; set; }
         public int? expiracao { get; set; }
         public bool? removerExpiracao { get; set; }
     }

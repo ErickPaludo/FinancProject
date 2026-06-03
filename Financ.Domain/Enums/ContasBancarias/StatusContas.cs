@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Financ.Domain.Enums.ContasBancarias
 {
-    public enum TiposStatusContas
+    public enum StatusContas
     {
         Ativo,
         Inativo,

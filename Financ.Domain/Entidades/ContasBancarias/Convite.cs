@@ -41,8 +41,8 @@ namespace Financ.Domain.Entidades.ContasBancarias
             ConvitesValidacao.Verifica(usuairoDestinatario is null, MensagensConvite.USUARIO_DESTINATARIO_NAO_ENCONTRADO);
 
             ConvitesValidacao.Verifica(usuarioRemetente!.Acesso != TiposAcessos.Mestre, MensagensConvite.USUARIO_SEM_PERMISSAO);
-            ConvitesValidacao.Verifica(usuarioRemetente.Status != TipoStatusContasUsuario.Ativo, MensagensConvite.USUARIO_CONTA_REMETENTE_INATIVO);
-            ConvitesValidacao.Verifica(usuarioRemetente.Conta.Status != TiposStatusContas.Ativo, MensagensContas.CONTA_INATIVA);
+            ConvitesValidacao.Verifica(usuarioRemetente.Status != StatusContasUsuario.Ativo, MensagensConvite.USUARIO_CONTA_REMETENTE_INATIVO);
+            ConvitesValidacao.Verifica(usuarioRemetente.Conta.Status != StatusContas.Ativo, MensagensContas.CONTA_INATIVA);
 
 
             ConvitesValidacao.Verifica(usuarioRemetente.Conta.UsuarioPertenceConta(usuairoDestinatario!.Id), MensagensConvite.USUARIO_JA_PERTENCE_A_CONTA);

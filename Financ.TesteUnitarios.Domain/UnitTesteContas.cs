@@ -43,7 +43,7 @@ namespace Financ.TesteUnitarios.Domain
             // Assert
             conta.Titulo.Should().Be(titulo);
             conta.Cor.Valor.Should().Be(cor);
-            conta.Status.Should().Be(TiposStatusContas.Ativo);
+            conta.Status.Should().Be(StatusContas.Ativo);
             conta.TipoConta.Should().Be(TipoConta.Corrente);
             conta.Saldo.Should().Be(0);
         }
@@ -97,7 +97,7 @@ namespace Financ.TesteUnitarios.Domain
             var conta = CriarContaValida();
             var usuarioMestre = CriarUsuarioMestreAtivo(conta);
             var novoTitulo = "Novo Titulo";
-            var novoStatus = TiposStatusContas.Inativo;
+            var novoStatus = StatusContas.Inativo;
 
             // Act
             conta.AtualizaConta(usuarioMestre, novoTitulo, novoStatus, "#000000");
@@ -129,7 +129,7 @@ namespace Financ.TesteUnitarios.Domain
         {
             // Arrange
             var conta = CriarContaValida();
-            var usuarioComum = new ContaUsuario(1, conta, "user-123", TiposAcessos.Administrador, TipoStatusContasUsuario.Ativo);
+            var usuarioComum = new ContaUsuario(1, conta, "user-123", TiposAcessos.Administrador, StatusContasUsuario.Ativo);
             conta.AddUsuario(usuarioComum);
 
             // Act
@@ -237,8 +237,8 @@ namespace Financ.TesteUnitarios.Domain
 
             // Assert
             conta.ContaUsuarios.Should().BeEmpty();
-            conta.Status.Should().Be(TiposStatusContas.Inativo);
-            usuario.Status.Should().Be(TipoStatusContasUsuario.Removido);
+            conta.Status.Should().Be(StatusContas.Inativo);
+            usuario.Status.Should().Be(StatusContasUsuario.Removido);
         }
 
         [Fact]

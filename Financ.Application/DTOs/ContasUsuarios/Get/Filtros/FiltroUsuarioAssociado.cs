@@ -7,5 +7,5 @@ using System.Threading.Tasks;
 
 namespace Financ.Application.DTOs.ContasUsuarios.Get.Filtros
 {
-    public record FiltroUsuarioAssociado(string? IdUsuario = null, string? NomeUsuario = null, TiposAcessos? Acesso = null, TipoStatusContasUsuario? Status = null);
+    public record FiltroUsuarioAssociado(string? IdUsuario = null, string? NomeUsuario = null, TiposAcessos? Acesso = null, StatusContasUsuario? Status = null);
 }

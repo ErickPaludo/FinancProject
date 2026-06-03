@@ -23,6 +23,8 @@ namespace Financ.Infra.Data.ConfiguracaoTabelas.Movimentações
             builder.Property(e => e.Titulo).HasMaxLength(80);
             builder.Property(e => e.Observacao).HasMaxLength(255);
 
+            builder.Ignore(mc => mc.Extorno);
+
             builder.Property(e => e.Valor).HasColumnType("decimal(18,2)");
             builder.HasOne(e => e.Conta)
                 .WithMany()
@@ -43,6 +45,11 @@ namespace Financ.Infra.Data.ConfiguracaoTabelas.Movimentações
             .WithMany()
             .HasForeignKey(e => e.IdUsuarioExecutor)
             .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(m => m.Fixa)
+            .WithMany(f => f.Movimentacoes)
+            .HasForeignKey(m => m.IdFixo)
+            .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

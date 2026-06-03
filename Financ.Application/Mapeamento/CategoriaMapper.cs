@@ -1,6 +1,6 @@
 ﻿using Financ.Application.DTOs.Categoria.Get;
 using Financ.Application.DTOs.ContasUsuarios.Get;
-using Financ.Domain.Entidades.Movimentações;
+using Financ.Domain.Entidades.Categorias;
 using System;
 using System.Collections.Generic;
 using System.Linq;

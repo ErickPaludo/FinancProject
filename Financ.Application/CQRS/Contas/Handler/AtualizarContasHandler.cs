@@ -40,7 +40,7 @@ namespace Financ.Application.CQRS.Contas_.Handler
                 _unitOfWork.contasRepositorio.Atualiza(conta);
                 await _unitOfWork.Commit();
 
-                IEnumerable<Movimentacao> movimentacoes = await _unitOfWork.movimentacaoRepositorio.BuscarPorCondicao(m => m.IdConta == request.IdConta && m.Status == TipoStatusMovimentacao.Pendente);
+                IEnumerable<Movimentacao> movimentacoes = await _unitOfWork.movimentacaoRepositorio.BuscarPorCondicao(m => m.IdConta == request.IdConta && m.Status == StatusMovimentacao.Pendente);
 
                 return Resultado<BaseGet<RetornaContasDTO>>.GeraSucesso(ContaUsuarioMapper.ParaGetDTO(contaUsuario,movimentacoes));
             }

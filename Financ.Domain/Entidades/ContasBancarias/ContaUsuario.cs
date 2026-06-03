@@ -18,7 +18,7 @@ namespace Financ.Domain.Entidades.ContasBancarias
         public int IdConta { get; private set; }
         public string IdUsuario { get; private set; }
         public TiposAcessos Acesso { get; private set; }
-        public TipoStatusContasUsuario Status { get; private set; }
+        public StatusContasUsuario Status { get; private set; }
         public DateTime? Expiracao { get; private set; }
         public bool ContaFavorita { get; private set; } = false;
         public Usuario Usuario { get; private set; }
@@ -27,7 +27,7 @@ namespace Financ.Domain.Entidades.ContasBancarias
 
         #region Construtores
         public ContaUsuario() { }
-        public ContaUsuario(int id, Conta conta, string idUsuario, TiposAcessos acesso, TipoStatusContasUsuario? status = null)
+        public ContaUsuario(int id, Conta conta, string idUsuario, TiposAcessos acesso, StatusContasUsuario? status = null)
         {
             ContasUsuariosValidacao.Verifica(id <= 0, MensagensBase.ID_IGUAL_MENOR_ZERO);
             Id = id;
@@ -38,7 +38,7 @@ namespace Financ.Domain.Entidades.ContasBancarias
             //Usuario = usuario!;
             IdUsuario = idUsuario;
             DthrReg = DateTime.UtcNow; ValidaEnums(acesso, status);
-            Status = status.HasValue ? status.Value : TipoStatusContasUsuario.Ativo;
+            Status = status.HasValue ? status.Value : StatusContasUsuario.Ativo;
             Acesso = acesso;
         }
         public ContaUsuario(Convite convite)
@@ -53,7 +53,7 @@ namespace Financ.Domain.Entidades.ContasBancarias
             Acesso = convite.Acesso;
 
 
-            Status = TipoStatusContasUsuario.Ativo;
+            Status = StatusContasUsuario.Ativo;
 
             if (convite.ExpiracaoContaUsuario.HasValue)
             {
@@ -66,20 +66,20 @@ namespace Financ.Domain.Entidades.ContasBancarias
             Conta = conta;
             IdUsuario = idUasuario;
             DthrReg = DateTime.UtcNow;
-            Status = TipoStatusContasUsuario.Ativo;
+            Status = StatusContasUsuario.Ativo;
             Acesso = TiposAcessos.Mestre;
         }
         #endregion
 
         #region Metodos Publicos
-        public void AtualizaOutraContaUsuario(ContaUsuario? contasUsuarioRemetente, TiposAcessos? acesso, TipoStatusContasUsuario? status, int? expiracao = null, bool? removerExpiracao = null)
+        public void AtualizaOutraContaUsuario(ContaUsuario? contasUsuarioRemetente, TiposAcessos? acesso, StatusContasUsuario? status, int? expiracao = null, bool? removerExpiracao = null)
         {
 
             #region Validação Remetente
             ContasUsuariosValidacao.Verifica(contasUsuarioRemetente is null || contasUsuarioRemetente.Conta != Conta, MensagensContasUsuarios.USUARIO_NAO_PERTENCE_A_CONTA);
             ContasUsuariosValidacao.Verifica(contasUsuarioRemetente == this, MensagensContasUsuarios.USUARIO_TENTA_SE_ATUALIZAR);
             ContasUsuariosValidacao.Verifica(contasUsuarioRemetente!.Acesso != TiposAcessos.Mestre, MensagensContasUsuarios.ACESSO_NEGADO);
-            ContasUsuariosValidacao.Verifica(contasUsuarioRemetente.Status != TipoStatusContasUsuario.Ativo, MensagensContasUsuarios.ACESSO_NEGADO_POR_STATUS);
+            ContasUsuariosValidacao.Verifica(contasUsuarioRemetente.Status != StatusContasUsuario.Ativo, MensagensContasUsuarios.ACESSO_NEGADO_POR_STATUS);
             #endregion
 
             ContasUsuariosValidacao.Verifica(ValidaUsuarioMestre(Acesso), MensagensContasUsuarios.USUARIO_MESTRE_NAO_PODE_SER_ATUALIZADO);
@@ -102,7 +102,7 @@ namespace Financ.Domain.Entidades.ContasBancarias
 
             if (status.HasValue)
             {
-                ContasUsuariosValidacao.Verifica(!status.Value.Equals(TipoStatusContasUsuario.Ativo) && ValidaUsuarioMestre(Acesso), MensagensContasUsuarios.ATUALIZA_PARA_USUARIO_MESTRE_DIFERENTE_DE_ATIVO);
+                ContasUsuariosValidacao.Verifica(!status.Value.Equals(StatusContasUsuario.Ativo) && ValidaUsuarioMestre(Acesso), MensagensContasUsuarios.ATUALIZA_PARA_USUARIO_MESTRE_DIFERENTE_DE_ATIVO);
                 Status = status.Value;
             }
 
@@ -130,7 +130,7 @@ namespace Financ.Domain.Entidades.ContasBancarias
 
             ContasUsuariosValidacao.Verifica(Conta.Convites.Any(x => DateTime.UtcNow <= x.Expiracao && x.Aceito is null && x.IdUsuarioRemetente.Equals(IdUsuario)), MensagensContasUsuarios.USUARIO_POSSUI_CONVITES_EM_ANDAMENTO);
 
-            Status = TipoStatusContasUsuario.Removido;
+            Status = StatusContasUsuario.Removido;
 
 
         }
@@ -139,11 +139,11 @@ namespace Financ.Domain.Entidades.ContasBancarias
             ValidaUsuarioRemetenteMestreAtivoDaConta(contasUsuarioRemetente);
             ContasUsuariosValidacao.Verifica(contasUsuarioRemetente == this, MensagensContasUsuarios.USUARIO_TENTA_SE_EXPULSAR);
             ContasUsuariosValidacao.Verifica(Acesso == TiposAcessos.Mestre, MensagensContasUsuarios.USUARIO_MESTRE_NAO_PODE_SER_REMOVIDO);
-            Status = TipoStatusContasUsuario.Removido;
+            Status = StatusContasUsuario.Removido;
         }
         public bool ValidaPermissoeNaConta(TiposAcessos acessoDestinatario)
         {
-            return !(acessoDestinatario.Equals(TiposAcessos.Mestre) && Conta.ContaUsuarios.Where(x => x.Acesso.Equals(TiposAcessos.Mestre) && x.Status.Equals(TipoStatusContasUsuario.Ativo)).Take(2).Count() == 2);
+            return !(acessoDestinatario.Equals(TiposAcessos.Mestre) && Conta.ContaUsuarios.Where(x => x.Acesso.Equals(TiposAcessos.Mestre) && x.Status.Equals(StatusContasUsuario.Ativo)).Take(2).Count() == 2);
         }
         public bool ValidaUsuarioMestre(TiposAcessos acesso)
         {
@@ -159,7 +159,7 @@ namespace Financ.Domain.Entidades.ContasBancarias
         }
         public void ValidaSituacaoUsuarioParaConsulta()
         {
-            ContasUsuariosValidacao.Verifica(Status is not TipoStatusContasUsuario.Ativo, MensagensContasUsuarios.ACESSO_NEGADO_POR_STATUS);
+            ContasUsuariosValidacao.Verifica(Status is not StatusContasUsuario.Ativo, MensagensContasUsuarios.ACESSO_NEGADO_POR_STATUS);
             ContasUsuariosValidacao.Verifica(Expiracao < DateTime.UtcNow, MensagensContasUsuarios.USUARIO_EXPIRADO);
         }
         public void RetornaParaConta(Convite convite)
@@ -167,7 +167,7 @@ namespace Financ.Domain.Entidades.ContasBancarias
             ValidaContasUsuarios(convite.Conta, convite.IdUsuarioDestinatario);
             ValidaEnums(convite.Acesso, null);
             Acesso = convite.Acesso;
-            Status = TipoStatusContasUsuario.Ativo;
+            Status = StatusContasUsuario.Ativo;
             if (convite.ExpiracaoContaUsuario.HasValue)
             {
                 Expiracao = DateTime.UtcNow.AddMinutes(convite.ExpiracaoContaUsuario.Value);
@@ -185,11 +185,11 @@ namespace Financ.Domain.Entidades.ContasBancarias
         #endregion
 
         #region Metodos Privados
-        private void ValidaEnums(TiposAcessos? acesso, TipoStatusContasUsuario? status)
+        private void ValidaEnums(TiposAcessos? acesso, StatusContasUsuario? status)
         {
 
             if (status.HasValue)
-                ContasUsuariosValidacao.Verifica(!Enum.IsDefined(typeof(TipoStatusContasUsuario), status), MensagensBase.STATUS_INVALIDO);
+                ContasUsuariosValidacao.Verifica(!Enum.IsDefined(typeof(StatusContasUsuario), status), MensagensBase.STATUS_INVALIDO);
 
             if (acesso.HasValue)
                 ContasUsuariosValidacao.Verifica(!Enum.IsDefined(typeof(TiposAcessos), acesso), MensagensContasUsuarios.ACESSO_INVALIDO);
@@ -197,7 +197,7 @@ namespace Financ.Domain.Entidades.ContasBancarias
         private void ValidaContasUsuarios(Conta conta, string idUsuario)
         {
             ContasUsuariosValidacao.Verifica(conta is null, MensagensContasUsuarios.CONTA_NAO_PODE_SER_NULA);
-            ContasUsuariosValidacao.Verifica(conta!.Status != TiposStatusContas.Ativo, MensagensContasUsuarios.CONTA_NAO_ESTA_ATIVA);
+            ContasUsuariosValidacao.Verifica(conta!.Status != StatusContas.Ativo, MensagensContasUsuarios.CONTA_NAO_ESTA_ATIVA);
             ContasUsuariosValidacao.Verifica(string.IsNullOrEmpty(idUsuario), MensagensContasUsuarios.IDUSUARIO_INVALIDO);
 
         }
@@ -213,7 +213,7 @@ namespace Financ.Domain.Entidades.ContasBancarias
         private void ValidaUsuarioMestreAtivo(ContaUsuario usuario)
         {
             ContasUsuariosValidacao.Verifica(usuario.Acesso != TiposAcessos.Mestre, MensagensContasUsuarios.ACESSO_NEGADO);
-            ContasUsuariosValidacao.Verifica(usuario.Status != TipoStatusContasUsuario.Ativo, MensagensContasUsuarios.ACESSO_NEGADO_POR_STATUS);
+            ContasUsuariosValidacao.Verifica(usuario.Status != StatusContasUsuario.Ativo, MensagensContasUsuarios.ACESSO_NEGADO_POR_STATUS);
         }
         #endregion
 

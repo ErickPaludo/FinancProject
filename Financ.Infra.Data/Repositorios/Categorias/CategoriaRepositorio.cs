@@ -1,5 +1,5 @@
-﻿using Financ.Domain.Entidades.Movimentações;
-using Financ.Domain.Interfaces.Repositorios.Movimentações;
+﻿using Financ.Domain.Entidades.Categorias;
+using Financ.Domain.Interfaces.Repositorios.Categorias;
 using Financ.Infra.Data.Contexto;
 using Financ.Infra.Data.Repositorios.Base;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +10,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Financ.Infra.Data.Repositorios.Movimentações
+namespace Financ.Infra.Data.Repositorios.Categorias
 {
     public class CategoriaRepositorio : BaseRepositorio<Categoria>, ICategoriaRepositorio
     {

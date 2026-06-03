@@ -3,19 +3,22 @@ using Financ.Application.CQRS.Contas_Usuarios.Querys;
 using Financ.Application.CQRS.Movimentação.Querys;
 using Financ.Application.DTOs.Base;
 using Financ.Application.DTOs.Movimentações.Get;
+using Financ.Application.DTOs.Movimentações.Get.Filtros;
 using Financ.Application.Mapeamento;
 using Financ.Domain.Entidades.ContasBancarias;
 using Financ.Domain.Entidades.Movimentações;
+using Financ.Domain.Entidades.Movimentações.Fixas;
 using Financ.Domain.Enums.Movimentações;
+using Financ.Domain.Enums.Movimentações.Fixas;
 using Financ.Domain.Interfaces;
-using NetDevPack.SimpleMediator;
+using Financ.Domain.Validacoes.ContasBancarias;
 using Microsoft.EntityFrameworkCore;
+using NetDevPack.SimpleMediator;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Financ.Domain.Validacoes.ContasBancarias;
 
 namespace Financ.Application.CQRS.Movimentação.Handlers
 {
@@ -44,11 +47,12 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
                 List<Movimentacao> movimentacoes = await MovimentacoesSelecionadas(request);
 
 
-                decimal totalEntradaConcluidos = movimentacoes.Where(x => x.Tipo is TipoMovimentacao.Entrada && x.Status is TipoStatusMovimentacao.Concluido).Sum(x => x.Valor);
-                decimal totalSaidaConcluidos = movimentacoes.Where(x => x.Tipo == TipoMovimentacao.Saida && x.Status is TipoStatusMovimentacao.Concluido).Sum(x => x.Valor);
 
-                decimal totalEntradaPendentes = movimentacoes.Where(x => x.Tipo is TipoMovimentacao.Entrada && x.Status is TipoStatusMovimentacao.Pendente).Sum(x => x.Valor);
-                decimal totalSaidaPendentes = movimentacoes.Where(x => x.Tipo == TipoMovimentacao.Saida && x.Status is TipoStatusMovimentacao.Pendente).Sum(x => x.Valor);
+                decimal totalEntradaConcluidos = movimentacoes.Where(x => x.Tipo is TipoMovimentacao.Entrada && x.Status is StatusMovimentacao.Concluido).Sum(x => x.Valor);
+                decimal totalSaidaConcluidos = movimentacoes.Where(x => x.Tipo == TipoMovimentacao.Saida && x.Status is StatusMovimentacao.Concluido).Sum(x => x.Valor);
+
+                decimal totalEntradaPendentes = movimentacoes.Where(x => x.Tipo is TipoMovimentacao.Entrada && x.Status is StatusMovimentacao.Pendente).Sum(x => x.Valor);
+                decimal totalSaidaPendentes = movimentacoes.Where(x => x.Tipo == TipoMovimentacao.Saida && x.Status is StatusMovimentacao.Pendente).Sum(x => x.Valor);
 
                 decimal totalEntrada = totalEntradaConcluidos + totalEntradaPendentes;
                 decimal totalSaida = totalSaidaConcluidos + totalSaidaPendentes;
@@ -77,7 +81,7 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
 
                 ResumoMovimentacoesDTO resumoDTO = new ResumoMovimentacoesDTO(saldoRealizado, saldoProjetado, grupoEntrada, grupoSaida);
 
-                return Resultado<BaseGet<RetornaMovimentacaoDTO>>.GeraSucesso(new BaseGet<RetornaMovimentacaoDTO>(MovimentacaoMapper.ParaDTO(resumoDTO, await MovimentacoesSelecionadas(request))));
+                return Resultado<BaseGet<RetornaMovimentacaoDTO>>.GeraSucesso(new BaseGet<RetornaMovimentacaoDTO>(MovimentacaoMapper.ParaDTO(resumoDTO, movimentacoes)));
             }
             catch (ContasUsuariosValidacao ex)
             {
@@ -89,52 +93,63 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
 
             var filtro = request.Filtros;
 
-            var queryable = _unitOfWork.movimentacaoRepositorio
+            var queryableMovimentacao = _unitOfWork.movimentacaoRepositorio
                 .BuscaMovimentacaoComContasUsuarios();
 
-            queryable = queryable.Where(x => x.IdConta == request.IdConta && x.DthrMovimentacao >= filtro.DthrMovimentacaoInicial && x.DthrMovimentacao <= filtro.DthrMovimentacaoFinal);
+            var queryableFixos = _unitOfWork.movimentacaoFixaRepositorio.BuscaMovimentacoesFixaCompleta(x => x.Movimentacao.Conta.Id == request.IdConta && x.Status == StatusMovimentacaoFixa.Ativo);
+
+            bool filtraFixo = request.Filtros.RetornaFixos.HasValue && request.Filtros.RetornaFixos.Value;
+
+            queryableMovimentacao = queryableMovimentacao.Where(x => x.IdConta == request.IdConta && x.DthrMovimentacao >= filtro.DthrMovimentacaoInicial && x.DthrMovimentacao <= filtro.DthrMovimentacaoFinal);
 
             if (1 == 1) //Não retorna movimentacoes excluidas
-                queryable = queryable.Where(x => x.Status != TipoStatusMovimentacao.Excluido);
+                queryableMovimentacao = queryableMovimentacao.Where(x => x.Status != StatusMovimentacao.Oculta);
 
             if (filtro!.Titulo is not null)
             {
-                queryable = queryable.Where(x => x.Titulo.Contains(filtro.Titulo));
+                queryableMovimentacao = queryableMovimentacao.Where(x => x.Titulo.Contains(filtro.Titulo));
+                queryableFixos = queryableFixos.Where((x => x.Movimentacao.Titulo.Contains(filtro.Titulo)));
             }
 
             if (filtro!.IdMovimentacao.HasValue == true)
             {
-                queryable = queryable.Where(x => x.Id == filtro.IdMovimentacao.Value);
+                queryableMovimentacao = queryableMovimentacao.Where(x => x.Id == filtro.IdMovimentacao.Value);
+                filtraFixo = false;
             }
 
             if (filtro!.Concluido.HasValue == true)
             {
                 var status = filtro.Concluido.Value
-                    ? TipoStatusMovimentacao.Concluido
-                    : TipoStatusMovimentacao.Pendente;
+                    ? StatusMovimentacao.Concluido
+                    : StatusMovimentacao.Pendente;
 
-                queryable = queryable.Where(x => x.Status == status);
+                queryableMovimentacao = queryableMovimentacao.Where(x => x.Status == status);
+
+                if (status == StatusMovimentacao.Concluido)
+                    filtraFixo = false;
+
             }
 
             if (filtro!.TipoMovimentacao.HasValue == true)
             {
                 var tipoMovimentacao = filtro.TipoMovimentacao.Value;
 
-                queryable = queryable.Where(x => x.Tipo == tipoMovimentacao);
+                queryableMovimentacao = queryableMovimentacao.Where(x => x.Tipo == tipoMovimentacao);
+                queryableFixos = queryableFixos.Where((x => x.Movimentacao.Tipo == tipoMovimentacao));
             }
 
             if (filtro?.IdCategoria?.Any() == true)
             {
                 if (filtro.IdCategoria.Any(x => x == 0))
                 {
-                    queryable = queryable
+                    queryableMovimentacao = queryableMovimentacao
                      .Where(x => !x.CategoriasMovimentacao.Any())
                      .Include(x => x.CategoriasMovimentacao)
                      .ThenInclude(mc => mc.Categoria);
                 }
                 else
                 {
-                    queryable = queryable
+                    queryableMovimentacao = queryableMovimentacao
                      .Where(x => x.CategoriasMovimentacao.Any(mc => filtro!.IdCategoria.Contains(mc.IdCategoria)))
                      .Include(x => x.CategoriasMovimentacao
                      .Where(mc => filtro.IdCategoria.Contains(mc.IdCategoria)))
@@ -142,8 +157,130 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
                 }
             }
 
-            return await queryable.OrderByDescending(x => x.DthrMovimentacao).ToListAsync();
+            List<Movimentacao> movimentacoes = await queryableMovimentacao.ToListAsync();
 
+            if (filtraFixo)
+            {
+                List<MovimentacaoFixa> movimentacaoFixas = await queryableFixos.ToListAsync();
+                List<Movimentacao> movimentacoesFixasGeradas = RetornaFixos(filtro!, movimentacoes, movimentacaoFixas);
+                movimentacoes.AddRange(movimentacoesFixasGeradas);
+            }
+
+            return movimentacoes.Where(x => x.Status != StatusMovimentacao.Excluido).OrderByDescending(x => x.DthrMovimentacao).ToList();
         }
+
+        private List<Movimentacao> RetornaFixos(FiltroRetornoMovimentacao filtros, IEnumerable<Movimentacao> movimentacoes, IEnumerable<MovimentacaoFixa> fixos)
+        {
+            var mensal = Mensal(filtros, movimentacoes, fixos);
+            var anual = Anual(filtros, movimentacoes, fixos);
+            List<Movimentacao> novaMov = new();
+            novaMov.AddRange(mensal);
+            novaMov.AddRange(anual);
+            return novaMov;
+        }
+        private List<Movimentacao> Mensal(FiltroRetornoMovimentacao filtros, IEnumerable<Movimentacao> movimentacoes, IEnumerable<MovimentacaoFixa> fixos)
+        {
+            DateOnly inicio = DateOnly.FromDateTime(filtros.DthrMovimentacaoInicial);
+            DateOnly fim = DateOnly.FromDateTime(filtros.DthrMovimentacaoFinal);
+
+            int diferencaMes = (fim.Year - inicio.Year) * 12 + (fim.Month - inicio.Month);
+            List<Movimentacao> novaMov = new();
+
+            var indiceProcura = movimentacoes
+                              .Select(m => (m.IdFixo, m.DthrMovimentacao.Year, m.DthrMovimentacao.Month))
+                              .ToHashSet();
+
+            var periodoFixos = fixos.Where(x => x.Tipo == TipoMovimentacaoFixa.Mensal && (inicio >= x.DataInicio || fim <= x.DataFim)).ToList();
+
+            if (!periodoFixos.Any())
+                return new List<Movimentacao>();
+
+            for (int i = 0; i <= diferencaMes; i++)
+            {
+                DateOnly proximoDt = i > 0 ? new DateOnly(inicio.Year, inicio.Month, 1).AddMonths(i) : inicio;
+                foreach (var fixo in periodoFixos.Where(
+                    x => proximoDt >= x.DataInicio && 
+                    proximoDt <= x.DataFim).ToList())
+                {
+              
+                    if(i == 0 && (proximoDt.Day > fixo.DataOcorrencia!.Value.Day))
+                    {
+                        continue;
+                    }
+
+                    if (i == diferencaMes && fixo.DataOcorrencia!.Value.Day > fim.Day)
+                    {
+                        continue;
+                    }
+
+                    if (!indiceProcura.Contains((fixo.Id, proximoDt.Year, proximoDt.Month)))
+                    {
+
+                        int diasMes = DateTime.DaysInMonth(proximoDt.Year, proximoDt.Month);
+
+                        diasMes = fixo.DataOcorrencia!.Value.Day > diasMes ? diasMes : fixo.DataOcorrencia!.Value.Day;
+
+                        DateTime dthrMovimentacao = new DateTime(proximoDt.Year, proximoDt.Month, diasMes);
+
+                        novaMov.Add(new Movimentacao(fixo.Movimentacao.Tipo, fixo.Movimentacao.ContaUsuarioCriador, fixo.Movimentacao.Valor, fixo.Movimentacao.Titulo, fixo.Movimentacao.Observacao, dthrMovimentacao, null, false, fixo));
+
+                        indiceProcura.Add((fixo.Id, proximoDt.Year, proximoDt.Month));
+                    }
+                }
+            }
+
+            return novaMov;
+        }
+        private List<Movimentacao> Anual(FiltroRetornoMovimentacao filtros, IEnumerable<Movimentacao> movimentacoes, IEnumerable<MovimentacaoFixa> fixos)
+        {
+            DateOnly inicio = DateOnly.FromDateTime(filtros.DthrMovimentacaoInicial);
+            DateOnly fim = DateOnly.FromDateTime(filtros.DthrMovimentacaoFinal);
+
+            int diferencaAno = (int)Math.Ceiling(((fim.Year - inicio.Year) * 12 + (fim.Month - inicio.Month)) / 12.0);
+
+            List<Movimentacao> novaMov = new();
+
+            var indiceProcura = movimentacoes
+                              .Select(m => (m.IdFixo, m.DthrMovimentacao.Year,m.DthrMovimentacao.Month,m.DthrMovimentacao.Day))
+                              .ToHashSet();
+
+            var periodoFixos = fixos.Where(x => x.Tipo == TipoMovimentacaoFixa.Anual && (inicio >= x.DataInicio || fim <= x.DataFim)).ToList();
+
+            for (int i = 0; i <= diferencaAno; i++)
+            {
+                DateOnly proximoDt = i > 0 ? new DateOnly(inicio.Year, 1, 1).AddYears(i) : inicio;
+
+                foreach (var fixo in periodoFixos.Where(x => proximoDt.Year >= x.DataInicio.Year && proximoDt.Year <= x.DataFim.Year).ToList())
+                {
+
+                    if ((i == 0 && (fixo.DataOcorrencia!.Value.Day < inicio.Day || fixo.DataOcorrencia!.Value.Month < inicio.Month)))
+                    {
+                        continue;
+                    }
+
+                    if ((i == diferencaAno && (fixo.DataOcorrencia!.Value.Day > fim.Day || fixo.DataOcorrencia!.Value.Month > fim.Month)))
+                    {
+                        continue;
+                    }
+
+                    if (!indiceProcura.Contains((fixo.Id, proximoDt.Year,fixo.DataOcorrencia!.Value.Month,fixo.DataOcorrencia!.Value.Day)))
+                    {
+
+                        int diasMes = DateTime.DaysInMonth(proximoDt.Year, proximoDt.Month);
+
+                        diasMes = fixo.DataOcorrencia!.Value.Day > diasMes ? diasMes : fixo.DataOcorrencia!.Value.Day;
+
+                        DateTime dthrMovimentacao = new DateTime(proximoDt.Year, fixo.DataOcorrencia!.Value.Month, diasMes);
+
+                        novaMov.Add(new Movimentacao(fixo.Movimentacao.Tipo, fixo.Movimentacao.ContaUsuarioCriador, fixo.Movimentacao.Valor, fixo.Movimentacao.Titulo, fixo.Movimentacao.Observacao, dthrMovimentacao, null, false, fixo));
+
+                        indiceProcura.Add((fixo.Id, proximoDt.Year,fixo.DataOcorrencia!.Value.Month, fixo.DataOcorrencia!.Value.Day));
+                    }
+                }
+            }
+
+            return novaMov;
+        }
+
     }
 }

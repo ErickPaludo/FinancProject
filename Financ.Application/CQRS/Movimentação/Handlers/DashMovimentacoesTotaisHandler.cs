@@ -39,9 +39,9 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
                     g.Key.Year,
                     g.Key.Month, 
                     new GrupoMovDashTotalDTO(
-                        g.Where(x => x.Tipo == TipoMovimentacao.Entrada && x.Status == TipoStatusMovimentacao.Concluido)
+                        g.Where(x => x.Tipo == TipoMovimentacao.Entrada && x.Status == StatusMovimentacao.Concluido)
                         .Sum(mov => mov.Valor),
-                        g.Where(x => x.Tipo == TipoMovimentacao.Saida && x.Status == TipoStatusMovimentacao.Concluido)
+                        g.Where(x => x.Tipo == TipoMovimentacao.Saida && x.Status == StatusMovimentacao.Concluido)
                         .Sum(mov => mov.Valor)
                         )))
                 .OrderBy(x => x.Ano).ThenBy(x => x.Mes).ToList();

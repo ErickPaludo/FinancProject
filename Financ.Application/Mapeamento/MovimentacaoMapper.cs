@@ -19,7 +19,7 @@ namespace Financ.Application.Mapeamento
             movimentacao.Tipo,
             movimentacao.IdConta,
             movimentacao.IdFixo,
-            movimentacao.Status is TipoStatusMovimentacao.Concluido,
+            movimentacao.Status is StatusMovimentacao.Concluido,
             movimentacao.Valor,
             movimentacao.Titulo,
             movimentacao.Observacao,
@@ -28,6 +28,7 @@ namespace Financ.Application.Mapeamento
             movimentacao.DthrConclusao.HasValue ? DateTime.SpecifyKind(movimentacao.DthrConclusao.Value, DateTimeKind.Utc) : null,
 ContaUsuarioMapper.ParaUsuarioDTO(movimentacao.ContaUsuarioCriador),
             (movimentacao.ContaUsuarioExecutor is null ? null : ContaUsuarioMapper.ParaUsuarioDTO(movimentacao.ContaUsuarioExecutor)),
+            movimentacao.Editado,
             movimentacao.CategoriasMovimentacao is not null ? movimentacao.CategoriasMovimentacao.Select(mc => CategoriaMapper.ParaDTO(mc.Categoria)).ToList() : null
             );
         }

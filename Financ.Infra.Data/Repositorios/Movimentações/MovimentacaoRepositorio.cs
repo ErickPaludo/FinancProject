@@ -35,6 +35,7 @@ namespace Financ.Infra.Data.Repositorios.Movimentações
             return _contexto.Movimentacao
                            .Include(mc => mc.CategoriasMovimentacao)
                             .ThenInclude(c => c.Categoria)
+                           .Include(mf => mf.Fixa)
                            .Include(u => u.ContaUsuarioCriador).ThenInclude(u => u.Usuario)
                            .Include(u => u.ContaUsuarioExecutor).ThenInclude(u => u!.Usuario)
                            .Include(c => c.Conta.ContaUsuarios);

@@ -3,6 +3,7 @@ using Financ.Application.CQRS.Movimentação.Commands;
 using Financ.Application.DTOs.Base;
 using Financ.Application.DTOs.Movimentações.Get;
 using Financ.Application.Mapeamento;
+using Financ.Domain.Entidades.Categorias;
 using Financ.Domain.Entidades.ContasBancarias;
 using Financ.Domain.Entidades.Movimentações;
 using Financ.Domain.Interfaces;

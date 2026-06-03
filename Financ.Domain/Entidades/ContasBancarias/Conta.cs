@@ -20,7 +20,7 @@ namespace Financ.Domain.Entidades.ContasBancarias
     public sealed class Conta : BaseConta
     {
         public string Titulo { get; private set; }
-        public TiposStatusContas Status { get; private set; }
+        public StatusContas Status { get; private set; }
         public TipoConta TipoConta { get; private set; }
         public decimal Saldo { get; private set; }
         public Cor Cor { get; private set; }
@@ -47,10 +47,10 @@ namespace Financ.Domain.Entidades.ContasBancarias
             ContaPadrao();
             Cor = new Cor(cor);
         }
-        public void AtualizaConta(ContaUsuario? usuario, string? titulo, TiposStatusContas? status, string? cor = null)
+        public void AtualizaConta(ContaUsuario? usuario, string? titulo, StatusContas? status, string? cor = null)
         {
             ContasValidacao.Verifica(usuario is null || usuario.Conta != this, MensagensContasUsuarios.USUARIO_NAO_PERTENCE_A_CONTA);
-            ContasValidacao.Verifica(!usuario!.Status.Equals(TipoStatusContasUsuario.Ativo), MensagensBase.USUARIO_INATIVO_NAO_PODE_SER_ATUALIZADO);
+            ContasValidacao.Verifica(!usuario!.Status.Equals(StatusContasUsuario.Ativo), MensagensBase.USUARIO_INATIVO_NAO_PODE_SER_ATUALIZADO);
             ContasValidacao.Verifica((usuario!.Acesso != TiposAcessos.Mestre), MensagensContas.ATUALIZA_CONTA_USUARIO_SEM_PERMISSAO);
 
             if (cor != null)
@@ -70,7 +70,7 @@ namespace Financ.Domain.Entidades.ContasBancarias
             _contasUsuarios.Remove(contaUsuario);
 
             if (ContaUsuarios.Count() == 0)
-                Status = TiposStatusContas.Inativo;
+                Status = StatusContas.Inativo;
         }
         public bool ConviteEmAndamento(string idUsuario)
         {
@@ -84,7 +84,7 @@ namespace Financ.Domain.Entidades.ContasBancarias
         }
         public void ProcessaMovimentacao(Movimentacao movimentacao)
         {
-            if (movimentacao.Status is TipoStatusMovimentacao.Concluido)
+            if (movimentacao.Status is StatusMovimentacao.Concluido)
             {
                 ContasValidacao.Verifica(movimentacao.Extorno, MensagensContas.NAO_PODE_PROCESSAR_MOVIMENTACAO_COM_EXTORNO);
                 ContasValidacao.Verifica(movimentacao.Tipo.Equals(TipoMovimentacao.Saida) && movimentacao.Valor > Saldo, MensagensContas.SALDO_INSUFICIENTE);
@@ -94,7 +94,7 @@ namespace Financ.Domain.Entidades.ContasBancarias
         public void ProcessaExtornoMovimentacao(Movimentacao movimentacao)
         {
             ContasValidacao.Verifica(!movimentacao.Extorno, MensagensContas.NAO_PODE_PROCESSAR_MOVIMENTACAO_SEM_EXTORNO);
-            ContasValidacao.Verifica(movimentacao.Status is not TipoStatusMovimentacao.Pendente, MensagensContas.EXTORNO_DE_MOVIMENTACAO_COM_DATA_DE_CONCLUSAO);
+            ContasValidacao.Verifica(movimentacao.Status is not StatusMovimentacao.Pendente, MensagensContas.EXTORNO_DE_MOVIMENTACAO_COM_DATA_DE_CONCLUSAO);
             ContasValidacao.Verifica(movimentacao.DthrConclusao is not null, MensagensContas.EXTORNO_DE_MOVIMENTACAO_COM_DATA_DE_CONCLUSAO);
             ContasValidacao.Verifica(movimentacao.Tipo.Equals(TipoMovimentacao.Entrada) && movimentacao.Valor > Saldo, MensagensContas.SALDO_INSUFICIENTE);
             Saldo = movimentacao.Tipo.Equals(TipoMovimentacao.Entrada) ? Saldo - movimentacao.Valor : Saldo + movimentacao.Valor;
@@ -116,7 +116,7 @@ namespace Financ.Domain.Entidades.ContasBancarias
 
         private void ContaPadrao()
         {
-            Status = TiposStatusContas.Ativo;
+            Status = StatusContas.Ativo;
             TipoConta = TipoConta.Corrente;
             DthrReg = DateTime.UtcNow;
         }
@@ -126,9 +126,9 @@ namespace Financ.Domain.Entidades.ContasBancarias
             ContasValidacao.Verifica(titulo.Length < 3 || titulo.Length > 100, MensagensContas.TITULO_TAMANHO_INVALIDO);
             Titulo = titulo;
         }
-        private void ValidaStatusConta(TiposStatusContas status)
+        private void ValidaStatusConta(StatusContas status)
         {
-            ContasValidacao.Verifica(!Enum.IsDefined(typeof(TiposStatusContas), status), MensagensBase.STATUS_INVALIDO);
+            ContasValidacao.Verifica(!Enum.IsDefined(typeof(StatusContas), status), MensagensBase.STATUS_INVALIDO);
             Status = status;
         }
         #region Linhas de credito Fase 3

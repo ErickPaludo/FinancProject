@@ -1,10 +1,11 @@
-﻿using Financ.Domain.Entidades.ContasBancarias;
+﻿using Financ.Domain.Entidades.Categorias;
+using Financ.Domain.Entidades.ContasBancarias;
 using Financ.Domain.Entidades.Movimentações;
 using Financ.Domain.Enums.ContasBancarias;
+using Financ.Domain.Validacoes.Categorias;
+using Financ.Domain.Validacoes.Categorias.Mensagens;
 using Financ.Domain.Validacoes.Cor;
 using Financ.Domain.Validacoes.Cor.Mensagens;
-using Financ.Domain.Validacoes.Movimentações;
-using Financ.Domain.Validacoes.Movimentações.Mensagens;
 using FluentAssertions;
 using System;
 using Xunit;
@@ -101,7 +102,7 @@ namespace Financ.TesteUnitarios.Domain
             // Arrange
             var conta = CriarContaValida();
             // Criando um usuário que não é mestre (usando construtor completo)
-            var usuarioComum = new ContaUsuario(1, conta, "user-123", TiposAcessos.Administrador, TipoStatusContasUsuario.Ativo);
+            var usuarioComum = new ContaUsuario(1, conta, "user-123", TiposAcessos.Administrador, StatusContasUsuario.Ativo);
 
             // Act
             Action action = () => new Categoria(usuarioComum, "Teste", "#FFFFFF");
@@ -116,7 +117,7 @@ namespace Financ.TesteUnitarios.Domain
         {
             // Arrange
             var conta = CriarContaValida();
-            var usuarioInativo = new ContaUsuario(1, conta, "user-123", TiposAcessos.Mestre, TipoStatusContasUsuario.Inativo);
+            var usuarioInativo = new ContaUsuario(1, conta, "user-123", TiposAcessos.Mestre, StatusContasUsuario.Inativo);
 
             // Act
             Action action = () => new Categoria(usuarioInativo, "Teste", "#FFFFFF");

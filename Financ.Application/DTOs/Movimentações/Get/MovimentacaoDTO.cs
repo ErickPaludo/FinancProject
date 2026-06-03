@@ -13,5 +13,5 @@ using System.Threading.Tasks;
 
 namespace Financ.Application.DTOs.Movimentações.Get
 {
-    public record MovimentacaoDTO(int Id, TipoMovimentacao Tipo, int IdConta, int? IdFixo, bool concluido,decimal valor, string Titulo, string? observacao, DateTime DthrReg, DateTime DthrMovimentacao, DateTime? DthrConclusao, RetornaContaUsuarioDTO UsarioCriador, RetornaContaUsuarioDTO? UsuarioExecutor, List<CategoriaDTO>? Categorias);
+    public record MovimentacaoDTO(int Id, TipoMovimentacao Tipo, int IdConta, int? IdFixo, bool concluido,decimal valor, string Titulo, string? observacao, DateTime DthrReg, DateTime DthrMovimentacao, DateTime? DthrConclusao, RetornaContaUsuarioDTO UsarioCriador, RetornaContaUsuarioDTO? UsuarioExecutor,bool Editado, List<CategoriaDTO>? Categorias);
 }

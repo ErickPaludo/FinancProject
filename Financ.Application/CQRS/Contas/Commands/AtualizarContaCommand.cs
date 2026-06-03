@@ -15,7 +15,7 @@ namespace Financ.Application.CQRS.Contas_Commands
     public sealed record AtualizarContaCommand(
           int IdConta,           
           string IdUsuario,      
-          TiposStatusContas? Status,
+          StatusContas? Status,
           string? Titulo,
           string? Cor
       ) : IRequest<Resultado<BaseGet<RetornaContasDTO>>>;

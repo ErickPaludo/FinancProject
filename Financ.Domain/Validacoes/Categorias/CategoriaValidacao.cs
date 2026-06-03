@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Financ.Domain.Validacoes.Movimentações
+namespace Financ.Domain.Validacoes.Categorias
 {
     public class CategoriaValidacao : BaseValidacao
     {

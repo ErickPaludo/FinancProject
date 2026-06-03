@@ -25,7 +25,7 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
         {
             var contasUsuarios = await ContasUsuariosSelecionadas(request);
             var idsContas = contasUsuarios.Select(c => c.Conta.Id).ToList();
-            var movimentacoes = await _unitOfWork.movimentacaoRepositorio.BuscarPorCondicao(m => idsContas.Contains(m.IdConta) && m.Status == TipoStatusMovimentacao.Pendente);
+            var movimentacoes = await _unitOfWork.movimentacaoRepositorio.BuscarPorCondicao(m => idsContas.Contains(m.IdConta) && m.Status == StatusMovimentacao.Pendente);
             if (contasUsuarios.Count() == 0)
                 return Resultado<BaseGetList<RetornaContasDTO>>.GeraFalha(Falha.NaoEncontrado("Nenhuma conta foi encontrada!"));
 
@@ -41,7 +41,7 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
             var possuiFiltros = filtros.Filtros != null;
 
             var contasUsuario = await _unitOfWork.contasUsuariosRepositorio.ObterContasDoUsuario(
-                x => x.IdUsuario == filtros.IdUsuario && x.Status == TipoStatusContasUsuario.Ativo
+                x => x.IdUsuario == filtros.IdUsuario && x.Status == StatusContasUsuario.Ativo
                 && (!possuiFiltros || (
                     (!filtroId.HasValue || x.IdConta == filtroId.Value) &&
                     (string.IsNullOrEmpty(filtroTitulo) || x.Conta!.Titulo!.Contains(filtroTitulo)) &&

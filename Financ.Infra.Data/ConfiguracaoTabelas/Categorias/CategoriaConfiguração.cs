@@ -1,4 +1,4 @@
-﻿using Financ.Domain.Entidades.Movimentações;
+﻿using Financ.Domain.Entidades.Categorias;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Financ.Infra.Data.ConfiguracaoTabelas.Movimentações
+namespace Financ.Infra.Data.ConfiguracaoTabelas.Categorias
 {
     public class CategoriaConfiguração : IEntityTypeConfiguration<Categoria>
     {
