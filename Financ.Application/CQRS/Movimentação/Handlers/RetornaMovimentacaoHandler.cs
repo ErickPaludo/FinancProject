@@ -46,8 +46,6 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
 
                 List<Movimentacao> movimentacoes = await MovimentacoesSelecionadas(request);
 
-
-
                 decimal totalEntradaConcluidos = movimentacoes.Where(x => x.Tipo is TipoMovimentacao.Entrada && x.Status is StatusMovimentacao.Concluido).Sum(x => x.Valor);
                 decimal totalSaidaConcluidos = movimentacoes.Where(x => x.Tipo == TipoMovimentacao.Saida && x.Status is StatusMovimentacao.Concluido).Sum(x => x.Valor);
 
@@ -146,12 +144,23 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
                      .Where(x => !x.CategoriasMovimentacao.Any())
                      .Include(x => x.CategoriasMovimentacao)
                      .ThenInclude(mc => mc.Categoria);
+
+                    queryableFixos = queryableFixos
+                     .Where(x => !x.Movimentacao.CategoriasMovimentacao.Any())
+                     .Include(x => x.Movimentacao.CategoriasMovimentacao)
+                     .ThenInclude(mc => mc.Categoria);
                 }
                 else
                 {
                     queryableMovimentacao = queryableMovimentacao
                      .Where(x => x.CategoriasMovimentacao.Any(mc => filtro!.IdCategoria.Contains(mc.IdCategoria)))
                      .Include(x => x.CategoriasMovimentacao
+                     .Where(mc => filtro.IdCategoria.Contains(mc.IdCategoria)))
+                     .ThenInclude(mc => mc.Categoria);
+
+                    queryableFixos = queryableFixos
+                     .Where(x => x.Movimentacao.CategoriasMovimentacao.Any(mc => filtro!.IdCategoria.Contains(mc.IdCategoria)))
+                     .Include(x => x.Movimentacao.CategoriasMovimentacao
                      .Where(mc => filtro.IdCategoria.Contains(mc.IdCategoria)))
                      .ThenInclude(mc => mc.Categoria);
                 }
@@ -173,9 +182,11 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
         {
             var mensal = Mensal(filtros, movimentacoes, fixos);
             var anual = Anual(filtros, movimentacoes, fixos);
+            var diario = Diario(filtros, movimentacoes, fixos);
             List<Movimentacao> novaMov = new();
             novaMov.AddRange(mensal);
             novaMov.AddRange(anual);
+            novaMov.AddRange(diario);
             return novaMov;
         }
         private List<Movimentacao> Mensal(FiltroRetornoMovimentacao filtros, IEnumerable<Movimentacao> movimentacoes, IEnumerable<MovimentacaoFixa> fixos)
@@ -190,7 +201,7 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
                               .Select(m => (m.IdFixo, m.DthrMovimentacao.Year, m.DthrMovimentacao.Month))
                               .ToHashSet();
 
-            var periodoFixos = fixos.Where(x => x.Tipo == TipoMovimentacaoFixa.Mensal && (inicio >= x.DataInicio || fim <= x.DataFim)).ToList();
+            var periodoFixos = fixos.Where(x => x.Tipo == TipoMovimentacaoFixa.Mensal && (inicio >= x.DataInicio || inicio <= x.DataFim)).ToList();
 
             if (!periodoFixos.Any())
                 return new List<Movimentacao>();
@@ -199,11 +210,11 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
             {
                 DateOnly proximoDt = i > 0 ? new DateOnly(inicio.Year, inicio.Month, 1).AddMonths(i) : inicio;
                 foreach (var fixo in periodoFixos.Where(
-                    x => proximoDt >= x.DataInicio && 
+                    x => proximoDt >= x.DataInicio &&
                     proximoDt <= x.DataFim).ToList())
                 {
-              
-                    if(i == 0 && (proximoDt.Day > fixo.DataOcorrencia!.Value.Day))
+
+                    if (i == 0 && (proximoDt.Day > fixo.DataOcorrencia!.Value.Day))
                     {
                         continue;
                     }
@@ -220,9 +231,14 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
 
                         diasMes = fixo.DataOcorrencia!.Value.Day > diasMes ? diasMes : fixo.DataOcorrencia!.Value.Day;
 
-                        DateTime dthrMovimentacao = new DateTime(proximoDt.Year, proximoDt.Month, diasMes);
+                        DateTime dthrMovimentacao = new DateTime(proximoDt.Year, proximoDt.Month, diasMes, fixo.DataOcorrencia!.Value.Hour, fixo.DataOcorrencia!.Value.Minute, fixo.DataOcorrencia!.Value.Second);
 
-                        novaMov.Add(new Movimentacao(fixo.Movimentacao.Tipo, fixo.Movimentacao.ContaUsuarioCriador, fixo.Movimentacao.Valor, fixo.Movimentacao.Titulo, fixo.Movimentacao.Observacao, dthrMovimentacao, null, false, fixo));
+                        var mov = new Movimentacao(fixo.Movimentacao.Tipo, fixo.Movimentacao.ContaUsuarioCriador, fixo.Movimentacao.Valor, fixo.Movimentacao.Titulo, fixo.Movimentacao.Observacao, dthrMovimentacao, null, false, fixo);
+
+                        fixo.Movimentacao.CategoriasMovimentacao.ToList().ForEach(x => mov.AdicionarCategoria(x));
+
+
+                        novaMov.Add(mov);
 
                         indiceProcura.Add((fixo.Id, proximoDt.Year, proximoDt.Month));
                     }
@@ -241,46 +257,109 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
             List<Movimentacao> novaMov = new();
 
             var indiceProcura = movimentacoes
-                              .Select(m => (m.IdFixo, m.DthrMovimentacao.Year,m.DthrMovimentacao.Month,m.DthrMovimentacao.Day))
+                              .Select(m => (m.IdFixo, m.DthrMovimentacao.Year, m.DthrMovimentacao.Month, m.DthrMovimentacao.Day))
                               .ToHashSet();
 
-            var periodoFixos = fixos.Where(x => x.Tipo == TipoMovimentacaoFixa.Anual && (inicio >= x.DataInicio || fim <= x.DataFim)).ToList();
+            var periodoFixos = fixos.Where(x => x.Tipo == TipoMovimentacaoFixa.Anual && (inicio >= x.DataInicio || inicio <= x.DataFim)).ToList();
 
             for (int i = 0; i <= diferencaAno; i++)
             {
                 DateOnly proximoDt = i > 0 ? new DateOnly(inicio.Year, 1, 1).AddYears(i) : inicio;
 
-                foreach (var fixo in periodoFixos.Where(x => proximoDt.Year >= x.DataInicio.Year && proximoDt.Year <= x.DataFim.Year).ToList())
+                foreach (var fixo in periodoFixos.Where(x => proximoDt.Year >= x.DataInicio.Year &&
+                                                             proximoDt.Year <= x.DataFim.Year).ToList())
                 {
+                    int diasMes = DateTime.DaysInMonth(proximoDt.Year, proximoDt.Month);
+
+                    diasMes = fixo.DataOcorrencia!.Value.Day > diasMes ? diasMes : fixo.DataOcorrencia!.Value.Day;
+
+                    DateTime dthrMovimentacao = new DateTime(proximoDt.Year, fixo.DataOcorrencia!.Value.Month, diasMes, fixo.DataOcorrencia!.Value.Hour, fixo.DataOcorrencia!.Value.Minute, fixo.DataOcorrencia!.Value.Second);
+
+                    if (!(DateOnly.FromDateTime(dthrMovimentacao) >= inicio && DateOnly.FromDateTime(dthrMovimentacao) <= fim))
+                        continue;
+
+                    if (DateOnly.FromDateTime(dthrMovimentacao) >= fixo.DataFim)
+                        break;
 
                     if ((i == 0 && (fixo.DataOcorrencia!.Value.Day < inicio.Day || fixo.DataOcorrencia!.Value.Month < inicio.Month)))
                     {
                         continue;
                     }
 
-                    if ((i == diferencaAno && (fixo.DataOcorrencia!.Value.Day > fim.Day || fixo.DataOcorrencia!.Value.Month > fim.Month)))
+                    //if ((i == diferencaAno && (fixo.DataOcorrencia!.Value.Day > fim.Day || fixo.DataOcorrencia!.Value.Month > fim.Month)))
+                    //{
+                    //    continue;
+                    //}
+
+                    if (!indiceProcura.Contains((fixo.Id, proximoDt.Year, fixo.DataOcorrencia!.Value.Month, fixo.DataOcorrencia!.Value.Day)))
                     {
-                        continue;
-                    }
+                        var mov = new Movimentacao(fixo.Movimentacao.Tipo, fixo.Movimentacao.ContaUsuarioCriador, fixo.Movimentacao.Valor, fixo.Movimentacao.Titulo, fixo.Movimentacao.Observacao, dthrMovimentacao, null, false, fixo);
 
-                    if (!indiceProcura.Contains((fixo.Id, proximoDt.Year,fixo.DataOcorrencia!.Value.Month,fixo.DataOcorrencia!.Value.Day)))
-                    {
+                        fixo.Movimentacao.CategoriasMovimentacao.ToList().ForEach(x => mov.AdicionarCategoria(x));
 
-                        int diasMes = DateTime.DaysInMonth(proximoDt.Year, proximoDt.Month);
+                        novaMov.Add(mov);
 
-                        diasMes = fixo.DataOcorrencia!.Value.Day > diasMes ? diasMes : fixo.DataOcorrencia!.Value.Day;
-
-                        DateTime dthrMovimentacao = new DateTime(proximoDt.Year, fixo.DataOcorrencia!.Value.Month, diasMes);
-
-                        novaMov.Add(new Movimentacao(fixo.Movimentacao.Tipo, fixo.Movimentacao.ContaUsuarioCriador, fixo.Movimentacao.Valor, fixo.Movimentacao.Titulo, fixo.Movimentacao.Observacao, dthrMovimentacao, null, false, fixo));
-
-                        indiceProcura.Add((fixo.Id, proximoDt.Year,fixo.DataOcorrencia!.Value.Month, fixo.DataOcorrencia!.Value.Day));
+                        indiceProcura.Add((fixo.Id, proximoDt.Year, fixo.DataOcorrencia!.Value.Month, fixo.DataOcorrencia!.Value.Day));
                     }
                 }
             }
 
             return novaMov;
         }
+        private List<Movimentacao> Diario(FiltroRetornoMovimentacao filtros, IEnumerable<Movimentacao> movimentacoes, IEnumerable<MovimentacaoFixa> fixos)
+        {
+            DateOnly inicio = DateOnly.FromDateTime(filtros.DthrMovimentacaoInicial);
+            DateOnly fim = DateOnly.FromDateTime(filtros.DthrMovimentacaoFinal);
 
+            int diferencaMes = (fim.Year - inicio.Year) * 12 + (fim.Month - inicio.Month);
+            List<Movimentacao> novaMov = new();
+
+            var indiceProcura = movimentacoes
+                              .Select(m => (m.IdFixo, m.DthrMovimentacao.Year, m.DthrMovimentacao.Month, m.DthrMovimentacao.Day))
+                              .ToHashSet();
+
+            var periodoFixos = fixos.Where(x => x.Tipo == TipoMovimentacaoFixa.Diaria && (inicio >= x.DataInicio || inicio <= x.DataFim)).ToList();
+
+            for (int i = 0; i <= diferencaMes; i++)
+            {
+                DateOnly proximoDt = inicio.AddMonths(i);
+
+                foreach (var fixo in periodoFixos.Where(x => proximoDt >= x.DataInicio && proximoDt <= x.DataFim).ToList())
+                {
+                    int diasMes = DateTime.DaysInMonth(proximoDt.Year, proximoDt.Month);
+
+                    for (int j = 1; j <= diasMes; j++)
+                    {
+                        int diaSemana = (int)new DateTime(proximoDt.Year, proximoDt.Month, j).DayOfWeek;
+                        DateTime dthrMovimentacao = new DateTime(proximoDt.Year, proximoDt.Month, j, 12, 0, 0);
+
+
+                        if ((i == diferencaMes && DateOnly.FromDateTime(dthrMovimentacao) > fim || DateOnly.FromDateTime(dthrMovimentacao) > fixo.DataFim))
+                        {
+                            break;
+                        }
+
+
+                        if (fixo.DiasFixosDiarios!.Any(x => x.DiaSemana == diaSemana))
+                        {
+                            if (!indiceProcura.Contains((fixo.Id, proximoDt.Year, proximoDt.Month, j)))
+                            {
+
+                                var mov = new Movimentacao(fixo.Movimentacao.Tipo, fixo.Movimentacao.ContaUsuarioCriador, fixo.Movimentacao.Valor, fixo.Movimentacao.Titulo, fixo.Movimentacao.Observacao, dthrMovimentacao, null, false, fixo);
+
+                                fixo.Movimentacao.CategoriasMovimentacao.ToList().ForEach(x => mov.AdicionarCategoria(x));
+
+                                novaMov.Add(mov);
+
+                                indiceProcura.Add((fixo.Id, proximoDt.Year, proximoDt.Month, j));
+                            }
+                        }
+                    }
+
+                }
+            }
+
+            return novaMov;
+        }
     }
 }

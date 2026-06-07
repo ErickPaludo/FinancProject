@@ -40,7 +40,6 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
 
                 Movimentacao movimentacao = new Movimentacao(request.tipo, contasUsuario, request.valor, request.titulo, request.observacao, request.dthrMovimentacao, request.dthrConclusao, request.concluido);
 
-                await _unitOfWork.movimentacaoRepositorio.Adicionar(movimentacao);
 
                 if (request.IdsCategoria is not null)
                 {
@@ -52,10 +51,11 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
 
                         MovimentacaoCategoria movimentacaoCategoria = new MovimentacaoCategoria(movimentacao, categoria);
                         movimentacao.AdicionarCategoria(movimentacaoCategoria);
-                        await _unitOfWork.movimentacaoCategoriaRepositorio.Adicionar(movimentacaoCategoria);
                     }
                 }
+
                 conta.ProcessaMovimentacao(movimentacao);
+                await _unitOfWork.movimentacaoRepositorio.Adicionar(movimentacao);
                 _unitOfWork.contasRepositorio.Atualiza(conta);
                 await _unitOfWork.Commit();
 

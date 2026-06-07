@@ -4,6 +4,7 @@ using Financ.Infra.Data.Contexto;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Financ.Infra.Data.Migrations
 {
     [DbContext(typeof(AppContextoData))]
-    partial class AppContextoDataModelSnapshot : ModelSnapshot
+    [Migration("20260604195732_CampoMovimentacoesSemanaisComHoraOcorrencia")]
+    partial class CampoMovimentacoesSemanaisComHoraOcorrencia
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -188,9 +191,6 @@ namespace Financ.Infra.Data.Migrations
                     b.Property<DateTime>("Dthr")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("IdConta")
-                        .HasColumnType("int");
-
                     b.Property<int>("IdMovimentacao")
                         .HasColumnType("int");
 
@@ -201,8 +201,6 @@ namespace Financ.Infra.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("IdConta");
 
                     b.HasIndex("IdMovimentacao");
 
@@ -480,19 +478,11 @@ namespace Financ.Infra.Data.Migrations
 
             modelBuilder.Entity("Financ.Domain.Entidades.Movimentações.Fixas.MovimentacaoFixa", b =>
                 {
-                    b.HasOne("Financ.Domain.Entidades.ContasBancarias.Conta", "Conta")
-                        .WithMany()
-                        .HasForeignKey("IdConta")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.HasOne("Financ.Domain.Entidades.Movimentações.Movimentacao", "Movimentacao")
                         .WithMany()
                         .HasForeignKey("IdMovimentacao")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
-
-                    b.Navigation("Conta");
 
                     b.Navigation("Movimentacao");
                 });

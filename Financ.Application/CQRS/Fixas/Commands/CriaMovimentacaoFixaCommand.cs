@@ -17,6 +17,6 @@ namespace Financ.Application.CQRS.Fixas.Commands
         public TipoMovimentacaoFixa TipoFixo { get; set; }
         public DateOnly DataInicio { get; set; }
         public DateOnly DataFim { get; set; }
-        public DateOnly DataOcorrencia { get; set; }
+        public DateTime DataOcorrencia { get; set; }
     }
 }

@@ -18,19 +18,21 @@ namespace Financ.Domain.Entidades.Movimentações.Fixas
     {
         public int Id { get; private set; }
         public int IdMovimentacao { get; private set; }
+        public int IdConta { get; private set; }
+        public Conta Conta { get; set; }
         public TipoMovimentacaoFixa Tipo { get; private set; }
         public StatusMovimentacaoFixa Status { get; private set; }
         public DateOnly DataInicio
         { get; private set; }
         public DateOnly DataFim { get; private set; }
-        public DateOnly? DataOcorrencia { get; private set; }
+        public DateTime? DataOcorrencia { get; private set; }
         public DateTime Dthr { get; private set; }
         public Movimentacao Movimentacao { get; private set; }
         public ICollection<Movimentacao> Movimentacoes { get; private set; } = new List<Movimentacao>();
         public ICollection<MovimentacaoFixaDiaria>? DiasFixosDiarios { get; private set; } = new List<MovimentacaoFixaDiaria>();
         public MovimentacaoFixa() { }
 
-        public MovimentacaoFixa(TipoMovimentacaoFixa tipo, DateOnly dataInicio, DateOnly dataFim, DateOnly dataOcorrencia, Movimentacao movimentacao)
+        public MovimentacaoFixa(TipoMovimentacaoFixa tipo, DateOnly dataInicio, DateOnly dataFim, DateTime dataOcorrencia, Movimentacao movimentacao)
         {
             ValidaDatas(dataInicio, dataFim);
             DataInicio = dataInicio;
@@ -39,6 +41,8 @@ namespace Financ.Domain.Entidades.Movimentações.Fixas
             Dthr = DateTime.UtcNow;
             ValidaTipoFixo(tipo);
             MovimentacaoFixaValidacao.Verifica(tipo == TipoMovimentacaoFixa.Diaria, MensagemMovimentacaoFixa.TIPO_DIARIO_NAO_PODE_SER_CRIA_COM_DATA_OCORRENCIA);
+            Conta = movimentacao.Conta;
+            IdConta = movimentacao.IdConta;
             Tipo = tipo;
             movimentacao.CriaMovimentacaoFixa(this);
             ValidaStatus(movimentacao.Status);
@@ -61,10 +65,8 @@ namespace Financ.Domain.Entidades.Movimentações.Fixas
             IdMovimentacao = movimentacao.Id;
             Movimentacao = movimentacao;
 
-            foreach(var dia in ocorrenciaDiaria)
-            {
-                DiasFixosDiarios.Add(new MovimentacaoFixaDiaria(this, dia));
-            }
+        
+            ocorrenciaDiaria.ToList().ForEach(ms => DiasFixosDiarios.Add(new MovimentacaoFixaDiaria(this, ms)));
 
         }
         public Movimentacao MaterializaMovimentacao(DateTime darMovimentacao, ContaUsuario? contaUsuario)
@@ -72,6 +74,12 @@ namespace Financ.Domain.Entidades.Movimentações.Fixas
             DateOnly dataMovimentacao = DateOnly.FromDateTime(darMovimentacao);
             MovimentacaoFixaValidacao.Verifica(!(dataMovimentacao >= DataInicio && dataMovimentacao <= DataFim), "A data de movimentação está fora do perído da movimentação fixa");
 
+            if (Tipo is TipoMovimentacaoFixa.Diaria)
+            {
+                MovimentacaoFixaValidacao.Verifica(Movimentacoes.Any(m => m.DthrMovimentacao == darMovimentacao), "Movimentação fixa já está meterializada para este período");
+
+                MovimentacaoFixaValidacao.Verifica(!(DiasFixosDiarios!.Any(x => x.DiaSemana == (int)dataMovimentacao.DayOfWeek)), "Data de ocorrencia errada");
+            }
 
             if (Tipo is TipoMovimentacaoFixa.Mensal)
             {
@@ -86,7 +94,10 @@ namespace Financ.Domain.Entidades.Movimentações.Fixas
                 MovimentacaoFixaValidacao.Verifica(!(dataMovimentacao.Month == DataOcorrencia!.Value.Month), "Data de ocorrencia errada");
             }
 
-            return new Movimentacao(Movimentacao.Tipo, contaUsuario, Movimentacao.Valor, Movimentacao.Titulo, Movimentacao.Observacao, darMovimentacao, Movimentacao.DthrConclusao, false, this);
+            Movimentacao movimentacaoMaterializada = new Movimentacao(Movimentacao.Tipo, contaUsuario, Movimentacao.Valor, Movimentacao.Titulo, Movimentacao.Observacao, darMovimentacao, Movimentacao.DthrConclusao, false, this);
+            Movimentacao.CategoriasMovimentacao.ToList().ForEach(x => movimentacaoMaterializada.AdicionarCategoria(x));
+
+            return movimentacaoMaterializada;
         }
         private void ValidaDatas(DateOnly dataInicio, DateOnly dataFim)
         {

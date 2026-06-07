@@ -25,6 +25,11 @@ namespace Financ.Infra.Data.ConfiguracaoTabelas.Movimentações.Fixas
             .WithMany()
             .HasForeignKey(mf => mf.IdMovimentacao)
             .OnDelete(DeleteBehavior.NoAction);
+
+            builder.HasOne(c => c.Conta)
+                .WithMany()
+                .HasForeignKey(c => c.IdConta)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

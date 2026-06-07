@@ -3,6 +3,7 @@ using Financ.Application.CQRS.Fixas.Commands;
 using Financ.Application.CQRS.Movimentação.Commands;
 using Financ.Application.DTOs.Base;
 using Financ.Application.DTOs.Movimentações.Get;
+using Financ.Domain.Entidades.Categorias;
 using Financ.Domain.Entidades.ContasBancarias;
 using Financ.Domain.Entidades.Movimentações;
 using Financ.Domain.Entidades.Movimentações.Fixas;
@@ -30,7 +31,20 @@ namespace Financ.Application.CQRS.Fixas.Handlers
             Movimentacao movimentacao = new Movimentacao(request.tipo, contaUsuario, request.valor, request.titulo, request.observacao, null, null, false);
 
             MovimentacaoFixa fixa = new MovimentacaoFixa(request.TipoFixo, request.DataInicio, request.DataFim, request.DataOcorrencia, movimentacao);
-            await _unitOfWork.movimentacaoRepositorio.Adicionar(movimentacao);
+
+            if (request.IdsCategoria is not null)
+            {
+                foreach (var idCategoria in request.IdsCategoria)
+                {
+                    Categoria? categoria = await _unitOfWork.categoriaRepositorio.BuscarObjetoUnico(c => c.Id == idCategoria && c.IdConta == request.idConta);
+                    if (categoria is null)
+                        return Resultado<BasePost<string>>.GeraFalha(Falha.NaoEncontrado($"Categoria com id {idCategoria} não encontrada"));
+
+                    MovimentacaoCategoria movimentacaoCategoria = new MovimentacaoCategoria(movimentacao, categoria);
+                    movimentacao.AdicionarCategoria(movimentacaoCategoria);
+                }
+            }
+
             await _unitOfWork.movimentacaoFixaRepositorio.Adicionar(fixa);
             await _unitOfWork.Commit();
             return Resultado<BasePost<string>>.GeraSucesso(new BasePost<string>("Movimentação fixa gerada com sucesso"));

@@ -3,6 +3,7 @@ using Financ.Application.CQRS.Fixas.Commands;
 using Financ.Application.DTOs.Base;
 using Financ.Application.DTOs.Movimentações.Get;
 using Financ.Application.Mapeamento;
+using Financ.Domain.Entidades.Categorias;
 using Financ.Domain.Entidades.ContasBancarias;
 using Financ.Domain.Entidades.Movimentações;
 using Financ.Domain.Entidades.Movimentações.Fixas;
@@ -39,6 +40,7 @@ namespace Financ.Application.CQRS.Fixas.Handlers
                 ContaUsuario? contaUsuario = movimentacoaFixa.Movimentacao.Conta.ContaUsuarios.FirstOrDefault(x => x.IdUsuario == request.IdUsuario);
                 Movimentacao movimentacao = movimentacoaFixa.MaterializaMovimentacao(request.DataMovimentacao, contaUsuario);
                 await _unitOfWork.movimentacaoRepositorio.Adicionar(movimentacao);
+
                 await _unitOfWork.Commit();
                 return Resultado<BasePost<MovimentacaoDTO>>.GeraSucesso(new BasePost<MovimentacaoDTO>(MovimentacaoMapper.ParaDTO(movimentacao)));
             }

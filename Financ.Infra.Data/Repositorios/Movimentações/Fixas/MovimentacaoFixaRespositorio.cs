@@ -21,12 +21,15 @@ namespace Financ.Infra.Data.Repositorios.Movimentações.Fixas
         public async Task<MovimentacaoFixa?> BuscaMovimentacaoFixaCompleta(Expression<Func<MovimentacaoFixa, bool>> predicado)
         {
             return await _contexto.MovimentacaoFixa
-                .Include(mf => mf.Movimentacoes)
-                .Include(mf => mf.Movimentacao)
-                 .ThenInclude(c => c.Conta)
-                 .ThenInclude(cu => cu.ContaUsuarios)
+                 .Include(mf => mf.Movimentacao)
+               .ThenInclude(cx => cx.CategoriasMovimentacao)
+               .ThenInclude(cc => cc.Categoria)
+           .Include(mf => mf.Movimentacao)
+               .ThenInclude(m => m.Conta)
+                .ThenInclude(c => c.ContaUsuarios)
                  .ThenInclude(cu => cu.Usuario)
-
+           .Include(md => md.DiasFixosDiarios)
+           .Include(mm => mm.Movimentacoes)
                 .FirstOrDefaultAsync(predicado);
         }
 
@@ -34,9 +37,13 @@ namespace Financ.Infra.Data.Repositorios.Movimentações.Fixas
         {
             return _contexto.MovimentacaoFixa
            .Include(mf => mf.Movimentacao)
+               .ThenInclude(cx => cx.CategoriasMovimentacao)
+               .ThenInclude(cc => cc.Categoria)
+           .Include(mf => mf.Movimentacao)
                .ThenInclude(m => m.Conta)
-                   .ThenInclude(c => c.ContaUsuarios)
-                       .ThenInclude(cu => cu.Usuario)
+                .ThenInclude(c => c.ContaUsuarios)
+                 .ThenInclude(cu => cu.Usuario)
+           .Include(md => md.DiasFixosDiarios)
            .Where(predicado);
         }
     }
