@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Financ.Application.CQRS.Contas_Usuarios.Querys
 {
-    public class RetornaContaUsuariosQuery : IRequest<Resultado<BaseGetList<RetornaContasDTO>>>
+    public class RetornaContaUsuariosQuery : IRequest<Resultado<BaseGet<RetornarContasDTO>>>
     {
         public string IdUsuario { get; private set; }
         public FiltroContasUsuarioDTO? Filtros { get; private set; }

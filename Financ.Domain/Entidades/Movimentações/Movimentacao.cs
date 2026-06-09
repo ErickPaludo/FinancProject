@@ -35,7 +35,7 @@ namespace Financ.Domain.Entidades.Movimentações
         public MovimentacaoFixa? Fixa { get; private set; }
         #region Contrutores
         private Movimentacao() { }
-        public Movimentacao(TipoMovimentacao tipo, ContaUsuario? contaUsuario, decimal valor, string titulo, string? observacao, DateTime? dthrMovimentacao, DateTime? dthrConclusao, bool concluido,MovimentacaoFixa? movimentacaoFixa = null)
+        public Movimentacao(TipoMovimentacao tipo, ContaUsuario? contaUsuario, decimal valor, string titulo, string? observacao, DateTime? dthrMovimentacao, DateTime? dthrConclusao, bool concluido, MovimentacaoFixa? movimentacaoFixa = null)
         {
             if (movimentacaoFixa is not null)
             {
@@ -57,6 +57,7 @@ namespace Financ.Domain.Entidades.Movimentações
             ValidaContaUsuario(contaUsuario);
             IdUsuarioCriador = contaUsuario!.Id;
             ContaUsuarioCriador = contaUsuario;
+
 
             IdUsuarioExecutor = concluido ? contaUsuario.Id : null;
             ContaUsuarioExecutor = concluido ? contaUsuario : null;
@@ -128,7 +129,7 @@ namespace Financ.Domain.Entidades.Movimentações
             {
                 ValidaObservacao(observacao);
                 Observacao = observacao;
-            }   
+            }
             if (dthrMovimentacao is not null)
             {
                 DthrMovimentacao = dthrMovimentacao.Value;
@@ -160,7 +161,8 @@ namespace Financ.Domain.Entidades.Movimentações
         {
             ValidaContaUsuario(contaUsuario);
         }
-        public void CriaMovimentacaoFixa(MovimentacaoFixa fixa) {
+        public void CriaMovimentacaoFixa(MovimentacaoFixa fixa)
+        {
             Status = StatusMovimentacao.Oculta;
         }
         #endregion

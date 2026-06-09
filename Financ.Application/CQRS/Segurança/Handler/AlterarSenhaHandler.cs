@@ -32,7 +32,7 @@ namespace Financ.Application.CQRS.Segurança.Handler
             if (!_passService.ValidaSenhaArgon(usuario.HashPass, request.senhaAntiga, usuario.Salt))
                 return Resultado<string>.GeraFalha(Falha.NaoAutorizado("Senha inválida."));
 
-            var senha = _passService.CriaSenhaArgon(request.senhaNova,"");
+            var senha = _passService.CriaSenhaArgon(request.senhaNova,null);
             usuario.AtualizaSenha(senha.salt,senha.hash);
             _unitOfWork.usuariosRepostorio.Atualiza(usuario);
             await _unitOfWork.Commit();

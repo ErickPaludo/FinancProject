@@ -2,7 +2,6 @@
 using Financ.Application.CQRS.ContasUsuarios.Commands;
 using Financ.Application.DTOs.Base;
 using Financ.Application.DTOs.ContasUsuarios.Get;
-using Financ.Application.DTOs.ContasUsuarios.Get.Filtros;
 using Financ.Application.Mapeamento;
 using Financ.Domain.Entidades.ContasBancarias;
 using Financ.Domain.Entidades.Movimentações;
@@ -17,28 +16,24 @@ using System.Threading.Tasks;
 
 namespace Financ.Application.CQRS.ContasUsuarios.Handler
 {
-    public record FavoritaContaUsuarioHandler : IRequestHandler<FavoritaContaUsuarioCommand, Resultado<BaseGet<ContasDTO>>>
+    public class AutoSomaContaUsuarioHandler : IRequestHandler<AutoSomaContaUsuarioCommand, Resultado<BaseGet<ContasDTO>>>
     {
         private readonly IUnitOfWork _unitOfWork;
-
-        public FavoritaContaUsuarioHandler(IUnitOfWork unitOfWork)
+        public AutoSomaContaUsuarioHandler(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
-
-        public async Task<Resultado<BaseGet<ContasDTO>>> Handle(FavoritaContaUsuarioCommand request, CancellationToken cancellationToken)
+        public async Task<Resultado<BaseGet<ContasDTO>>> Handle(AutoSomaContaUsuarioCommand request, CancellationToken cancellationToken)
         {
             ContaUsuario? contaUsuario = await _unitOfWork.contasUsuariosRepositorio.ObterContaUsuarioComUsuarioPredicado(c => c.IdConta == request.IdConta && c.IdUsuario == request.IdUsuario);
-            
-            if(contaUsuario is null)
+
+            if (contaUsuario is null)
                 return Resultado<BaseGet<ContasDTO>>.GeraFalha(Falha.NaoEncontrado("Conta não encontrada."));
 
-            contaUsuario.FavoritarConta();
-             _unitOfWork.contasUsuariosRepositorio.Atualiza(contaUsuario);
+            contaUsuario.AutoSomaConta();
+            _unitOfWork.contasUsuariosRepositorio.Atualiza(contaUsuario);
             await _unitOfWork.Commit();
             IEnumerable<Movimentacao>? movimentacao = await _unitOfWork.movimentacaoRepositorio.BuscarPorCondicao(m => m.IdConta == request.IdConta && m.Status == StatusMovimentacao.Pendente);
-
-
 
             return Resultado<BaseGet<ContasDTO>>.GeraSucesso(ContaUsuarioMapper.ParaGetDTO(contaUsuario, movimentacao));
         }

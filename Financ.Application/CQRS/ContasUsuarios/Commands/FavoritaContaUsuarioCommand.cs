@@ -10,5 +10,5 @@ using System.Threading.Tasks;
 
 namespace Financ.Application.CQRS.ContasUsuarios.Commands
 {
-    public record FavoritaContaUsuarioCommand(int IdConta, string IdUsuario) : IRequest<Resultado<BaseGet<RetornaContasDTO>>>;
+    public record FavoritaContaUsuarioCommand(int IdConta, string IdUsuario) : IRequest<Resultado<BaseGet<ContasDTO>>>;
 }

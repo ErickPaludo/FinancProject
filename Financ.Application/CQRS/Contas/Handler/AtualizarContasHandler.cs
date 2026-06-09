@@ -17,21 +17,21 @@ using System.Text;
 using System.Threading.Tasks;
 namespace Financ.Application.CQRS.Contas_.Handler
 {
-    public class AtualizarContasHandler : IRequestHandler<AtualizarContaCommand, Resultado<BaseGet<RetornaContasDTO>>>
+    public class AtualizarContasHandler : IRequestHandler<AtualizarContaCommand, Resultado<BaseGet<ContasDTO>>>
     {
         private readonly IUnitOfWork _unitOfWork;
         public AtualizarContasHandler(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
-        public async Task<Resultado<BaseGet<RetornaContasDTO>>> Handle(AtualizarContaCommand request, CancellationToken cancellationToken)
+        public async Task<Resultado<BaseGet<ContasDTO>>> Handle(AtualizarContaCommand request, CancellationToken cancellationToken)
         {
             try
             {
                 Conta? conta = await _unitOfWork.contasRepositorio.BuscarContaComUsuariosEConvintes(x => x.Id == request.IdConta);
 
                 if (conta is null)
-                    return Resultado<BaseGet<RetornaContasDTO>>.GeraFalha(Falha.NaoEncontrado("Conta não encontrada."));
+                    return Resultado<BaseGet<ContasDTO>>.GeraFalha(Falha.NaoEncontrado("Conta não encontrada."));
 
                 ContaUsuario? contaUsuario = conta.ContaUsuarios.FirstOrDefault(x => x.IdUsuario == request.IdUsuario);
 
@@ -42,11 +42,11 @@ namespace Financ.Application.CQRS.Contas_.Handler
 
                 IEnumerable<Movimentacao> movimentacoes = await _unitOfWork.movimentacaoRepositorio.BuscarPorCondicao(m => m.IdConta == request.IdConta && m.Status == StatusMovimentacao.Pendente);
 
-                return Resultado<BaseGet<RetornaContasDTO>>.GeraSucesso(ContaUsuarioMapper.ParaGetDTO(contaUsuario,movimentacoes));
+                return Resultado<BaseGet<ContasDTO>>.GeraSucesso(ContaUsuarioMapper.ParaGetDTO(contaUsuario,movimentacoes));
             }
             catch (ContasValidacao contasExecao)
             {
-                return Resultado<BaseGet<RetornaContasDTO>>.GeraFalha(Falha.ErroOperacional(contasExecao.Message));
+                return Resultado<BaseGet<ContasDTO>>.GeraFalha(Falha.ErroOperacional(contasExecao.Message));
             }
         }
     }

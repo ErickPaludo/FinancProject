@@ -34,6 +34,7 @@ namespace Financ.Application.CQRS.Fixas.Handlers
             {
 
                 MovimentacaoFixa? movimentacoaFixa = await _unitOfWork.movimentacaoFixaRepositorio.BuscaMovimentacaoFixaCompleta(x => x.Id == request.IdMovimentacao && x.Status == StatusMovimentacaoFixa.Ativo);
+
                 if (movimentacoaFixa is null)
                     return Resultado<BasePost<MovimentacaoDTO>>.GeraFalha(Falha.NaoEncontrado("Movimentação fixa não encontrada!"));
 

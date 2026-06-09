@@ -16,21 +16,20 @@ namespace Financ.Application.Mapeamento
 
             movimentacaoFixa.ForEach(mf =>
             {
-                movimentacoesFixas.Add(
-                    new GetMovimentacaoFixaDTO(
-                        mf.Id,
-                        mf.Tipo,
-                        mf.DataInicio,
-                        mf.DataFim,
-                        mf.DataOcorrencia,
-                        mf.DiasFixosDiarios is not null ? mf.DiasFixosDiarios.Select(x => x.DiaSemana).ToArray() : null,
-                         DateOnly.FromDateTime(DateTime.UtcNow) > mf.DataFim,
-                        MovimentacaoMapper.ParaDTO(mf.Movimentacao)
-                        ) );
+                movimentacoesFixas.Add(ParaDTO(mf));
             });
-
-
             return movimentacoesFixas;
         }
+
+        public static GetMovimentacaoFixaDTO ParaDTO(MovimentacaoFixa movimentacaoFixa) 
+            => new GetMovimentacaoFixaDTO(
+                movimentacaoFixa.Id,
+                movimentacaoFixa.Tipo,
+                movimentacaoFixa.DataInicio,
+                movimentacaoFixa.DataFim,
+                movimentacaoFixa.DataOcorrencia,
+                movimentacaoFixa.DiasFixosDiarios is not null ? movimentacaoFixa.DiasFixosDiarios.Select(x => x.DiaSemana).ToArray() : null,
+                 DateOnly.FromDateTime(DateTime.UtcNow) > movimentacaoFixa.DataFim,
+                MovimentacaoMapper.ParaDTO(movimentacaoFixa.Movimentacao));
     }
 }

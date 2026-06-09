@@ -21,6 +21,7 @@ namespace Financ.Domain.Entidades.ContasBancarias
         public StatusContasUsuario Status { get; private set; }
         public DateTime? Expiracao { get; private set; }
         public bool ContaFavorita { get; private set; } = false;
+        public bool AutoSoma { get; private set; } = true;
         public Usuario Usuario { get; private set; }
 
         public Conta Conta { get; private set; }
@@ -180,6 +181,11 @@ namespace Financ.Domain.Entidades.ContasBancarias
         public void FavoritarConta()
         {
             ContaFavorita = !ContaFavorita;
+            DthrReg = DateTime.UtcNow;
+        }
+        public void AutoSomaConta()
+        {
+            AutoSoma = !AutoSoma;
             DthrReg = DateTime.UtcNow;
         }
         #endregion

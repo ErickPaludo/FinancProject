@@ -71,5 +71,12 @@ namespace Financ.UI.Api.Controllers
             var conta = await _mediator.Send(new FavoritaContaUsuarioCommand(idConta, User.RetornaIdUsuario()));
             return conta.RetornoAutomatico();
         }
+    
+        [HttpPost("{idConta}/AutoSoma")]
+        public async Task<IActionResult> ContaAutoSoma([FromRoute] int idConta)
+        {
+            var conta = await _mediator.Send(new AutoSomaContaUsuarioCommand(idConta, User.RetornaIdUsuario()));
+            return conta.RetornoAutomatico();
+        }
     }
 }

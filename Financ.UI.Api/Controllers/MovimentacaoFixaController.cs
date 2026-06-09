@@ -1,5 +1,6 @@
 ﻿using Financ.Application.CQRS.Fixas.Commands;
 using Financ.Application.CQRS.Movimentação.Commands;
+using Financ.Application.DTOs.Movimentações.Fixas.Patch;
 using Financ.Application.DTOs.Movimentações.Fixas.Post;
 using Financ.Application.DTOs.Movimentações.Get;
 using Financ.Domain.Entidades.ContasBancarias;
@@ -26,7 +27,7 @@ namespace Financ.UI.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> CriaFixo(int idConta, CriaMovimentacaoFixaDTO fixoDTO)
         {
-            var movFixo = await  _mediator.Send(new CriaMovimentacaoFixaCommand
+            var movFixo = await _mediator.Send(new CriaMovimentacaoFixaCommand
             {
                 idConta = idConta,
                 idUsuario = User.RetornaIdUsuario(),
@@ -45,7 +46,7 @@ namespace Financ.UI.Api.Controllers
         [HttpPost("Diarias")]
         public async Task<IActionResult> CriaFixoDiaria(int idConta, CriaMovimentacaoFixaDiariaDTO fixoDTO)
         {
-            var movFixo = await  _mediator.Send(new CriaMovimentacaoFixaDiariaCommand
+            var movFixo = await _mediator.Send(new CriaMovimentacaoFixaDiariaCommand
             {
                 idConta = idConta,
                 idUsuario = User.RetornaIdUsuario(),
@@ -62,13 +63,34 @@ namespace Financ.UI.Api.Controllers
         }
 
         [HttpPost("{idFixo}/Materializa")]
-        public async Task<IActionResult> MaterializaFixo(int idConta,int idFixo,[FromBody] MaterializaMovimentacaoFixa movimentacaoDTO)
+        public async Task<IActionResult> MaterializaFixo(int idConta, int idFixo, [FromBody] MaterializaMovimentacaoFixa movimentacaoDTO)
         {
-            var movFixo = await _mediator.Send(new MaterializaMovimentacaoFixaCommand(idFixo,User.RetornaIdUsuario(),movimentacaoDTO.DataMovimentacao));
+            var movFixo = await _mediator.Send(new MaterializaMovimentacaoFixaCommand(idFixo, User.RetornaIdUsuario(), movimentacaoDTO.DataMovimentacao));
             return movFixo.RetornoAutomatico();
         }
         [HttpGet]
         public async Task<IActionResult> RetornaFixos(int idConta, [FromQuery] TipoMovimentacaoFixa? tipoMovimentacao)
+        {
+            var movFixo = await _mediator.Send(new RetornarMovimentacoesFixasCommand(idConta, User.RetornaIdUsuario(), tipoMovimentacao));
+            return movFixo.RetornoAutomatico();
+        }
+        [HttpPatch("{idFixo}/Alterar")]
+        public async Task<IActionResult> AlterarFixos(int idConta, int idFixo,[FromBody] AlteraMovimentacaoFixaDTO movimentacaoFixaDTO)
+        {
+            var movFixo = await _mediator.Send(new AlterarMovimentacaoFixaCommand(
+                                                idConta,
+                                                idFixo, 
+                                                User.RetornaIdUsuario(),
+                                                movimentacaoFixaDTO.Tipo,
+                                                movimentacaoFixaDTO.Status,
+                                                movimentacaoFixaDTO.DataInicio,
+                                                movimentacaoFixaDTO.DataFim,
+                                                movimentacaoFixaDTO.DataOcorrencia));
+
+            return movFixo.RetornoAutomatico();
+        }
+        [HttpPatch("{idFixo}/Alterar/Diario")]
+        public async Task<IActionResult> AlterarFixosDiario(int idConta, [FromQuery] TipoMovimentacaoFixa? tipoMovimentacao)
         {
             var movFixo = await _mediator.Send(new RetornarMovimentacoesFixasCommand(idConta, User.RetornaIdUsuario(), tipoMovimentacao));
             return movFixo.RetornoAutomatico();

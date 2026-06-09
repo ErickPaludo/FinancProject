@@ -1,4 +1,5 @@
 ﻿using Financ.Domain.Entidades.Movimentações;
+using Financ.Domain.Enums.Movimentações;
 using Financ.Domain.Interfaces.Repositorios.Movimentações;
 using Financ.Infra.Data.Contexto;
 using Financ.Infra.Data.Repositorios.Base;
@@ -41,5 +42,13 @@ namespace Financ.Infra.Data.Repositorios.Movimentações
                            .Include(c => c.Conta.ContaUsuarios);
         }
 
+        public async Task<decimal> MovimentacaoLedger(int idConta, DateTime dtMax)
+        {
+            return await _contexto.Movimentacao
+                        .Where(x => x.IdConta == idConta && x.DthrMovimentacao < dtMax && x.Status == StatusMovimentacao.Concluido)
+                        .SumAsync(x => x.Tipo == TipoMovimentacao.Entrada ? x.Valor :
+                                       x.Tipo == TipoMovimentacao.Saida ? - x.Valor : 0);
+            throw new NotImplementedException();
+        }
     }
 }

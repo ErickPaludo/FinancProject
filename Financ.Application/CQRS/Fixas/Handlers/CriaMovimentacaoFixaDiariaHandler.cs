@@ -6,6 +6,7 @@ using Financ.Domain.Entidades.ContasBancarias;
 using Financ.Domain.Entidades.Movimentações;
 using Financ.Domain.Entidades.Movimentações.Fixas;
 using Financ.Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using NetDevPack.SimpleMediator;
 using System;
 using System.Collections.Generic;
@@ -44,10 +45,10 @@ namespace Financ.Application.CQRS.Fixas.Handlers
             MovimentacaoFixa fixa = new MovimentacaoFixa(request.DataInicio, request.DataFim, request.OcorrenciasDiarias, movimentacao);
             await _unitOfWork.movimentacaoFixaRepositorio.Adicionar(fixa);
 
-            //fixa.DiasFixosDiarios!.ToList().ForEach(async x => await _unitOfWork.movimentacaoFixaDiariaRepositorio.Adicionar(x));
-
             await _unitOfWork.Commit();
             return Resultado<BasePost<string>>.GeraSucesso(new BasePost<string>("Movimentação fixa gerada com sucesso"));
+            
+            
         }
     }
 }

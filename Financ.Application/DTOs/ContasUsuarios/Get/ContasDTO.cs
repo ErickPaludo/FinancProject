@@ -9,5 +9,5 @@ using Financ.Domain.Enums.ContasBancarias;
 
 namespace Financ.Application.DTOs.ContasUsuarios.Get
 {
-    public sealed record RetornaContasDTO(int IdConta, string Titulo,bool ContaFavorita, string Cor, StatusContas Status,decimal SaldoAtual,decimal SaldoProjetado, decimal EntradaPendente,decimal SaidaPendente, DateTime? Expiracao);
+    public sealed record ContasDTO(int IdConta, string Titulo,bool ContaFavorita,bool SomaSaldo, string Cor, StatusContas Status,decimal SaldoAtual,decimal SaldoProjetado, decimal EntradaPendente,decimal SaidaPendente, DateTime? Expiracao);
 }

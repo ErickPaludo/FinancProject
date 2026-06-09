@@ -13,5 +13,6 @@ namespace Financ.Domain.Interfaces.Repositorios.Movimentações
     {
         Task<Movimentacao?> BuscaMovimentacaoUnicaComContasUsuarios(Expression<Func<Movimentacao, bool>> predicado);
         IQueryable<Movimentacao> BuscaMovimentacaoComContasUsuarios();
+        Task<decimal> MovimentacaoLedger(int idConta,DateTime dtMax);
     }
 }
