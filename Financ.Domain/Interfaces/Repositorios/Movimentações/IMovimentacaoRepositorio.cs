@@ -1,4 +1,5 @@
 ﻿using Financ.Domain.Entidades.Movimentações;
+using Financ.Domain.Enums.Movimentações;
 using Financ.Domain.Interfaces.Repositorios.Base;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,7 @@ namespace Financ.Domain.Interfaces.Repositorios.Movimentações
     {
         Task<Movimentacao?> BuscaMovimentacaoUnicaComContasUsuarios(Expression<Func<Movimentacao, bool>> predicado);
         IQueryable<Movimentacao> BuscaMovimentacaoComContasUsuarios();
-        Task<decimal> MovimentacaoLedger(int idConta,DateTime dtMax);
+        Task<decimal> SomaTotalConcluidas(int idConta,DateTime dtMax);
+        Task<decimal> SomaTotalPendentes(int idConta,DateTime dtMax);
     }
 }

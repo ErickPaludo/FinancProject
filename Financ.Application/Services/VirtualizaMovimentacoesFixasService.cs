@@ -163,7 +163,7 @@ namespace Financ.Application.Services
             {
                 DateOnly proximoDt = _dataInicio.AddMonths(i);
 
-                foreach (var fixo in periodoFixos.Where(x => proximoDt >= x.DataInicio && proximoDt <= x.DataFim).ToList())
+                foreach (var fixo in periodoFixos.Where(x => proximoDt <= x.DataFim).ToList())
                 {
                     int diasMes = DateTime.DaysInMonth(proximoDt.Year, proximoDt.Month);
 
@@ -172,8 +172,13 @@ namespace Financ.Application.Services
                         int diaSemana = (int)new DateTime(proximoDt.Year, proximoDt.Month, j).DayOfWeek;
                         DateTime dthrMovimentacao = new DateTime(proximoDt.Year, proximoDt.Month, j, 12, 0, 0);
 
+                        if (DateOnly.FromDateTime(dthrMovimentacao) < fixo.DataInicio)
+                        {
+                            continue;
+                        }
 
-                        if ((i == diferencaMes && DateOnly.FromDateTime(dthrMovimentacao) > _dataFim || DateOnly.FromDateTime(dthrMovimentacao) > fixo.DataFim))
+
+                        if ((i == diferencaMes && DateOnly.FromDateTime(dthrMovimentacao) >= _dataFim || DateOnly.FromDateTime(dthrMovimentacao) > fixo.DataFim))
                         {
                             break;
                         }

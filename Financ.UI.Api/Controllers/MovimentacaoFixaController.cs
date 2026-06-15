@@ -1,7 +1,7 @@
 ﻿using Financ.Application.CQRS.Fixas.Commands;
 using Financ.Application.CQRS.Movimentação.Commands;
-using Financ.Application.DTOs.Movimentações.Fixas.Patch;
-using Financ.Application.DTOs.Movimentações.Fixas.Post;
+using Financ.Application.DTOs.Fixas.Patch;
+using Financ.Application.DTOs.Fixas.Post;
 using Financ.Application.DTOs.Movimentações.Get;
 using Financ.Domain.Entidades.ContasBancarias;
 using Financ.Domain.Enums.Movimentações.Fixas;
@@ -90,10 +90,17 @@ namespace Financ.UI.Api.Controllers
             return movFixo.RetornoAutomatico();
         }
         [HttpPatch("{idFixo}/Alterar/Diario")]
-        public async Task<IActionResult> AlterarFixosDiario(int idConta, [FromQuery] TipoMovimentacaoFixa? tipoMovimentacao)
+        public async Task<IActionResult> AlterarFixosDiario(int idConta, int idFixo, [FromBody] AlterarMovimentacaoFixaDiariaDTO movimentacaoFixaDTO)
         {
-            var movFixo = await _mediator.Send(new RetornarMovimentacoesFixasCommand(idConta, User.RetornaIdUsuario(), tipoMovimentacao));
-            return movFixo.RetornoAutomatico();
+            var movFixo = await _mediator.Send(new AlterarMovimentacaoFixaDiariaCommand(
+                                                           idConta,
+                                                           idFixo,
+                                                           User.RetornaIdUsuario(),
+                                                           movimentacaoFixaDTO.Status,
+                                                           movimentacaoFixaDTO.DataInicio,
+                                                           movimentacaoFixaDTO.DataFim,
+                                                           movimentacaoFixaDTO.OcorrenciaDiaria)); return movFixo.RetornoAutomatico();
         }
+
     }
 }

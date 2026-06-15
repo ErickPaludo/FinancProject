@@ -1,6 +1,6 @@
 ﻿using Financ.Application.Comun.Resultado;
 using Financ.Application.DTOs.Base;
-using Financ.Application.DTOs.Movimentações.Fixas.Get;
+using Financ.Application.DTOs.Fixas.Get;
 using Financ.Domain.Enums.Movimentações.Fixas;
 using NetDevPack.SimpleMediator;
 using System;

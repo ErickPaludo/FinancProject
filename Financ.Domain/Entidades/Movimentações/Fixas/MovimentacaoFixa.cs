@@ -78,7 +78,7 @@ namespace Financ.Domain.Entidades.Movimentações.Fixas
 
             if (Tipo is TipoMovimentacaoFixa.Diaria)
             {
-                MovimentacaoFixaValidacao.Verifica(Movimentacoes.Any(m => m.DthrMovimentacao == darMovimentacao), "Movimentação fixa já está meterializada para este período");
+                MovimentacaoFixaValidacao.Verifica(Movimentacoes.Any(m => DateOnly.FromDateTime(m.DthrMovimentacao) == dataMovimentacao), "Movimentação fixa já está meterializada para este período");
 
                 MovimentacaoFixaValidacao.Verifica(!(DiasFixosDiarios!.Any(x => x.DiaSemana == (int)dataMovimentacao.DayOfWeek)), "Data de ocorrencia errada");
             }
@@ -101,23 +101,16 @@ namespace Financ.Domain.Entidades.Movimentações.Fixas
 
             return movimentacaoMaterializada;
         }
-        public void AlteraMovimentacaoFixa(ContaUsuario? contaUsuario, TipoMovimentacaoFixa? tipo,StatusMovimentacaoFixa? status, DateOnly? dataInicio, DateOnly? dataFim, DateTime? dataOcorrencia,bool diario = false)
+        public void AlteraMovimentacaoFixa(ContaUsuario? contaUsuario, TipoMovimentacaoFixa? tipo,StatusMovimentacaoFixa? status, DateOnly? dataInicio, DateOnly? dataFim, DateTime? dataOcorrencia)
         {
             MovimentacaoFixaValidacao.Verifica(contaUsuario is null, "Usuário não pertence a esta conta.");
             MovimentacaoFixaValidacao.Verifica(contaUsuario!.Status != StatusContasUsuario.Ativo, "Usuário inativo.");
-            MovimentacaoFixaValidacao.Verifica(contaUsuario.Acesso != TiposAcessos.Visualizador, "Usuário não possui permissão para esta ação.");
+            MovimentacaoFixaValidacao.Verifica(contaUsuario.Acesso == TiposAcessos.Visualizador, "Usuário não possui permissão para esta ação.");
 
             if(status.HasValue)
             {
                 ValidaStatus(status.Value);
                 Status = status.Value;
-            }
-
-            if (!diario && tipo.HasValue)
-            {
-                ValidaTipoFixo(tipo.Value);
-                MovimentacaoFixaValidacao.Verifica(Tipo != TipoMovimentacaoFixa.Diaria, "Não foi possivel alterar essa movimentação fixa, pois essa rota é somente para tipos mensais e anuais.");
-                Tipo = tipo.Value;
             }
 
             if (dataInicio.HasValue || dataFim.HasValue)
@@ -130,6 +123,16 @@ namespace Financ.Domain.Entidades.Movimentações.Fixas
 
             if(DataOcorrencia.HasValue)
                 DataOcorrencia = dataOcorrencia!.Value;
+        }
+
+        public void AlteraMovimentacaoFixaDiaria(ContaUsuario? contaUsuario, StatusMovimentacaoFixa? status, DateOnly? dataInicio, DateOnly? dataFim, int[]? ocorrenciaDiaria)
+        {
+            AlteraMovimentacaoFixa(contaUsuario,null,status,dataInicio,dataFim,null);
+            if(ocorrenciaDiaria is not null)
+            {
+                DiasFixosDiarios!.Clear();
+                ocorrenciaDiaria.ToList().ForEach(ms => DiasFixosDiarios.Add(new MovimentacaoFixaDiaria(this, ms)));
+            }
         }
         private void ValidaDatas(DateOnly dataInicio, DateOnly dataFim)
         {

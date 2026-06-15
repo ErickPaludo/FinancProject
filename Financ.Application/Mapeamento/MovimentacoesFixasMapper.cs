@@ -1,4 +1,4 @@
-﻿using Financ.Application.DTOs.Movimentações.Fixas.Get;
+﻿using Financ.Application.DTOs.Fixas.Get;
 using Financ.Domain.Entidades.Movimentações.Fixas;
 using System;
 using System.Collections.Generic;
@@ -28,7 +28,7 @@ namespace Financ.Application.Mapeamento
                 movimentacaoFixa.DataInicio,
                 movimentacaoFixa.DataFim,
                 movimentacaoFixa.DataOcorrencia,
-                movimentacaoFixa.DiasFixosDiarios is not null ? movimentacaoFixa.DiasFixosDiarios.Select(x => x.DiaSemana).ToArray() : null,
+                movimentacaoFixa.DiasFixosDiarios.Count > 0 ? movimentacaoFixa.DiasFixosDiarios.Select(x => x.DiaSemana).ToArray() : null,
                  DateOnly.FromDateTime(DateTime.UtcNow) > movimentacaoFixa.DataFim,
                 MovimentacaoMapper.ParaDTO(movimentacaoFixa.Movimentacao));
     }

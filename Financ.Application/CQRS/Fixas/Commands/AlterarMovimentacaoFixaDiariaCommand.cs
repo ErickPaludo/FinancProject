@@ -10,5 +10,5 @@ using System.Threading.Tasks;
 
 namespace Financ.Application.CQRS.Fixas.Commands
 {
-    public record AlterarMovimentacaoFixaCommand(int IdConta,int IdFixa,string IdUsuario, TipoMovimentacaoFixa? Tipo, StatusMovimentacaoFixa? Status, DateOnly? DataInicio, DateOnly? DataFim, DateTime? DataOcorrencia) : IRequest<Resultado<GetMovimentacaoFixaDTO>>;
+    public record AlterarMovimentacaoFixaDiariaCommand(int IdConta, int IdFixa, string IdUsuario, StatusMovimentacaoFixa? Status, DateOnly? DataInicio, DateOnly? DataFim, int[]? OcorrenciasDiarias) : IRequest<Resultado<GetMovimentacaoFixaDTO>>;
 }

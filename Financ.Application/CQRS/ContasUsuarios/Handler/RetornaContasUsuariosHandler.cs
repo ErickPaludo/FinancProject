@@ -37,12 +37,13 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
             var movimentacoesPendentes = movimentacoes.Where(x => x.Status == StatusMovimentacao.Pendente).ToList();
             var movimentacoesConcluidas = movimentacoes.Where(x => x.Status == StatusMovimentacao.Concluido).ToList();
 
-            if (fixos.Count > 0)
+            foreach (var contaUsuario in contasUsuarios)
             {
-                foreach (var contaUsuario in contasUsuarios)
+                var fixoConta = fixos.Where(x => x.IdConta == contaUsuario.IdConta).ToList();
+                if (fixoConta.Count > 0)
                 {
                     VirtualizaMovimentacoesFixasService virtualizaMovimentacao =
-                     new VirtualizaMovimentacoesFixasService(movimentacoes.Where(m => m.Conta == contaUsuario.Conta), fixos, fixos.Min(x => x.DataInicio), fixos.Max(x => x.DataFim),contaUsuario);
+                     new VirtualizaMovimentacoesFixasService(movimentacoes.Where(m => m.Conta == contaUsuario.Conta), fixoConta, fixoConta.Min(x => x.DataInicio), fixoConta.Max(x => x.DataFim), contaUsuario);
 
                     var mensal = virtualizaMovimentacao.Mensal();
                     var anual = virtualizaMovimentacao.Anual();

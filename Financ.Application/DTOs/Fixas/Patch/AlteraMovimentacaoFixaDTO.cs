@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Financ.Application.DTOs.Movimentações.Fixas.Patch
+namespace Financ.Application.DTOs.Fixas.Patch
 {
     public record AlteraMovimentacaoFixaDTO(TipoMovimentacaoFixa? Tipo, StatusMovimentacaoFixa? Status, DateOnly? DataInicio, DateOnly? DataFim, DateTime? DataOcorrencia);
 }

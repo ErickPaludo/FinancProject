@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Financ.Application.DTOs.Movimentações.Fixas.Post
+namespace Financ.Application.DTOs.Fixas.Post
 {
-    public record CriaMovimentacaoFixaDiariaDTO(DateOnly DataInicio, DateOnly DataFim,int[] OcorrenciaDiaria, CriaMovimentacaoDTO Movimentacao);
+    public record CriaMovimentacaoFixaDTO(TipoMovimentacaoFixa Tipo, DateOnly DataInicio, DateOnly DataFim, DateTime DataOcorrencia, MovimentacaoFixaDTO Movimentacao);
 }

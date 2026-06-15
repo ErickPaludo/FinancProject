@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Financ.Application.DTOs.Movimentações.Fixas.Get
+namespace Financ.Application.DTOs.Fixas.Get
 {
     public record GetMovimentacaoFixaDTO(int Id, TipoMovimentacaoFixa Tipo, DateOnly DataInicio, DateOnly DataFim, DateTime? DataOcorrencia, int[]? OcorrenciaDiaria,bool Expirado,MovimentacaoDTO MovimentacaoBase);
 }

@@ -1,11 +1,12 @@
 ﻿using Financ.Application.Comun.Resultado;
 using Financ.Application.CQRS.Fixas.Commands;
 using Financ.Application.DTOs.Base;
-using Financ.Application.DTOs.Movimentações.Fixas.Get;
+using Financ.Application.DTOs.Fixas.Get;
 using Financ.Application.DTOs.Movimentações.Get;
 using Financ.Application.Mapeamento;
 using Financ.Domain.Entidades.ContasBancarias;
 using Financ.Domain.Entidades.Movimentações.Fixas;
+using Financ.Domain.Enums.Movimentações.Fixas;
 using Financ.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using NetDevPack.SimpleMediator;
@@ -35,7 +36,7 @@ namespace Financ.Application.CQRS.Fixas.Handlers
             if (contaUsuario is null) 
                 return Resultado<BaseGetList<GetMovimentacaoFixaDTO>>.GeraFalha(Falha.NaoEncontrado("Usuário não pertence a conta!"));
 
-            IQueryable<MovimentacaoFixa> fixas = _unitOfWork.movimentacaoFixaRepositorio.BuscaMovimentacoesFixaCompleta(f => f.IdConta == request.IdConta);
+            IQueryable<MovimentacaoFixa> fixas = _unitOfWork.movimentacaoFixaRepositorio.BuscaMovimentacoesFixaCompleta(f => f.IdConta == request.IdConta && f.Status == StatusMovimentacaoFixa.Ativo);
 
             if(request.Tipo.HasValue)
                 fixas = fixas.Where(x => x.Tipo == request.Tipo.Value);

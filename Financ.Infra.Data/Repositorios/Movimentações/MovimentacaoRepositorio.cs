@@ -42,13 +42,20 @@ namespace Financ.Infra.Data.Repositorios.Movimentações
                            .Include(c => c.Conta.ContaUsuarios);
         }
 
-        public async Task<decimal> MovimentacaoLedger(int idConta, DateTime dtMax)
+        public async Task<decimal> SomaTotalPendentes(int idConta, DateTime dtMax)
         {
             return await _contexto.Movimentacao
-                        .Where(x => x.IdConta == idConta && x.DthrMovimentacao < dtMax && x.Status == StatusMovimentacao.Concluido)
-                        .SumAsync(x => x.Tipo == TipoMovimentacao.Entrada ? x.Valor :
-                                       x.Tipo == TipoMovimentacao.Saida ? - x.Valor : 0);
-            throw new NotImplementedException();
+                         .Where(x => x.IdConta == idConta && x.DthrMovimentacao <= dtMax && x.Status == StatusMovimentacao.Pendente)
+                         .SumAsync(x => x.Tipo == TipoMovimentacao.Entrada ? x.Valor :
+                                        x.Tipo == TipoMovimentacao.Saida ? -x.Valor : 0);
+        }
+
+        public async Task<decimal> SomaTotalConcluidas(int idConta, DateTime dtMax)
+        {
+            return await _contexto.Movimentacao
+                                  .Where(x => x.IdConta == idConta && x.DthrConclusao <= dtMax && x.Status == StatusMovimentacao.Concluido)
+                                  .SumAsync(x => x.Tipo == TipoMovimentacao.Entrada ? x.Valor :
+                                                 x.Tipo == TipoMovimentacao.Saida ? -x.Valor : 0);
         }
     }
 }
