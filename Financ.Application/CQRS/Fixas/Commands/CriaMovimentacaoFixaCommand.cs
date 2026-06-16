@@ -15,8 +15,8 @@ namespace Financ.Application.CQRS.Fixas.Commands
     public record CriaMovimentacaoFixaCommand : MovimentacaoBaseCommand, IRequest<Resultado<BasePost<string>>>
     {
         public TipoMovimentacaoFixa TipoFixo { get; set; }
-        public DateOnly DataInicio { get; set; }
-        public DateOnly DataFim { get; set; }
+        public DateTime DataInicio { get; set; }
+        public DateTime DataFim { get; set; }
         public DateTime DataOcorrencia { get; set; }
     }
 }

@@ -9,5 +9,5 @@ using System.Threading.Tasks;
 
 namespace Financ.Application.DTOs.Fixas.Get
 {
-    public record GetMovimentacaoFixaDTO(int Id, TipoMovimentacaoFixa Tipo, DateOnly DataInicio, DateOnly DataFim, DateTime? DataOcorrencia, int[]? OcorrenciaDiaria,bool Expirado,MovimentacaoDTO MovimentacaoBase);
+    public record GetMovimentacaoFixaDTO(int Id, TipoMovimentacaoFixa Tipo, DateTime DataInicio, DateTime DataFim, DateTime? DataOcorrencia, int[]? OcorrenciaDiaria,bool Expirado,MovimentacaoDTO MovimentacaoBase);
 }

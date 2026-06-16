@@ -8,5 +8,5 @@ using System.Threading.Tasks;
 
 namespace Financ.Application.DTOs.Fixas.Post
 {
-    public record CriaMovimentacaoFixaDTO(TipoMovimentacaoFixa Tipo, DateOnly DataInicio, DateOnly DataFim, DateTime DataOcorrencia, MovimentacaoFixaDTO Movimentacao);
+    public record CriaMovimentacaoFixaDTO(TipoMovimentacaoFixa Tipo, DateTime DataInicio, DateTime DataFim, DateTime DataOcorrencia, MovimentacaoFixaDTO Movimentacao);
 }

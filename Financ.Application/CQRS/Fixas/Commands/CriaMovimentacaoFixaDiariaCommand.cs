@@ -13,8 +13,8 @@ namespace Financ.Application.CQRS.Fixas.Commands
 {
     public record CriaMovimentacaoFixaDiariaCommand : MovimentacaoBaseCommand, IRequest<Resultado<BasePost<string>>>
     {
-        public DateOnly DataInicio { get; set; }
-        public DateOnly DataFim { get; set; }
+        public DateTime DataInicio { get; set; }
+        public DateTime DataFim { get; set; }
         public int[] OcorrenciasDiarias { get; set; }
     }
 }

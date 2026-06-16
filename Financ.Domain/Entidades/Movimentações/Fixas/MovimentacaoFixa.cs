@@ -22,9 +22,9 @@ namespace Financ.Domain.Entidades.Movimentações.Fixas
         public Conta Conta { get; set; }
         public TipoMovimentacaoFixa Tipo { get; private set; }
         public StatusMovimentacaoFixa Status { get; private set; }
-        public DateOnly DataInicio
+        public DateTime DataInicio
         { get; private set; }
-        public DateOnly DataFim { get; private set; }
+        public DateTime DataFim { get; private set; }
         public DateTime? DataOcorrencia { get; private set; }
         public DateTime Dthr { get; private set; }
         public Movimentacao Movimentacao { get; private set; }
@@ -32,7 +32,7 @@ namespace Financ.Domain.Entidades.Movimentações.Fixas
         public ICollection<MovimentacaoFixaDiaria>? DiasFixosDiarios { get; private set; } = new List<MovimentacaoFixaDiaria>();
         public MovimentacaoFixa() { }
 
-        public MovimentacaoFixa(TipoMovimentacaoFixa tipo, DateOnly dataInicio, DateOnly dataFim, DateTime dataOcorrencia, Movimentacao movimentacao)
+        public MovimentacaoFixa(TipoMovimentacaoFixa tipo, DateTime dataInicio, DateTime dataFim, DateTime dataOcorrencia, Movimentacao movimentacao)
         {
             ValidaDatas(dataInicio, dataFim);
             DataInicio = dataInicio;
@@ -50,7 +50,7 @@ namespace Financ.Domain.Entidades.Movimentações.Fixas
             IdMovimentacao = movimentacao.Id;
             Movimentacao = movimentacao;
         }
-        public MovimentacaoFixa(DateOnly dataInicio, DateOnly dataFim, int[] ocorrenciaDiaria, Movimentacao movimentacao)
+        public MovimentacaoFixa(DateTime dataInicio, DateTime dataFim, int[] ocorrenciaDiaria, Movimentacao movimentacao)
         {
             MovimentacaoFixaValidacao.Verifica(!ocorrenciaDiaria.Any(), MensagemMovimentacaoFixa.MOVIMENTACAO_DIARIA_NAO_INFORMADA);
 
@@ -73,12 +73,12 @@ namespace Financ.Domain.Entidades.Movimentações.Fixas
         }
         public Movimentacao MaterializaMovimentacao(DateTime darMovimentacao, ContaUsuario? contaUsuario)
         {
-            DateOnly dataMovimentacao = DateOnly.FromDateTime(darMovimentacao);
-            MovimentacaoFixaValidacao.Verifica(!(dataMovimentacao >= DataInicio && dataMovimentacao <= DataFim), "A data de movimentação está fora do perído da movimentação fixa");
+            DateTime dataMovimentacao = darMovimentacao;
+            MovimentacaoFixaValidacao.Verifica(!(dataMovimentacao.Date >= DataInicio.Date && dataMovimentacao.Date <= DataFim.Date), "A data de movimentação está fora do perído da movimentação fixa");
 
             if (Tipo is TipoMovimentacaoFixa.Diaria)
             {
-                MovimentacaoFixaValidacao.Verifica(Movimentacoes.Any(m => DateOnly.FromDateTime(m.DthrMovimentacao) == dataMovimentacao), "Movimentação fixa já está meterializada para este período");
+                MovimentacaoFixaValidacao.Verifica(Movimentacoes.Any(m => m.DthrMovimentacao.Date == dataMovimentacao.Date), "Movimentação fixa já está meterializada para este período");
 
                 MovimentacaoFixaValidacao.Verifica(!(DiasFixosDiarios!.Any(x => x.DiaSemana == (int)dataMovimentacao.DayOfWeek)), "Data de ocorrencia errada");
             }
@@ -97,17 +97,17 @@ namespace Financ.Domain.Entidades.Movimentações.Fixas
             }
 
             Movimentacao movimentacaoMaterializada = new Movimentacao(Movimentacao.Tipo, contaUsuario, Movimentacao.Valor, Movimentacao.Titulo, Movimentacao.Observacao, darMovimentacao, Movimentacao.DthrConclusao, false, this);
-            Movimentacao.CategoriasMovimentacao.ToList().ForEach(x => movimentacaoMaterializada.AdicionarCategoria(x));
-
+            Movimentacao.CategoriasMovimentacao.ToList().ForEach(x =>
+    movimentacaoMaterializada.AdicionarCategoria(new MovimentacaoCategoria(movimentacaoMaterializada, x.Categoria)));
             return movimentacaoMaterializada;
         }
-        public void AlteraMovimentacaoFixa(ContaUsuario? contaUsuario, TipoMovimentacaoFixa? tipo,StatusMovimentacaoFixa? status, DateOnly? dataInicio, DateOnly? dataFim, DateTime? dataOcorrencia)
+        public void AlteraMovimentacaoFixa(ContaUsuario? contaUsuario, TipoMovimentacaoFixa? tipo, StatusMovimentacaoFixa? status, DateTime? dataInicio, DateTime? dataFim, DateTime? dataOcorrencia)
         {
             MovimentacaoFixaValidacao.Verifica(contaUsuario is null, "Usuário não pertence a esta conta.");
             MovimentacaoFixaValidacao.Verifica(contaUsuario!.Status != StatusContasUsuario.Ativo, "Usuário inativo.");
             MovimentacaoFixaValidacao.Verifica(contaUsuario.Acesso == TiposAcessos.Visualizador, "Usuário não possui permissão para esta ação.");
 
-            if(status.HasValue)
+            if (status.HasValue)
             {
                 ValidaStatus(status.Value);
                 Status = status.Value;
@@ -121,22 +121,26 @@ namespace Financ.Domain.Entidades.Movimentações.Fixas
                 DataFim = dataFim.HasValue ? dataFim.Value : DataFim;
             }
 
-            if(DataOcorrencia.HasValue)
+            if (dataOcorrencia.HasValue)
                 DataOcorrencia = dataOcorrencia!.Value;
+
+            if (tipo.HasValue)
+                Tipo = tipo.Value;
         }
 
-        public void AlteraMovimentacaoFixaDiaria(ContaUsuario? contaUsuario, StatusMovimentacaoFixa? status, DateOnly? dataInicio, DateOnly? dataFim, int[]? ocorrenciaDiaria)
+        public void AlteraMovimentacaoFixaDiaria(ContaUsuario? contaUsuario, StatusMovimentacaoFixa? status, DateTime? dataInicio, DateTime? dataFim, int[]? ocorrenciaDiaria)
         {
-            AlteraMovimentacaoFixa(contaUsuario,null,status,dataInicio,dataFim,null);
-            if(ocorrenciaDiaria is not null)
+            AlteraMovimentacaoFixa(contaUsuario, null, status, dataInicio, dataFim, null);
+            if (ocorrenciaDiaria is not null)
             {
+                MovimentacaoFixaValidacao.Verifica(!ocorrenciaDiaria.Any(), MensagemMovimentacaoFixa.MOVIMENTACAO_DIARIA_NAO_INFORMADA);
                 DiasFixosDiarios!.Clear();
                 ocorrenciaDiaria.ToList().ForEach(ms => DiasFixosDiarios.Add(new MovimentacaoFixaDiaria(this, ms)));
             }
         }
-        private void ValidaDatas(DateOnly dataInicio, DateOnly dataFim)
+        private void ValidaDatas(DateTime dataInicio, DateTime dataFim)
         {
-            MovimentacaoFixaValidacao.Verifica(dataInicio >= dataFim, MensagemMovimentacaoFixa.DATAS_INVALIDAS);
+            MovimentacaoFixaValidacao.Verifica(dataInicio.Date >= dataFim.Date, MensagemMovimentacaoFixa.DATAS_INVALIDAS);
         }
         private void ValidaTipoFixo(TipoMovimentacaoFixa tipo)
         {

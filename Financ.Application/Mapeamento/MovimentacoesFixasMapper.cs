@@ -29,7 +29,7 @@ namespace Financ.Application.Mapeamento
                 movimentacaoFixa.DataFim,
                 movimentacaoFixa.DataOcorrencia,
                 movimentacaoFixa.DiasFixosDiarios.Count > 0 ? movimentacaoFixa.DiasFixosDiarios.Select(x => x.DiaSemana).ToArray() : null,
-                 DateOnly.FromDateTime(DateTime.UtcNow) > movimentacaoFixa.DataFim,
+                DateTime.UtcNow > movimentacaoFixa.DataFim,
                 MovimentacaoMapper.ParaDTO(movimentacaoFixa.Movimentacao));
     }
 }

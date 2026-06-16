@@ -7,5 +7,5 @@ using System.Threading.Tasks;
 
 namespace Financ.Application.DTOs.Fixas.Patch
 {
-    public record AlterarMovimentacaoFixaDiariaDTO(StatusMovimentacaoFixa? Status, DateOnly? DataInicio, DateOnly? DataFim, int[]? OcorrenciaDiaria);
+    public record AlterarMovimentacaoFixaDiariaDTO(StatusMovimentacaoFixa? Status, DateTime? DataInicio, DateTime? DataFim, int[]? OcorrenciaDiaria);
 }

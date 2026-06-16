@@ -59,7 +59,7 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
                 if (fixos.Any())
                 {
                     VirtualizaMovimentacoesFixasService virtualizaMovimentacao =
-                       new VirtualizaMovimentacoesFixasService(movimentacoes.Where(m => m.Conta == contaUsuario.Conta && m.IdFixo == null), fixos, fixos.Min(x => x.DataInicio), DateOnly.FromDateTime(request.Filtros.DthrMovimentacaoFinal), contaUsuario);
+                       new VirtualizaMovimentacoesFixasService(movimentacoes.Where(m => m.Conta == contaUsuario.Conta && m.IdFixo == null), fixos, fixos.Min(x => x.DataInicio), request.Filtros.DthrMovimentacaoFinal, contaUsuario);
 
                     var mensal = virtualizaMovimentacao.Mensal();
                     var anual = virtualizaMovimentacao.Anual();

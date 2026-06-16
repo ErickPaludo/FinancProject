@@ -73,7 +73,7 @@ namespace Financ.Domain.Entidades.Movimentações
             DthrMovimentacao = dthrMovimentacao is null ? DthrReg : dthrMovimentacao.Value; //data em que a movimentacao deve/foi feita
 
             ValidaDataConclusao(dthrConclusao);
-            DthrConclusao = dthrConclusao ?? dthrMovimentacao;
+            DthrConclusao = concluido ?( dthrConclusao ?? dthrMovimentacao) : null;
         }
         #endregion
 
