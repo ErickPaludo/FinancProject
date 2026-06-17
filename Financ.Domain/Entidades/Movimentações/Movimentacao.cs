@@ -35,7 +35,7 @@ namespace Financ.Domain.Entidades.Movimentações
         public MovimentacaoFixa? Fixa { get; private set; }
         #region Contrutores
         private Movimentacao() { }
-        public Movimentacao(TipoMovimentacao tipo, ContaUsuario? contaUsuario, decimal valor, string titulo, string? observacao, DateTime? dthrMovimentacao, DateTime? dthrConclusao, bool concluido, MovimentacaoFixa? movimentacaoFixa = null)
+        public Movimentacao(TipoMovimentacao tipo, ContaUsuario? contaUsuario, decimal valor, string titulo, string? observacao, DateTime? dthrMovimentacao, DateTime? dthrConclusao, bool concluido, MovimentacaoFixa? movimentacaoFixa = null, bool movimentacaoVirtual = false)
         {
             if (movimentacaoFixa is not null)
             {
@@ -54,9 +54,12 @@ namespace Financ.Domain.Entidades.Movimentações
             ValidaObservacao(observacao);
             Observacao = observacao;
 
-            ValidaContaUsuario(contaUsuario);
-            IdUsuarioCriador = contaUsuario!.Id;
-            ContaUsuarioCriador = contaUsuario;
+            if (!movimentacaoVirtual)
+            {
+                ValidaContaUsuario(contaUsuario);
+                IdUsuarioCriador = contaUsuario!.Id;
+                ContaUsuarioCriador = contaUsuario;
+            }
 
 
             IdUsuarioExecutor = concluido ? contaUsuario.Id : null;
@@ -73,7 +76,7 @@ namespace Financ.Domain.Entidades.Movimentações
             DthrMovimentacao = dthrMovimentacao is null ? DthrReg : dthrMovimentacao.Value; //data em que a movimentacao deve/foi feita
 
             ValidaDataConclusao(dthrConclusao);
-            DthrConclusao = concluido ?( dthrConclusao ?? dthrMovimentacao) : null;
+            DthrConclusao = concluido ? (dthrConclusao ?? dthrMovimentacao) : null;
         }
         #endregion
 

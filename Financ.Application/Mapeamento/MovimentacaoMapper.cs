@@ -26,7 +26,7 @@ namespace Financ.Application.Mapeamento
             DateTime.SpecifyKind(movimentacao.DthrReg, DateTimeKind.Utc),
             DateTime.SpecifyKind(movimentacao.DthrMovimentacao, DateTimeKind.Utc),
             movimentacao.DthrConclusao.HasValue ? DateTime.SpecifyKind(movimentacao.DthrConclusao.Value, DateTimeKind.Utc) : null,
-            ContaUsuarioMapper.ParaUsuarioDTO(movimentacao.ContaUsuarioCriador),
+            movimentacao.ContaUsuarioCriador is not null ? ContaUsuarioMapper.ParaUsuarioDTO(movimentacao.ContaUsuarioCriador) : null,
             (movimentacao.ContaUsuarioExecutor is null ? null : ContaUsuarioMapper.ParaUsuarioDTO(movimentacao.ContaUsuarioExecutor)),
             movimentacao.Editado,
             movimentacao.CategoriasMovimentacao is not null ? movimentacao.CategoriasMovimentacao.Select(mc => CategoriaMapper.ParaDTO(mc.Categoria)).ToList() : null

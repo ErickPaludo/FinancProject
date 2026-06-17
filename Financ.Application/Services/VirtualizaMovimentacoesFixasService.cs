@@ -48,31 +48,42 @@ namespace Financ.Application.Services
             if (!periodoFixos.Any())
                 return new List<Movimentacao>();
 
+
+
+
             for (int i = 0; i <= diferencaMes; i++)
             {
                 DateTime proximoDt = i > 0 ? new DateTime(_dataInicioFiltro.Year, _dataInicioFiltro.Month, 1).AddMonths(i) : _dataInicioFiltro;
-                foreach (var fixo in periodoFixos.Where(f =>
-                        new DateTime(proximoDt.Year, proximoDt.Month, f.DataOcorrencia!.Value.Day).Date >= f.DataInicio.Date &&
-                        new DateTime(proximoDt.Year, proximoDt.Month, f.DataOcorrencia!.Value.Day).Date <= f.DataFim.Date &&
-                        new DateTime(proximoDt.Year, proximoDt.Month, f.DataOcorrencia!.Value.Day).Date <= _dataFimFiltro.Date))
+
+                foreach (var fixo in periodoFixos)
                 {
-                    int diasMes = DateTime.DaysInMonth(proximoDt.Year, proximoDt.Month);
+                    int diaOcorrencia = fixo.DataOcorrencia!.Value.Day;
+                    int ultimoDiaMes = DateTime.DaysInMonth(proximoDt.Year, proximoDt.Month);
 
-                    diasMes = fixo.DataOcorrencia!.Value.Day > diasMes ? diasMes : fixo.DataOcorrencia!.Value.Day;
+                    int diaValido = Math.Min(diaOcorrencia, ultimoDiaMes);
 
-                    DateTime dthrMovimentacao = new DateTime(proximoDt.Year, proximoDt.Month, diasMes, fixo.DataOcorrencia!.Value.Hour, fixo.DataOcorrencia!.Value.Minute, fixo.DataOcorrencia!.Value.Second);
+                    DateTime dthrMovimentacao = new(
+                        proximoDt.Year,
+                        proximoDt.Month,
+                        diaValido);
 
-
-                    if (!indiceProcura.Contains((fixo.Id, proximoDt.Year, proximoDt.Month)))
+                    if (dthrMovimentacao.Date >= fixo.DataInicio.Date &&
+                        dthrMovimentacao.Date <= fixo.DataFim.Date &&
+                        dthrMovimentacao.Date <= _dataFimFiltro.Date)
                     {
-                        var mov = new Movimentacao(fixo.Movimentacao.Tipo, _contaUsuario, fixo.Movimentacao.Valor, fixo.Movimentacao.Titulo, fixo.Movimentacao.Observacao, dthrMovimentacao, null, false, fixo);
-
-                        fixo.Movimentacao.CategoriasMovimentacao.ToList().ForEach(x => mov.AdicionarCategoria(x));
 
 
-                        novaMov.Add(mov);
+                        if (!indiceProcura.Contains((fixo.Id, proximoDt.Year, proximoDt.Month)))
+                        {
+                            var mov = new Movimentacao(fixo.Movimentacao.Tipo, _contaUsuario, fixo.Movimentacao.Valor, fixo.Movimentacao.Titulo, fixo.Movimentacao.Observacao, dthrMovimentacao, null, false, fixo, true);
 
-                        indiceProcura.Add((fixo.Id, proximoDt.Year, proximoDt.Month));
+                            fixo.Movimentacao.CategoriasMovimentacao.ToList().ForEach(x => mov.AdicionarCategoria(x));
+
+
+                            novaMov.Add(mov);
+
+                            indiceProcura.Add((fixo.Id, proximoDt.Year, proximoDt.Month));
+                        }
                     }
                 }
             }
@@ -114,7 +125,7 @@ x.DataFim.Date >= _dataInicioFiltro.Date)
 
                     if (!indiceProcura.Contains((fixo.Id, proximoDt.Year, fixo.DataOcorrencia!.Value.Month, fixo.DataOcorrencia!.Value.Day)))
                     {
-                        var mov = new Movimentacao(fixo.Movimentacao.Tipo, _contaUsuario, fixo.Movimentacao.Valor, fixo.Movimentacao.Titulo, fixo.Movimentacao.Observacao, dthrMovimentacao, null, false, fixo);
+                        var mov = new Movimentacao(fixo.Movimentacao.Tipo, _contaUsuario, fixo.Movimentacao.Valor, fixo.Movimentacao.Titulo, fixo.Movimentacao.Observacao, dthrMovimentacao, null, false, fixo, true);
 
                         fixo.Movimentacao.CategoriasMovimentacao.ToList().ForEach(x => mov.AdicionarCategoria(x));
 
@@ -166,7 +177,7 @@ x.DataFim.Date >= _dataInicioFiltro.Date)
                             if (!indiceProcura.Contains((fixo.Id, proximoDt.Year, proximoDt.Month, j)))
                             {
 
-                                var mov = new Movimentacao(fixo.Movimentacao.Tipo, _contaUsuario, fixo.Movimentacao.Valor, fixo.Movimentacao.Titulo, fixo.Movimentacao.Observacao, dthrMovimentacao, null, false, fixo);
+                                var mov = new Movimentacao(fixo.Movimentacao.Tipo, _contaUsuario, fixo.Movimentacao.Valor, fixo.Movimentacao.Titulo, fixo.Movimentacao.Observacao, dthrMovimentacao, null, false, fixo, true);
 
                                 fixo.Movimentacao.CategoriasMovimentacao.ToList().ForEach(x => mov.AdicionarCategoria(x));
 

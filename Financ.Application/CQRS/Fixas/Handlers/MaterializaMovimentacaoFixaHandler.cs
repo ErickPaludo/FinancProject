@@ -9,6 +9,7 @@ using Financ.Domain.Entidades.Movimentações;
 using Financ.Domain.Entidades.Movimentações.Fixas;
 using Financ.Domain.Enums.Movimentações.Fixas;
 using Financ.Domain.Interfaces;
+using Financ.Domain.Validacoes.Movimentações;
 using Financ.Domain.Validacoes.Movimentações.Fixas;
 using Microsoft.EntityFrameworkCore;
 using NetDevPack.SimpleMediator;
@@ -47,7 +48,10 @@ namespace Financ.Application.CQRS.Fixas.Handlers
             catch (MovimentacaoFixaValidacao ex) {
                 return Resultado<BasePost<MovimentacaoDTO>>.GeraFalha(Falha.ErroOperacional(ex.Message));
             }
-
+            catch (MovimentacaoValidacao ex)
+            {
+                return Resultado<BasePost<MovimentacaoDTO>>.GeraFalha(Falha.ErroOperacional(ex.Message));
+            }
         }
     }
 }

@@ -44,6 +44,7 @@ namespace Financ.Infra.Data.Repositorios.Movimentações.Fixas
                 .ThenInclude(c => c.ContaUsuarios)
                  .ThenInclude(cu => cu.Usuario)
            .Include(md => md.DiasFixosDiarios)
+           .Include(mm => mm.Movimentacoes)
            .Where(predicado);
         }
     }

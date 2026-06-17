@@ -53,9 +53,12 @@ namespace Financ.Infra.Data.Repositorios.Movimentações
         public async Task<decimal> SomaTotalConcluidas(int idConta, DateTime dtMax)
         {
             var teste = await _contexto.Movimentacao
-                                  .Where(x => x.IdConta == idConta && x.DthrConclusao <= dtMax && x.Status == StatusMovimentacao.Concluido)
-                                  .SumAsync(x => x.Tipo == TipoMovimentacao.Entrada ? x.Valor :
-                                                 x.Tipo == TipoMovimentacao.Saida ? -x.Valor : 0);
+                                  .Where(x => x.IdConta == idConta && x.DthrConclusao!.Value.Date <= dtMax.Date && x.Status == StatusMovimentacao.Concluido && x.Tipo == TipoMovimentacao.Entrada)
+                                  .SumAsync(x => x.Valor);
+
+            var testee = await _contexto.Movimentacao
+                                 .Where(x => x.IdConta == idConta && x.DthrConclusao!.Value.Date <= dtMax.Date && x.Status == StatusMovimentacao.Concluido && x.Tipo == TipoMovimentacao.Saida)
+                                 .SumAsync(x => x.Valor);
 
             return await _contexto.Movimentacao
                                   .Where(x => x.IdConta == idConta && x.DthrConclusao <= dtMax && x.Status == StatusMovimentacao.Concluido)

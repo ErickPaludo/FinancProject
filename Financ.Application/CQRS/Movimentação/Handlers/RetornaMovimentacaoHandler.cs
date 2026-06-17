@@ -58,19 +58,21 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
 
                 if (fixos.Any())
                 {
+                    //VirtualizaMovimentacoesFixasService virtualizaMovimentacao =
+                    //   new VirtualizaMovimentacoesFixasService(movimentacoes.Where(m => m.Conta == contaUsuario.Conta && (m.IdFixo != null && m.Id != 0)), fixos, fixos.Min(x => x.DataInicio), request.Filtros.DthrMovimentacaoFinal, contaUsuario);
+
+                    List<Movimentacao> teste = new();
+                    fixos.ForEach(mf => teste.AddRange(mf.Movimentacoes));
+
                     VirtualizaMovimentacoesFixasService virtualizaMovimentacao =
-                       new VirtualizaMovimentacoesFixasService(movimentacoes.Where(m => m.Conta == contaUsuario.Conta && m.IdFixo == null), fixos, fixos.Min(x => x.DataInicio), request.Filtros.DthrMovimentacaoFinal, contaUsuario);
+                       new VirtualizaMovimentacoesFixasService(teste, fixos, fixos.Min(x => x.DataInicio), request.Filtros.DthrMovimentacaoFinal, contaUsuario);
 
-                    var mensal = virtualizaMovimentacao.Mensal();
-                    var anual = virtualizaMovimentacao.Anual();
-                    var diario = virtualizaMovimentacao.Diario();
+                    var temporario = virtualizaMovimentacao.Mensal();
+                    temporario.AddRange(virtualizaMovimentacao.Anual());
+                    temporario.AddRange(virtualizaMovimentacao.Diario());
 
-                    saldoRealPendente += mensal.Sum(x => x.Tipo == TipoMovimentacao.Entrada ? x.Valor :
+                    saldoRealPendente += temporario.Sum(x => x.Tipo == TipoMovimentacao.Entrada ? x.Valor :
                                             x.Tipo == TipoMovimentacao.Saida ? -x.Valor : 0);
-                    saldoRealPendente += anual.Sum(x => x.Tipo == TipoMovimentacao.Entrada ? x.Valor :
-                                           x.Tipo == TipoMovimentacao.Saida ? -x.Valor : 0);
-                    saldoRealPendente += diario.Sum(x => x.Tipo == TipoMovimentacao.Entrada ? x.Valor :
-                                           x.Tipo == TipoMovimentacao.Saida ? -x.Valor : 0);
                 }
 
                 movimentacoes = movimentacoes.Where(x => x.Status != StatusMovimentacao.Excluido).ToList();
@@ -157,6 +159,7 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
 
                 queryableMovimentacao = queryableMovimentacao.Where(x => x.Status == status);
 
+
                 if (status == StatusMovimentacao.Concluido)
                     filtraFixo = false;
             }
@@ -204,10 +207,18 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
             if (filtraFixo)
             {
                 List<MovimentacaoFixa> movimentacaoFixas = await queryableFixos.ToListAsync();
+                List<Movimentacao> temporarias = new();
+                if (filtro!.Concluido.HasValue == true)
+                {
+                    movimentacaoFixas.ForEach(mf => temporarias.AddRange(mf.Movimentacoes.Where(x => x.DthrMovimentacao.Date >= filtro.DthrMovimentacaoInicial.Date && x.DthrMovimentacao.Date <= filtro.DthrMovimentacaoFinal.Date && x.Status == StatusMovimentacao.Concluido)));
+                }
+
+
                 List<Movimentacao> movimentacoesFixasGeradas = RetornaFixos(filtro!, movimentacoes, movimentacaoFixas, contaUsuario);
+                temporarias.ForEach(t => movimentacoesFixasGeradas.RemoveAll(m => m.IdFixo == t.IdFixo && m.DthrMovimentacao == t.DthrMovimentacao));
                 movimentacoes.AddRange(movimentacoesFixasGeradas);
             }
-
+            movimentacoes.Where(x => !(x.IdFixo is not null && x.Id != 0 && x.Status != StatusMovimentacao.Pendente));
             return movimentacoes.OrderByDescending(x => x.DthrMovimentacao).ToList();
         }
 

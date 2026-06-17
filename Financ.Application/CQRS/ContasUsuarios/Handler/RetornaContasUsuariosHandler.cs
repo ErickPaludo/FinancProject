@@ -32,7 +32,7 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
 
             var fixos = await _unitOfWork.movimentacaoFixaRepositorio.BuscaMovimentacoesFixaCompleta(x => idsContas.Contains(x.IdConta) && x.Status == StatusMovimentacaoFixa.Ativo).ToListAsync();
 
-            var movimentacoes = await _unitOfWork.movimentacaoRepositorio.BuscarPorCondicao(m => idsContas.Contains(m.IdConta) && m.Status != StatusMovimentacao.Oculta);
+            var movimentacoes = await _unitOfWork.movimentacaoRepositorio.BuscarPorCondicao(m => idsContas.Contains(m.IdConta) && (m.Status != StatusMovimentacao.Oculta && m.Status != StatusMovimentacao.Excluido));
 
             var movimentacoesPendentes = movimentacoes.Where(x => x.Status == StatusMovimentacao.Pendente).ToList();
             var movimentacoesConcluidas = movimentacoes.Where(x => x.Status == StatusMovimentacao.Concluido).ToList();
@@ -43,7 +43,7 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
                 if (fixoConta.Count > 0)
                 {
                     VirtualizaMovimentacoesFixasService virtualizaMovimentacao =
-                     new VirtualizaMovimentacoesFixasService(movimentacoes.Where(m => m.Conta == contaUsuario.Conta), fixoConta, fixoConta.Min(x => x.DataInicio), fixoConta.Max(x => x.DataFim), contaUsuario);
+                     new VirtualizaMovimentacoesFixasService(movimentacoes.Where(m => m.IdConta == contaUsuario.IdConta), fixoConta, fixoConta.Min(x => x.DataInicio), fixoConta.Max(x => x.DataFim), contaUsuario);
 
                     var mensal = virtualizaMovimentacao.Mensal();
                     var anual = virtualizaMovimentacao.Anual();
