@@ -6,21 +6,22 @@ services:
       context: .
       dockerfile: Financ.UI.Api/Dockerfile
     container_name: financ-api
+    restart: unless-stopped
     ports:
       - "5000:5000"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - 'ASPNETCORE_URLS=http://+:5000'
-      - 'ConnectionStrings:SqlServer=Server=sqlserver;Database=dbfinanc;User Id=sa;Password=F1n4c+P1d22;TrustServerCertificate=True'
+      - 'ConnectionStrings:SqlServer=Server=sqlserver;Database=dbfinanc;User Id=sa;Password=F1n4c+P1d22;TrustServerCert>
     depends_on:
       - sqlserver
-    restart: on-failure
     networks:
       - financ-network
 
   sqlserver:
     image: 'mcr.microsoft.com/mssql/server:2022-latest'
     container_name: financ-sqlserver
+    restart: unless-stopped
     ports:
       - "1433:1433"
     environment:
@@ -38,7 +39,7 @@ services:
     restart: unless-stopped
     # Usar network_mode host resolve todos os problemas de comunicação interna
     network_mode: "host"
-    command: tunnel run --token eyJhIjoiMmI2MzI0NDkxMTFlMzI2MjkyN2Q4ZTU2N2YxOTVmZjIiLCJ0IjoiOGUyZDIwZjgtZDUwYy00NzE3LTlkMjQtMDU3ODM2NzBhYTlmIiwicyI6Ik1HUTROekV4TlRJdFkySTNNQzAwT0dZd0xXSTFNamd0TlROa1pHSTFOV1l6WlRReCJ9
+    command: tunnel run --token eyJhIjoiMmI2MzI0NDkxMTFlMzI2MjkyN2Q4ZTU2N2YxOTVmZjIiLCJ0IjoiOGUyZDIwZjgtZDUwYy00NzE3LTl>
 
 networks:
   financ-network:
