@@ -10,6 +10,6 @@ namespace Financ.Infra.Security.Configurações.Autenticação
     {
         public string SecretKeyJWT { get; set; }
         public int ExpiracaoEmMinutos { get; set; }
-        public int ExpitacaoRefreshTokenDias { get; set; }
+        public int ExpiracaoRefreshTokenDias { get; set; }
     }
 }

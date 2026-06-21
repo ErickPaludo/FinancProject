@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   financapi:
     build:
@@ -7,27 +5,28 @@ services:
       dockerfile: Financ.UI.Api/Dockerfile
     container_name: financ-api
     restart: unless-stopped
+    env_file:
+      - .env
     ports:
       - "5000:5000"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - 'ASPNETCORE_URLS=http://+:5000'
-      - 'ConnectionStrings:SqlServer=Server=sqlserver;Database=dbfinanc;User Id=sa;Password=F1n4c+P1d22;TrustServerCert>
     depends_on:
       - sqlserver
     networks:
       - financ-network
 
   sqlserver:
-    image: 'mcr.microsoft.com/mssql/server:2022-latest'
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
     container_name: financ-sqlserver
     restart: unless-stopped
+    env_file:
+      - .env
     ports:
       - "1433:1433"
     environment:
       - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=F1n4c+P1d22
       - MSSQL_PID=Developer
+      # MSSQL_SA_PASSWORD deve ser mapeada explicitamente se o nome no .env for diferente
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD} 
     networks:
       - financ-network
     volumes:
@@ -37,9 +36,17 @@ services:
     image: cloudflare/cloudflared:latest
     container_name: cloudflared
     restart: unless-stopped
-    # Usar network_mode host resolve todos os problemas de comunicação interna
-    network_mode: "host"
-    command: tunnel run --token eyJhIjoiMmI2MzI0NDkxMTFlMzI2MjkyN2Q4ZTU2N2YxOTVmZjIiLCJ0IjoiOGUyZDIwZjgtZDUwYy00NzE3LTl>
+    # Removido 'network_mode: host' para permitir que ele veja a 'financapi' pelo nome do serviço
+    networks:
+      - financ-network
+    env_file:
+      - .env
+    environment:
+      # Mapeamento correto: a variável no .env chama-se CLOUDFLARED_TOKEN
+      - TUNNEL_TOKEN=${CLOUDFLARED_TOKEN}
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARED_TOKEN}
+    depends_on:
+      - financapi
 
 networks:
   financ-network:

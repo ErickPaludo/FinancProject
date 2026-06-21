@@ -58,14 +58,11 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
 
                 if (fixos.Any())
                 {
-                    //VirtualizaMovimentacoesFixasService virtualizaMovimentacao =
-                    //   new VirtualizaMovimentacoesFixasService(movimentacoes.Where(m => m.Conta == contaUsuario.Conta && (m.IdFixo != null && m.Id != 0)), fixos, fixos.Min(x => x.DataInicio), request.Filtros.DthrMovimentacaoFinal, contaUsuario);
-
-                    List<Movimentacao> teste = new();
-                    fixos.ForEach(mf => teste.AddRange(mf.Movimentacoes));
+                    List<Movimentacao> movimentacoesFixasConcluidas = new();
+                    fixos.ForEach(mf => movimentacoesFixasConcluidas.AddRange(mf.Movimentacoes));//vai pegar as movimentacoes fixas geradas geradas
 
                     VirtualizaMovimentacoesFixasService virtualizaMovimentacao =
-                       new VirtualizaMovimentacoesFixasService(teste, fixos, fixos.Min(x => x.DataInicio), request.Filtros.DthrMovimentacaoFinal, contaUsuario);
+                       new VirtualizaMovimentacoesFixasService(movimentacoesFixasConcluidas, fixos, fixos.Min(x => x.DataInicio), request.Filtros.DthrMovimentacaoFinal, contaUsuario);
 
                     var temporario = virtualizaMovimentacao.Mensal();
                     temporario.AddRange(virtualizaMovimentacao.Anual());
@@ -89,9 +86,6 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
                 decimal saldoRealizado = totalEntradaConcluidos - totalSaidaConcluidos;
                 decimal saldoProjetado = (totalEntradaConcluidos + totalEntradaPendentes) - (totalSaidaConcluidos + totalSaidaPendentes);
 
-
-
-
                 decimal saldoRealProjetado = saldoRealConcluido + saldoRealPendente;
 
                 if (request.Filtros.Concluido.HasValue)
@@ -107,8 +101,6 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
                         saldoProjetado = 0;
                     }
                 }
-
-
 
                 GrupoMovimentacaoDTO grupoEntrada = new GrupoMovimentacaoDTO(totalEntradaConcluidos, totalEntradaPendentes, totalEntrada);
                 GrupoMovimentacaoDTO grupoSaida = new GrupoMovimentacaoDTO(totalSaidaConcluidos, totalSaidaPendentes, totalSaida);
@@ -157,11 +149,13 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
                     ? StatusMovimentacao.Concluido
                     : StatusMovimentacao.Pendente;
 
-                queryableMovimentacao = queryableMovimentacao.Where(x => x.Status == status);
-
-
                 if (status == StatusMovimentacao.Concluido)
+                {
+                    queryableMovimentacao = queryableMovimentacao.Where(x => x.Status == status);
                     filtraFixo = false;
+                }
+                else
+                    queryableMovimentacao = queryableMovimentacao.Where(x => x.Status == status || x.IdFixo != null);
             }
 
             if (filtro!.TipoMovimentacao.HasValue == true)
@@ -207,18 +201,13 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
             if (filtraFixo)
             {
                 List<MovimentacaoFixa> movimentacaoFixas = await queryableFixos.ToListAsync();
-                List<Movimentacao> temporarias = new();
-                if (filtro!.Concluido.HasValue == true)
-                {
-                    movimentacaoFixas.ForEach(mf => temporarias.AddRange(mf.Movimentacoes.Where(x => x.DthrMovimentacao.Date >= filtro.DthrMovimentacaoInicial.Date && x.DthrMovimentacao.Date <= filtro.DthrMovimentacaoFinal.Date && x.Status == StatusMovimentacao.Concluido)));
-                }
-
-
                 List<Movimentacao> movimentacoesFixasGeradas = RetornaFixos(filtro!, movimentacoes, movimentacaoFixas, contaUsuario);
-                temporarias.ForEach(t => movimentacoesFixasGeradas.RemoveAll(m => m.IdFixo == t.IdFixo && m.DthrMovimentacao == t.DthrMovimentacao));
                 movimentacoes.AddRange(movimentacoesFixasGeradas);
+
+                if (filtro!.Concluido.HasValue == true)
+                    movimentacoes = movimentacoes.Where(x => (filtro.Concluido.Value ? StatusMovimentacao.Concluido : StatusMovimentacao.Pendente) == x.Status).ToList();
+
             }
-            movimentacoes.Where(x => !(x.IdFixo is not null && x.Id != 0 && x.Status != StatusMovimentacao.Pendente));
             return movimentacoes.OrderByDescending(x => x.DthrMovimentacao).ToList();
         }
 

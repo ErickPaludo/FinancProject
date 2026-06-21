@@ -57,6 +57,7 @@ namespace Financ.UI.Api
             app.MapControllers();
 
             app.Run();
+     
         }
     }
 }

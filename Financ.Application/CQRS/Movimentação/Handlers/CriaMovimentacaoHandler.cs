@@ -30,7 +30,6 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
         {
             try
             {
-
                 var conta = await _unitOfWork.contasRepositorio.BuscarContaComUsuarios(c => c.Id == request.idConta);
 
                 if (conta is null)

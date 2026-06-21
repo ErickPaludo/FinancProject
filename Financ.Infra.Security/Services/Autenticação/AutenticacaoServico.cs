@@ -54,7 +54,7 @@ namespace Financ.Application.Services.Autenticação
 
             var tokenString = handler.WriteToken(token);
 
-            DateTime expirationRefreshToken = DateTime.UtcNow.AddDays(_autenticacaoConfig.ExpitacaoRefreshTokenDias);
+            DateTime expirationRefreshToken = DateTime.UtcNow.AddDays(_autenticacaoConfig.ExpiracaoRefreshTokenDias);
 
             return new ResultadoToken(tokenString,expiration, refreshToken, UtilAutenticacao.DateTimeInUnixTimestamp(expirationRefreshToken), expirationRefreshToken);
         }
