@@ -60,7 +60,7 @@ namespace Financ.UI.Api.Controllers
         {
             var movimentacao = await _mediator.Send(new RetornaMovimentacaoQuery(User.RetornaIdUsuario(), idConta,filtro));
 
-            return movimentacao.RetornoAutomatico();
+            return Ok(movimentacao);
         }
 
         [HttpGet("/api/Contas/{idConta}/[controller]/Dash")]
@@ -68,7 +68,7 @@ namespace Financ.UI.Api.Controllers
         {
             var movimentacao = await _mediator.Send(new DashMovimentacoesTotaisCommand(idConta, User.RetornaIdUsuario()));
 
-            return movimentacao.RetornoAutomatico();
+            return Ok(movimentacao);
         }
         [HttpPatch("{idMovimentacao}/Alterar")]
         public async Task<IActionResult> AlterarMovimentacao(int idMovimentacao,AlterarMovimentacaoDTO movimentacaoDTO)
@@ -83,21 +83,21 @@ namespace Financ.UI.Api.Controllers
                 movimentacaoDTO.dthrMovimentacao,
                 movimentacaoDTO.dthrConclusao));
 
-            return movimentacao.RetornoAutomatico();
+            return Ok(movimentacao);
         }
 
         [HttpPut("{idMovimentacao}/Alterar/Categoria")]
         public async Task<IActionResult> AlterarCategoriaMovimentacao(int idMovimentacao, AlterarMovimentacaoCategoriaDTO movimentacaoDTO)
         {
             var movimentacao = await _mediator.Send(new AlterarCategoriaMovimentacaoCommand(idMovimentacao, User.RetornaIdUsuario(), movimentacaoDTO.categorias));
-            return movimentacao.RetornoAutomatico();
+            return Ok(movimentacao);
         }
         [HttpDelete("{idMovimentacao}/Remover")]
         public async Task<IActionResult> RemoverMovimentacao(int idMovimentacao)
         {
             var movimentacao = await _mediator.Send(new RemoverMovimentacaoCommand(User.RetornaIdUsuario(), idMovimentacao));
 
-            return movimentacao.RetornoAutomatico();
+            return Ok(movimentacao);
         }
     }
 }

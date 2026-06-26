@@ -17,6 +17,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.4" />
     <PackageReference Include="NetDevPack.SimpleMediator" Version="1.2.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.4" />
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="9.0.4" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="9.0.4" />

@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace Financ.Infra.IoC
 {
@@ -20,6 +21,14 @@ namespace Financ.Infra.IoC
         {
             services.AddSimpleMediator();
             services.AddScoped<IMediator, Mediator>();
+
+            var outputTemplate = "{Timestamp} [{Level}] {Message}{NewLine}{Exception}{NewLine}";
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Information()
+                .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", Serilog.Events.LogEventLevel.Warning)
+                .WriteTo.Console(outputTemplate: outputTemplate)
+                .Enrich.FromLogContext()
+                .CreateLogger();
         }
     }
 }

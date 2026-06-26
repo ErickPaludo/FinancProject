@@ -2,6 +2,8 @@
 using Financ.Infra.IoC;
 using Financ.Ui.Api;
 using Financ.UI.Api.Excessao;
+using Serilog;
+using Serilog.Events;
 
 namespace Financ.UI.Api
 {
@@ -25,6 +27,8 @@ namespace Financ.UI.Api
             builder.Services.AddSwaggerGen();
 
             var MyAllowSpecificOrigins = "_MyAllowSubdomainPolicy";
+  
+            builder.Host.UseSerilog(); //Responsavel pelos logs
 
             builder.Services.AddCors(options =>
             {
