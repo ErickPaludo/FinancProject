@@ -26,8 +26,6 @@ namespace Financ.Application.CQRS.Contas_.Handler
         }
         public async Task<Resultado<BaseGet<ContasDTO>>> Handle(AtualizarContaCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
                 Conta? conta = await _unitOfWork.contasRepositorio.BuscarContaComUsuariosEConvintes(x => x.Id == request.IdConta);
 
                 if (conta is null)
@@ -43,11 +41,6 @@ namespace Financ.Application.CQRS.Contas_.Handler
                 IEnumerable<Movimentacao> movimentacoes = await _unitOfWork.movimentacaoRepositorio.BuscarPorCondicao(m => m.IdConta == request.IdConta && m.Status == StatusMovimentacao.Pendente);
 
                 return Resultado<BaseGet<ContasDTO>>.GeraSucesso(ContaUsuarioMapper.ParaGetDTO(contaUsuario,movimentacoes));
-            }
-            catch (ContasValidacao contasExecao)
-            {
-                return Resultado<BaseGet<ContasDTO>>.GeraFalha(Falha.ErroOperacional(contasExecao.Message));
-            }
         }
     }
 }

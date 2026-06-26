@@ -5,14 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Financ.Domain.Validacoes.Segurança
+namespace Financ.Domain.Validacoes.Usuarios
 {
-    public class AutenticacaoValidacoes : BaseValidacao
+    public sealed class UsuariosValidacao : BaseValidacao
     {
-        public AutenticacaoValidacoes(string erro) : base(erro) { }
+        public UsuariosValidacao(string Erro) : base(Erro) { }
         public static void Verifica(bool condicao, string mensagem)
         {
-            VerificaExcessao<AutenticacaoValidacoes>(condicao, mensagem);
+            VerificaExcessao<UsuariosValidacao>(condicao, mensagem);
         }
     }
 }

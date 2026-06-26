@@ -24,8 +24,6 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
         }
         public async Task<Resultado<RetornaCadastroContasUsuariosDTO>> Handle(AtualizarContaUsuarioCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
                 Conta? conta = await _unitOfWork.contasRepositorio.BuscarContaComUsuarios(x => x.Id == request.idConta);
 
                 if (conta is null)
@@ -42,12 +40,6 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
                 await _unitOfWork.Commit();
 
                 return Resultado<RetornaCadastroContasUsuariosDTO>.GeraSucesso(ContaUsuarioMapper.ParaDTO(contaUsuarioDestinatario));
-
-            }
-            catch (ContasUsuariosValidacao ex)
-            {
-                return Resultado<RetornaCadastroContasUsuariosDTO>.GeraFalha(Falha.ErroOperacional(ex.Message));
-            }
         }
     }
 }

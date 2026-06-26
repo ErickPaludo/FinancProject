@@ -21,9 +21,6 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
         }
         public async Task<Resultado<string>> Handle(RemoveContaUsuarioCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
-
                 Conta? conta = await _unitOfWork.contasRepositorio.BuscarContaComUsuariosEConvintes(x => x.Id.Equals(request.idConta));
 
                 if (conta is null)
@@ -39,11 +36,6 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
                 _unitOfWork.contasUsuariosRepositorio.Atualiza(contaUsuarioDestinatario);
                 await _unitOfWork.Commit();
                 return Resultado<string>.GeraSucesso("Usuário removido da conta com sucesso!");
-            }
-            catch (ContasUsuariosValidacao contasUsuariosExcessao)
-            {
-                return Resultado<string>.GeraFalha(Falha.ErroOperacional(contasUsuariosExcessao.Message));
-            }
         }
     }
 }

@@ -26,36 +26,25 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
         }
         public async Task<Resultado<string>> Handle(RemoverMovimentacaoCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
-                var movimentacao = await _unitOfWork.movimentacaoRepositorio.BuscaMovimentacaoUnicaComContasUsuarios(m => m.Id == request.idMovimentacao);
+            var movimentacao = await _unitOfWork.movimentacaoRepositorio.BuscaMovimentacaoUnicaComContasUsuarios(m => m.Id == request.idMovimentacao);
 
-                if (movimentacao is null)
-                    return Resultado<string>.GeraFalha(Falha.NaoEncontrado("Movimentação não encontrada"));
+            if (movimentacao is null)
+                return Resultado<string>.GeraFalha(Falha.NaoEncontrado("Movimentação não encontrada"));
 
-                ContaUsuario? usuarioExecutor = await _unitOfWork.contasUsuariosRepositorio.ObterContaUsuarioComUsuario().FirstOrDefaultAsync(cu => cu.IdConta == movimentacao.IdConta && cu.IdUsuario == request.idUsuario);
+            ContaUsuario? usuarioExecutor = await _unitOfWork.contasUsuariosRepositorio.ObterContaUsuarioComUsuario().FirstOrDefaultAsync(cu => cu.IdConta == movimentacao.IdConta && cu.IdUsuario == request.idUsuario);
 
-                movimentacao.ExcluiMovimentacao(usuarioExecutor);
+            movimentacao.ExcluiMovimentacao(usuarioExecutor);
 
-                Conta conta = movimentacao.Conta;
-                conta.RemoverMovimentacao(movimentacao);
+            Conta conta = movimentacao.Conta;
+            conta.RemoverMovimentacao(movimentacao);
 
-               
-                _unitOfWork.movimentacaoRepositorio.Atualiza(movimentacao);
 
-                _unitOfWork.contasRepositorio.Atualiza(conta);
-                await _unitOfWork.Commit();
+            _unitOfWork.movimentacaoRepositorio.Atualiza(movimentacao);
 
-                return Resultado<string>.GeraSucesso("Movimentação removida com sucesso!");
-            }
-            catch (ContasValidacao ex)
-            {
-                return Resultado<string>.GeraFalha(Falha.ErroOperacional(ex.Message));
-            }
-            catch (MovimentacaoValidacao ex)
-            {
-                return Resultado<string>.GeraFalha(Falha.ErroOperacional(ex.Message));
-            }
+            _unitOfWork.contasRepositorio.Atualiza(conta);
+            await _unitOfWork.Commit();
+
+            return Resultado<string>.GeraSucesso("Movimentação removida com sucesso!");
         }
     }
 }

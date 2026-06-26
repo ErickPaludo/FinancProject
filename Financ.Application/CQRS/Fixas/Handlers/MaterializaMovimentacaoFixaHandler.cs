@@ -31,8 +31,6 @@ namespace Financ.Application.CQRS.Fixas.Handlers
         }
         public async Task<Resultado<BasePost<MovimentacaoDTO>>> Handle(MaterializaMovimentacaoFixaCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
              MovimentacaoFixa? movimentacoaFixa = await _unitOfWork.movimentacaoFixaRepositorio.BuscaMovimentacaoFixaCompleta(x => x.Id == request.IdMovimentacao && x.Status == StatusMovimentacaoFixa.Ativo);
 
                 if (movimentacoaFixa is null)
@@ -44,14 +42,6 @@ namespace Financ.Application.CQRS.Fixas.Handlers
 
                 await _unitOfWork.Commit();
                 return Resultado<BasePost<MovimentacaoDTO>>.GeraSucesso(new BasePost<MovimentacaoDTO>(MovimentacaoMapper.ParaDTO(movimentacao)));
-            }
-            catch (MovimentacaoFixaValidacao ex) {
-                return Resultado<BasePost<MovimentacaoDTO>>.GeraFalha(Falha.ErroOperacional(ex.Message));
-            }
-            catch (MovimentacaoValidacao ex)
-            {
-                return Resultado<BasePost<MovimentacaoDTO>>.GeraFalha(Falha.ErroOperacional(ex.Message));
-            }
         }
     }
 }

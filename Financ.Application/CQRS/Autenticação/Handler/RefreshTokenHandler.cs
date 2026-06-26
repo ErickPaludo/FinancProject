@@ -25,8 +25,7 @@ namespace Financ.Application.CQRS.Autenticação.Handler
         }
         public async Task<Resultado<RetornaTokenDTO>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
+           
                 Autenticacao? auth = await _unitOfWork.autenticacoesRepositorio.BuscarAuthComUsuarios(x => x.RefreshToken!.Equals(request.refreshToken));
 
                 if (auth is null)
@@ -46,10 +45,7 @@ namespace Financ.Application.CQRS.Autenticação.Handler
                     RefreshToken = refreshToken.refreshToken,
                     Token = refreshToken.token,
                 });
-            }catch(AutenticacaoValidacoes ex)
-            {
-                return Resultado<RetornaTokenDTO>.GeraFalha(Falha.NaoAutorizado(ex.Message));
-            }
+           
         }
     }
 }

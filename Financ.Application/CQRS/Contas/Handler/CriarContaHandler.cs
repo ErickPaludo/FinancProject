@@ -26,24 +26,13 @@ namespace Financ.Application.CQRS.Contas_.Handler
         }
         public async Task<Resultado<BasePost<ContasDTO>>> Handle(CriarContaCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
-                Conta conta = new Conta(request.Titulo, request.Cor);
-                ContaUsuario contaUsuario = new ContaUsuario(conta, request.IdUsuario);
+            Conta conta = new Conta(request.Titulo, request.Cor);
+            ContaUsuario contaUsuario = new ContaUsuario(conta, request.IdUsuario);
 
-                await _unitOfWork.contasUsuariosRepositorio.Adicionar(contaUsuario); //Cria a conta e a conta usuario pois os objetos estão linkados
-                await _unitOfWork.Commit();
+            await _unitOfWork.contasUsuariosRepositorio.Adicionar(contaUsuario); //Cria a conta e a conta usuario pois os objetos estão linkados
+            await _unitOfWork.Commit();
 
-                return Resultado<BasePost<ContasDTO>>.GeraSucesso(ContaUsuarioMapper.ParaDTO(contaUsuario,null));
-            }
-            catch (ContasValidacao contasExecao)
-            {
-                return Resultado<BasePost<ContasDTO>>.GeraFalha(Falha.ErroOperacional(contasExecao.Message));
-            }
-            catch (ContasUsuariosValidacao contasUseuariosExcessao)
-            {
-                return Resultado<BasePost<ContasDTO>>.GeraFalha(Falha.ErroOperacional(contasUseuariosExcessao.Message));
-            }
+            return Resultado<BasePost<ContasDTO>>.GeraSucesso(ContaUsuarioMapper.ParaDTO(contaUsuario, null));
         }
     }
 }

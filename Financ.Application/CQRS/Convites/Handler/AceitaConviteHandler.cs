@@ -27,8 +27,6 @@ namespace Financ.Application.CQRS.Convites.Handler
         }
         public async Task<Resultado<BasePost<RetornaPostCadastroDTO>>> Handle(AceitaConviteCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
                 var convite = await _unitOfWork.convitesRepostorio.BuscarConviteComContasEContasUsuarios(x => x.Id == request.IdConvite && x.IdUsuarioDestinatario.Equals(request.IdUsuario));
 
                 if (convite is null)
@@ -60,15 +58,6 @@ namespace Financ.Application.CQRS.Convites.Handler
 
                 await _unitOfWork.Commit();
                 return Resultado<BasePost<RetornaPostCadastroDTO>>.GeraSucesso(ContaUsuarioMapper.ParaDTO(convite, contaUsuario));
-            }
-            catch (ConvitesValidacao contasUsuariosExcessao)
-            {
-                return Resultado<BasePost<RetornaPostCadastroDTO>>.GeraFalha(Falha.ErroOperacional(contasUsuariosExcessao.Message));
-            }
-            catch (ContasUsuariosValidacao contasUsuariosExcessao)
-            {
-                return Resultado<BasePost<RetornaPostCadastroDTO>>.GeraFalha(Falha.ErroOperacional(contasUsuariosExcessao.Message));
-            }
         }
     }
 }

@@ -1,7 +1,7 @@
 
 using Financ.Infra.IoC;
 using Financ.Ui.Api;
-using Financ.UI.Api.Middleware;
+using Financ.UI.Api.Excessao;
 
 namespace Financ.UI.Api
 {
@@ -38,9 +38,12 @@ namespace Financ.UI.Api
                     });
             });
             builder.Services.AddControllers();
+            builder.Services.AddProblemDetails();
 
+            builder.Services.AddExceptionHandler<ExcessaoGlobal>();
             var app = builder.Build();
-            app.UseMiddleware<MiddlewareErroInterno>();
+            app.UseExceptionHandler();
+            // app.UseMiddleware<MiddlewareErroInterno>();
             app.MigrateDatabase();
         
             app.UseSwagger();

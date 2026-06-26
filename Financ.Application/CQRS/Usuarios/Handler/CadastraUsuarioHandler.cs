@@ -25,8 +25,6 @@ namespace Financ.Application.CQRS.Usuarios.Handler
         }
         public async Task<Resultado<string>> Handle(CadastraUsuarioCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
                 request.Email = request.Email.Trim();
 
                 if (await _unitOfWork.usuariosRepostorio.ExisteId(x => x.Email == request.Email))
@@ -40,15 +38,6 @@ namespace Financ.Application.CQRS.Usuarios.Handler
                 await _unitOfWork.usuariosRepostorio.Adicionar(usuario);
                 await _unitOfWork.Commit();
                 return Resultado<string>.GeraSucesso("Usuário criado com sucesso!");
-            }
-            catch (UsuariosValidacoes ex)
-            {
-                return Resultado<string>.GeraFalha(Falha.ErroOperacional(ex.Message));
-            }
-            catch (Exception ex)
-            {
-                return Resultado<string>.GeraFalha(Falha.ErroOperacional(ex.Message));
-            }
         }
     }
 }

@@ -31,7 +31,7 @@ namespace Financ.Domain.Entidades.Segurança
         }
         public void ValidaRefreshToken(string refreshToken)
         {
-            AutenticacaoValidacoes.Verifica(string.IsNullOrEmpty(refreshToken) || RefreshToken is null || Revoke, MensagensAutenticacao.REFRESH_TOKEN_INVALIDO);
+            AutenticacaoValidacao.Verifica(string.IsNullOrEmpty(refreshToken) || RefreshToken is null || Revoke, MensagensAutenticacao.REFRESH_TOKEN_INVALIDO);
         }
         public void AtualizaRefreshToken(string refreshToken, long expirationRefresh)
         {

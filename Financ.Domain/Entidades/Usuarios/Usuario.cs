@@ -16,7 +16,7 @@ namespace Financ.Domain.Entidades.Usuarios
         private Usuario() { }
         public Usuario(string idUsuario, string primeiroNome, string segundoNome, string email, string salt, string hashPass)
         {
-            UsuariosValidacoes.Verifica(string.IsNullOrEmpty(idUsuario), MensagensBase.USUARIO_NAO_INFORMADO);
+            UsuariosValidacao.Verifica(string.IsNullOrEmpty(idUsuario), MensagensBase.USUARIO_NAO_INFORMADO);
             VerificaNome(primeiroNome, segundoNome);
             VerificaEmail(email);
 
@@ -31,8 +31,8 @@ namespace Financ.Domain.Entidades.Usuarios
             VerificaEmail(email);
             Id = Guid.NewGuid().ToString();
 
-            UsuariosValidacoes.Verifica(string.IsNullOrWhiteSpace(salt), MensagensUsuarios.MESMA_SENHA);
-            UsuariosValidacoes.Verifica(string.IsNullOrWhiteSpace(hashPass), MensagensUsuarios.MESMA_SENHA);
+            UsuariosValidacao.Verifica(string.IsNullOrWhiteSpace(salt), MensagensUsuarios.MESMA_SENHA);
+            UsuariosValidacao.Verifica(string.IsNullOrWhiteSpace(hashPass), MensagensUsuarios.MESMA_SENHA);
 
             Salt = salt;
             HashPass = hashPass;
@@ -42,26 +42,26 @@ namespace Financ.Domain.Entidades.Usuarios
 
         private void VerificaNome(string primeiroNome, string segundoNome)
         {
-            UsuariosValidacoes.Verifica(string.IsNullOrWhiteSpace(primeiroNome), MensagensUsuarios.PRIMEIRO_NOME_OBRIGATORIO);
-            UsuariosValidacoes.Verifica(string.IsNullOrWhiteSpace(segundoNome), MensagensUsuarios.SEGUNDO_NOME_OBRIGATORIO);
+            UsuariosValidacao.Verifica(string.IsNullOrWhiteSpace(primeiroNome), MensagensUsuarios.PRIMEIRO_NOME_OBRIGATORIO);
+            UsuariosValidacao.Verifica(string.IsNullOrWhiteSpace(segundoNome), MensagensUsuarios.SEGUNDO_NOME_OBRIGATORIO);
 
             // Verifica espaços inválidos
-            UsuariosValidacoes.Verifica(primeiroNome.StartsWith(" ") || primeiroNome.EndsWith(" ") || primeiroNome.Contains("  "),
+            UsuariosValidacao.Verifica(primeiroNome.StartsWith(" ") || primeiroNome.EndsWith(" ") || primeiroNome.Contains("  "),
                 MensagensUsuarios.PRIMEIRO_NOME_INVALIDO);
-            UsuariosValidacoes.Verifica(segundoNome.StartsWith(" ") || segundoNome.EndsWith(" ") || segundoNome.Contains("  "),
+            UsuariosValidacao.Verifica(segundoNome.StartsWith(" ") || segundoNome.EndsWith(" ") || segundoNome.Contains("  "),
                 MensagensUsuarios.SEGUNDO_NOME_INVALIDO);
 
             // Verifica comprimento mínimo e máximo
-            UsuariosValidacoes.Verifica(primeiroNome.Length > 100, MensagensUsuarios.PRIMEIRO_NOME_MAXIMO);
-            UsuariosValidacoes.Verifica(primeiroNome.Length < 3, MensagensUsuarios.PRIMEIRO_NOME_MINIMO);
+            UsuariosValidacao.Verifica(primeiroNome.Length > 100, MensagensUsuarios.PRIMEIRO_NOME_MAXIMO);
+            UsuariosValidacao.Verifica(primeiroNome.Length < 3, MensagensUsuarios.PRIMEIRO_NOME_MINIMO);
 
-            UsuariosValidacoes.Verifica(segundoNome.Length > 100, MensagensUsuarios.SEGUNDO_NOME_MAXIMO);
-            UsuariosValidacoes.Verifica(segundoNome.Length < 3, MensagensUsuarios.SEGUNDO_NOME_MINIMO);
+            UsuariosValidacao.Verifica(segundoNome.Length > 100, MensagensUsuarios.SEGUNDO_NOME_MAXIMO);
+            UsuariosValidacao.Verifica(segundoNome.Length < 3, MensagensUsuarios.SEGUNDO_NOME_MINIMO);
 
             // Verifica caracteres inválidos (aceita letras, acentos, hífen e apóstrofo)
-            UsuariosValidacoes.Verifica(!primeiroNome.All(c => char.IsLetter(c) || c == '-' || c == '\'' || c == ' '),
+            UsuariosValidacao.Verifica(!primeiroNome.All(c => char.IsLetter(c) || c == '-' || c == '\'' || c == ' '),
                 MensagensUsuarios.PRIMEIRO_NOME_INVALIDO);
-            UsuariosValidacoes.Verifica(!segundoNome.All(c => char.IsLetter(c) || c == '-' || c == '\'' || c == ' '),
+            UsuariosValidacao.Verifica(!segundoNome.All(c => char.IsLetter(c) || c == '-' || c == '\'' || c == ' '),
                 MensagensUsuarios.SEGUNDO_NOME_INVALIDO);
 
 
@@ -71,15 +71,15 @@ namespace Financ.Domain.Entidades.Usuarios
         }
         private void VerificaEmail(string email)
         {
-            UsuariosValidacoes.Verifica(string.IsNullOrWhiteSpace(email), MensagensUsuarios.EMAIL_OBRIGATORIO);
-            UsuariosValidacoes.Verifica(email.Length > 256, MensagensUsuarios.EMAIL_MAXIMO);
-            UsuariosValidacoes.Verifica(email.Length < 6, MensagensUsuarios.EMAIL_MINIMO);
+            UsuariosValidacao.Verifica(string.IsNullOrWhiteSpace(email), MensagensUsuarios.EMAIL_OBRIGATORIO);
+            UsuariosValidacao.Verifica(email.Length > 256, MensagensUsuarios.EMAIL_MAXIMO);
+            UsuariosValidacao.Verifica(email.Length < 6, MensagensUsuarios.EMAIL_MINIMO);
             Email = email.Trim();
         }
         public void AtualizaSenha(string salt, string hashPass)
         {
-            UsuariosValidacoes.Verifica(salt == Salt, MensagensUsuarios.MESMA_SENHA);
-            UsuariosValidacoes.Verifica(hashPass == HashPass, MensagensUsuarios.MESMA_SENHA);
+            UsuariosValidacao.Verifica(salt == Salt, MensagensUsuarios.MESMA_SENHA);
+            UsuariosValidacao.Verifica(hashPass == HashPass, MensagensUsuarios.MESMA_SENHA);
 
             Salt = salt;
             HashPass = hashPass;

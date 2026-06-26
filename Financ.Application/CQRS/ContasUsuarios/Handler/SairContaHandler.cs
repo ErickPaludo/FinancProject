@@ -22,8 +22,6 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
         }
         public async Task<Resultado<string>> Handle(SairContaUsuarioCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
                 var conta = await _unitOfWork.contasRepositorio.BuscarContaComUsuariosEConvintes(x => x.Id == request.idConta);
 
                 if (conta is null)
@@ -40,15 +38,6 @@ namespace Financ.Application.CQRS.Contas_Usuarios.Handler
                 await _unitOfWork.Commit();
 
                 return Resultado<string>.GeraSucesso("Usuário saiu da conta com sucesso.");
-            }
-            catch (ContasUsuariosValidacao contasUsuariosExcessao)
-            {
-                return Resultado<string>.GeraFalha(Falha.ErroOperacional(contasUsuariosExcessao.Message));
-            }
-            catch (ContasValidacao contasExcessao)
-            {
-                return Resultado<string>.GeraFalha(Falha.ErroOperacional(contasExcessao.Message));
-            }
         }
     }
 }

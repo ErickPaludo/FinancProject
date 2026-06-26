@@ -26,34 +26,23 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
         }
         public async Task<Resultado<BasePost<MovimentacaoDTO>>> Handle(ExtornarMovimentacaoCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
-                var movimentacao = await _unitOfWork.movimentacaoRepositorio.BuscaMovimentacaoUnicaComContasUsuarios(m => m.Id == request.idMovimentacao);
+            var movimentacao = await _unitOfWork.movimentacaoRepositorio.BuscaMovimentacaoUnicaComContasUsuarios(m => m.Id == request.idMovimentacao);
 
-                if (movimentacao is null)
-                    return Resultado<BasePost<MovimentacaoDTO>>.GeraFalha(Falha.NaoEncontrado("Movimentação não encontrada"));
+            if (movimentacao is null)
+                return Resultado<BasePost<MovimentacaoDTO>>.GeraFalha(Falha.NaoEncontrado("Movimentação não encontrada"));
 
-                ContaUsuario? usuarioExecutor = await _unitOfWork.contasUsuariosRepositorio.ObterContaUsuarioComUsuario().FirstOrDefaultAsync(cu => cu.IdConta == movimentacao.IdConta && cu.IdUsuario == request.idUsuario);
+            ContaUsuario? usuarioExecutor = await _unitOfWork.contasUsuariosRepositorio.ObterContaUsuarioComUsuario().FirstOrDefaultAsync(cu => cu.IdConta == movimentacao.IdConta && cu.IdUsuario == request.idUsuario);
 
-                movimentacao.ExtornaMovimentacao(usuarioExecutor);
+            movimentacao.ExtornaMovimentacao(usuarioExecutor);
 
-                Conta conta = movimentacao.Conta;
-                conta.ProcessaExtornoMovimentacao(movimentacao);
+            Conta conta = movimentacao.Conta;
+            conta.ProcessaExtornoMovimentacao(movimentacao);
 
-                _unitOfWork.movimentacaoRepositorio.Atualiza(movimentacao);
-                _unitOfWork.contasRepositorio.Atualiza(conta);
-                await _unitOfWork.Commit();
+            _unitOfWork.movimentacaoRepositorio.Atualiza(movimentacao);
+            _unitOfWork.contasRepositorio.Atualiza(conta);
+            await _unitOfWork.Commit();
 
-                return Resultado<BasePost<MovimentacaoDTO>>.GeraSucesso(new BasePost<MovimentacaoDTO>(MovimentacaoMapper.ParaDTO(movimentacao)));
-            }
-            catch (ContasValidacao ex)
-            {
-                return Resultado<BasePost<MovimentacaoDTO>>.GeraFalha(Falha.ErroOperacional(ex.Message));
-            }
-            catch (MovimentacaoValidacao ex)
-            {
-                return Resultado<BasePost<MovimentacaoDTO>>.GeraFalha(Falha.ErroOperacional(ex.Message));
-            }
+            return Resultado<BasePost<MovimentacaoDTO>>.GeraSucesso(new BasePost<MovimentacaoDTO>(MovimentacaoMapper.ParaDTO(movimentacao)));
         }
     }
 }

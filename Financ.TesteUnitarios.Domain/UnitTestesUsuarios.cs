@@ -51,7 +51,7 @@ namespace Financ.TesteUnitarios.Domain
             Action action = () => new Usuario("", "Joao", "Silva", "teste@teste.com", "salt", "hash");
 
             // Assert
-            action.Should().Throw<UsuariosValidacoes>()
+            action.Should().Throw<UsuariosValidacao>()
                 .WithMessage(MensagensBase.USUARIO_NAO_INFORMADO);
         }
 
@@ -65,7 +65,7 @@ namespace Financ.TesteUnitarios.Domain
 
             // Assert
             // Pode lançar PRIMEIRO_NOME_OBRIGATORIO ou PRIMEIRO_NOME_MINIMO dependendo do caso
-            action.Should().Throw<UsuariosValidacoes>();
+            action.Should().Throw<UsuariosValidacao>();
         }
 
         [Theory]
@@ -78,7 +78,7 @@ namespace Financ.TesteUnitarios.Domain
             Action action = () => new Usuario(Guid.NewGuid().ToString(), nomeInvalido, "Silva", "teste@teste.com", "salt", "hash");
 
             // Assert
-            action.Should().Throw<UsuariosValidacoes>()
+            action.Should().Throw<UsuariosValidacao>()
                 .WithMessage(MensagensUsuarios.PRIMEIRO_NOME_INVALIDO);
         }
 
@@ -92,7 +92,7 @@ namespace Financ.TesteUnitarios.Domain
             Action action = () => new Usuario(Guid.NewGuid().ToString(), "Joao", nomeInvalido, "teste@teste.com", "salt", "hash");
 
             // Assert
-            action.Should().Throw<UsuariosValidacoes>()
+            action.Should().Throw<UsuariosValidacao>()
                 .WithMessage(MensagensUsuarios.SEGUNDO_NOME_INVALIDO);
         }
 
@@ -103,7 +103,7 @@ namespace Financ.TesteUnitarios.Domain
             Action action = () => new Usuario(Guid.NewGuid().ToString(), "Joao123", "Silva!", "teste@teste.com", "salt", "hash");
 
             // Assert
-            action.Should().Throw<UsuariosValidacoes>();
+            action.Should().Throw<UsuariosValidacao>();
         }
 
         #endregion
@@ -136,7 +136,7 @@ namespace Financ.TesteUnitarios.Domain
             Action action = () => usuario.AtualizaSenha(usuario.Salt, "novo_hash");
 
             // Assert
-            action.Should().Throw<UsuariosValidacoes>()
+            action.Should().Throw<UsuariosValidacao>()
                 .WithMessage(MensagensUsuarios.MESMA_SENHA);
         }
 

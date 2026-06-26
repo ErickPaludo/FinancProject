@@ -22,8 +22,6 @@ namespace Financ.Application.CQRS.Convites.Handler
 
         public async Task<Resultado<string>> Handle(RevogaConviteCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
             var convite = await _unitOfWork.convitesRepostorio.BuscarConviteComContasEContasUsuarios(x => x.IdUsuarioRemetente.Equals(request.idRemetente) && x.Id == request.idConvite);
 
             if (convite is null)
@@ -34,11 +32,6 @@ namespace Financ.Application.CQRS.Convites.Handler
             await _unitOfWork.Commit();
 
             return Resultado<string>.GeraSucesso("Convite revogado com sucesso!");
-            }
-            catch(ConvitesValidacao ex)
-            {
-                return Resultado<string>.GeraFalha(Falha.ErroOperacional(ex.Message));
-            }
         }
     }
 }

@@ -27,8 +27,7 @@ namespace Financ.Application.CQRS.Categorias.Handler
 
         public async Task<Resultado<BasePost<CategoriaDTO>>> Handle(AlterarCategoriaCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
+           
 
                 Categoria? categoria = await _unitOfWork.categoriaRepositorio.ObterCategoriaComConta(c => c.Id == request.IdCategoria);
 
@@ -42,11 +41,7 @@ namespace Financ.Application.CQRS.Categorias.Handler
                 _unitOfWork.categoriaRepositorio.Atualiza(categoria);
                 await _unitOfWork.Commit();
                 return Resultado<BasePost<CategoriaDTO>>.GeraSucesso(new BasePost<CategoriaDTO>(CategoriaMapper.ParaDTO(categoria)));
-            }
-            catch (CategoriaValidacao ex)
-            {
-                return Resultado<BasePost<CategoriaDTO>>.GeraFalha(Falha.ErroOperacional(ex.Message));
-            }
+           
         }
     }
 }

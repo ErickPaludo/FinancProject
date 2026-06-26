@@ -27,9 +27,6 @@ namespace Financ.Application.CQRS.Fixas.Handlers
         }
         public async Task<Resultado<BasePost<string>>> Handle(CriaMovimentacaoFixaDiariaCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
-
             ContaUsuario? contaUsuario = await _unitOfWork.contasUsuariosRepositorio.ObterContaUsuarioComUsuarioPredicado(x => x.IdUsuario == request.idUsuario && x.IdConta == request.idConta);
 
             Movimentacao movimentacao = new Movimentacao(request.tipo, contaUsuario, request.valor, request.titulo, request.observacao, null, null, false);
@@ -51,16 +48,7 @@ namespace Financ.Application.CQRS.Fixas.Handlers
             await _unitOfWork.movimentacaoFixaRepositorio.Adicionar(fixa);
 
             await _unitOfWork.Commit();
-            return Resultado<BasePost<string>>.GeraSucesso(new BasePost<string>("Movimentação fixa gerada com sucesso"));
-            
-            }catch(MovimentacaoFixaValidacao ex)
-            {
-                return Resultado<BasePost<string>>.GeraFalha(Falha.ErroOperacional(ex.Message));
-            }
-            catch (MovimentacaoValidacao ex)
-            {
-                return Resultado<BasePost<string>>.GeraFalha(Falha.ErroOperacional(ex.Message));
-            }
+            return Resultado<BasePost<string>>.GeraSucesso(new BasePost<string>("Movimentação fixa gerada com sucesso"));       
         }
     }
 }

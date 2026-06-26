@@ -29,8 +29,6 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
 
         public async Task<Resultado<BasePost<MovimentacaoDTO>>> Handle(AlterarMovimentacaoCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
                 var movimentacao = await _unitOfWork.movimentacaoRepositorio.BuscaMovimentacaoUnicaComContasUsuarios(m => m.Id == request.idMovimentacao);
 
                 if (movimentacao is null)
@@ -44,12 +42,7 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
                 _unitOfWork.movimentacaoRepositorio.Atualiza(movimentacao);
                 await _unitOfWork.Commit();
 
-                return Resultado<BasePost<MovimentacaoDTO>>.GeraSucesso(new BasePost<MovimentacaoDTO>(MovimentacaoMapper.ParaDTO(movimentacao)));
-            }          
-            catch (MovimentacaoValidacao ex)
-            {
-                return Resultado<BasePost<MovimentacaoDTO>>.GeraFalha(Falha.ErroOperacional(ex.Message));
-            }
+                return Resultado<BasePost<MovimentacaoDTO>>.GeraSucesso(new BasePost<MovimentacaoDTO>(MovimentacaoMapper.ParaDTO(movimentacao)));        
         }
     }
 }

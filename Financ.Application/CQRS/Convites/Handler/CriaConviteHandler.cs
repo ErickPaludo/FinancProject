@@ -26,8 +26,6 @@ namespace Financ.Application.CQRS.Convites.Handler
         }
         public async Task<Resultado<BasePost<GetCriaConviteDTO>>> Handle(CriaConviteCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
                 Usuario? usuarioDestinatario = await _unitOfWork.usuariosRepostorio.BuscarObjetoUnico(x => x.Email.Equals(request.emailDestinatario!.Trim()));
 
                 if (usuarioDestinatario is null)
@@ -45,11 +43,6 @@ namespace Financ.Application.CQRS.Convites.Handler
                 await _unitOfWork.Commit();
 
                 return Resultado<BasePost<GetCriaConviteDTO>>.GeraSucesso(ConviteMapper.ParaDTO(convite));
-            }
-            catch (ConvitesValidacao ex)
-            {
-                return Resultado<BasePost<GetCriaConviteDTO>>.GeraFalha(Falha.ErroOperacional(ex.Message));
-            }
         }
     }
 }

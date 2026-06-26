@@ -31,8 +31,7 @@ namespace Financ.Application.CQRS.Autenticação.Handler
 
         public async Task<Resultado<RetornaTokenDTO>> Handle(AutenticacaoCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
+           
             request.Email = request.Email.Trim();
             var usuario = await _unitOfWork.usuariosRepostorio.BuscarObjetoUnico(x => x.Email == request.Email);
 
@@ -67,11 +66,7 @@ namespace Financ.Application.CQRS.Autenticação.Handler
                 Token = tokenJwt.token
             });
 
-            }
-            catch(Exception ex)
-            {
-                return Resultado<RetornaTokenDTO>.GeraFalha(Falha.ErroOperacional(ex.Message));
-            }
+         
         }
     }
 }

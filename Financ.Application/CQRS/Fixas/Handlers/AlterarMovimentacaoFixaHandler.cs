@@ -30,8 +30,6 @@ namespace Financ.Application.CQRS.Fixas.Handlers
 
         public async Task<Resultado<GetMovimentacaoFixaDTO>> Handle(AlterarMovimentacaoFixaCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
                 MovimentacaoFixa? movimentacoaFixa = await _unitOfWork.movimentacaoFixaRepositorio.BuscaMovimentacaoFixaCompleta(x => x.Id == request.IdFixa && x.Status == StatusMovimentacaoFixa.Ativo && x.Tipo != TipoMovimentacaoFixa.Diaria);
 
                 if (movimentacoaFixa is null)
@@ -44,11 +42,6 @@ namespace Financ.Application.CQRS.Fixas.Handlers
                 _unitOfWork.movimentacaoFixaRepositorio.Atualiza(movimentacoaFixa);
                 await _unitOfWork.Commit();
                 return Resultado<GetMovimentacaoFixaDTO>.GeraSucesso(MovimentacoesFixasMapper.ParaDTO(movimentacoaFixa));
-            }
-            catch (MovimentacaoFixaValidacao ex)
-            {
-                return Resultado<GetMovimentacaoFixaDTO>.GeraFalha(Falha.ErroOperacional(ex.Message));
-            }
         }
     }
 }

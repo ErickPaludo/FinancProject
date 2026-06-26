@@ -25,25 +25,18 @@ namespace Financ.Application.CQRS.Fixas.Handlers
         }
         public async Task<Resultado<GetMovimentacaoFixaDTO>> Handle(AlterarMovimentacaoFixaDiariaCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
-                MovimentacaoFixa? movimentacoaFixa = await _unitOfWork.movimentacaoFixaRepositorio.BuscaMovimentacaoFixaCompleta(x => x.Id == request.IdFixa && x.Status == StatusMovimentacaoFixa.Ativo && x.Tipo == TipoMovimentacaoFixa.Diaria);
+            MovimentacaoFixa? movimentacoaFixa = await _unitOfWork.movimentacaoFixaRepositorio.BuscaMovimentacaoFixaCompleta(x => x.Id == request.IdFixa && x.Status == StatusMovimentacaoFixa.Ativo && x.Tipo == TipoMovimentacaoFixa.Diaria);
 
-                if (movimentacoaFixa is null)
-                    return Resultado<GetMovimentacaoFixaDTO>.GeraFalha(Falha.NaoEncontrado("Movimentação fixa não encontrada!"));
+            if (movimentacoaFixa is null)
+                return Resultado<GetMovimentacaoFixaDTO>.GeraFalha(Falha.NaoEncontrado("Movimentação fixa não encontrada!"));
 
-                ContaUsuario? contaUsuario = movimentacoaFixa.Movimentacao.Conta.ContaUsuarios.FirstOrDefault(x => x.IdUsuario == request.IdUsuario);
+            ContaUsuario? contaUsuario = movimentacoaFixa.Movimentacao.Conta.ContaUsuarios.FirstOrDefault(x => x.IdUsuario == request.IdUsuario);
 
-                movimentacoaFixa.AlteraMovimentacaoFixaDiaria(contaUsuario, request.Status, request.DataInicio, request.DataFim, request.OcorrenciasDiarias);
+            movimentacoaFixa.AlteraMovimentacaoFixaDiaria(contaUsuario, request.Status, request.DataInicio, request.DataFim, request.OcorrenciasDiarias);
 
-                _unitOfWork.movimentacaoFixaRepositorio.Atualiza(movimentacoaFixa);
-                await _unitOfWork.Commit();
-                return Resultado<GetMovimentacaoFixaDTO>.GeraSucesso(MovimentacoesFixasMapper.ParaDTO(movimentacoaFixa));
-            }
-            catch (MovimentacaoFixaValidacao ex)
-            {
-                return Resultado<GetMovimentacaoFixaDTO>.GeraFalha(Falha.ErroOperacional(ex.Message));
-            }
+            _unitOfWork.movimentacaoFixaRepositorio.Atualiza(movimentacoaFixa);
+            await _unitOfWork.Commit();
+            return Resultado<GetMovimentacaoFixaDTO>.GeraSucesso(MovimentacoesFixasMapper.ParaDTO(movimentacoaFixa));
         }
     }
 }

@@ -39,21 +39,21 @@ namespace Financ.UI.Api.Controllers
                 dthrConclusao = movimentacaoDTO.dthrConclusao
             });
 
-            return movimentacao.RetornoAutomatico();
+            return Created();
         }
         [HttpPost("{idMovimentacao}/Concluir")]
         public async Task<IActionResult> ConcluirMovimentacao(int idMovimentacao, ConcluirMovimentacaoDTO movimentacaoDTO)
         {
             var movimentacao = await _mediator.Send(new ConcluirMovimentacaoCommand(User.RetornaIdUsuario(),idMovimentacao, movimentacaoDTO.dthrConclusao));
 
-            return movimentacao.RetornoAutomatico();
+            return Ok(movimentacao);
         }
         [HttpPost("{idMovimentacao}/Extornar")]
         public async Task<IActionResult> ExtornarMovimentacao(int idMovimentacao)
         {
             var movimentacao = await _mediator.Send(new ExtornarMovimentacaoCommand(User.RetornaIdUsuario(), idMovimentacao));
 
-            return movimentacao.RetornoAutomatico();
+            return Ok(movimentacao);
         }
         [HttpGet("/api/Contas/{idConta}/[controller]/Retornar")]
         public async Task<IActionResult> RetornaMovimentacao(int idConta, [FromQuery] FiltroRetornoMovimentacao filtro)

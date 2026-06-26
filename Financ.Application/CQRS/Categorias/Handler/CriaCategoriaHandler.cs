@@ -28,8 +28,7 @@ namespace Financ.Application.CQRS.Categorias.Handler
 
         async Task<Resultado<BasePost<CategoriaDTO>>> IRequestHandler<CriaCategoriaCommand, Resultado<BasePost<CategoriaDTO>>>.Handle(CriaCategoriaCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
+           
                 ContaUsuario? contaUsuario = await _unitOfWork.contasUsuariosRepositorio.ObterContaUsuarioComUsuarioPredicado(x => x.IdConta == request.IdConta && x.IdUsuario == request.IdUsuario);
 
                 if (await _unitOfWork.categoriaRepositorio.BuscarObjetoUnico(c => c.IdConta == request.IdConta && c.Nome.Equals(request.Nome.Trim())) is not null)
@@ -40,11 +39,7 @@ namespace Financ.Application.CQRS.Categorias.Handler
                 await _unitOfWork.categoriaRepositorio.Adicionar(categoria);
                 await _unitOfWork.Commit();
                 return Resultado<BasePost<CategoriaDTO>>.GeraSucesso(new BasePost<CategoriaDTO>(CategoriaMapper.ParaDTO(categoria)));
-            }
-            catch (CategoriaValidacao ex)
-            {
-                return Resultado<BasePost<CategoriaDTO>>.GeraFalha(Falha.ErroOperacional(ex.Message));
-            }
+          
         }
     }
 }

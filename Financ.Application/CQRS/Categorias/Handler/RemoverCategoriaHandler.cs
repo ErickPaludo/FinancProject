@@ -25,9 +25,6 @@ namespace Financ.Application.CQRS.Categorias.Handler
         }
         public async Task<Resultado<string>> Handle(RemoverCategoriaCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
-
                 Categoria? categoria = await _unitOfWork.categoriaRepositorio.ObterCategoriaComConta(c => c.Id == request.IdCategoria);
 
                 if (categoria is null)
@@ -40,11 +37,6 @@ namespace Financ.Application.CQRS.Categorias.Handler
                 _unitOfWork.categoriaRepositorio.Delete(categoria);
                 await _unitOfWork.Commit();
                 return Resultado<string>.GeraSucesso("Categoria removida com sucesso");
-            }
-            catch (CategoriaValidacao ex)
-            {
-                return Resultado<string>.GeraFalha(Falha.ErroOperacional(ex.Message));
-            }
         }
     }
 }
