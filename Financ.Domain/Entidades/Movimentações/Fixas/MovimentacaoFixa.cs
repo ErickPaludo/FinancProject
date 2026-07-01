@@ -104,8 +104,6 @@ namespace Financ.Domain.Entidades.Movimentações.Fixas
         public void AlteraMovimentacaoFixa(ContaUsuario? contaUsuario, TipoMovimentacaoFixa? tipo, StatusMovimentacaoFixa? status, DateTime? dataInicio, DateTime? dataFim, DateTime? dataOcorrencia)
         {
             MovimentacaoFixaValidacao.Verifica(contaUsuario is null, "Usuário não pertence a esta conta.");
-            MovimentacaoFixaValidacao.Verifica(contaUsuario!.Status != StatusContasUsuario.Ativo, "Usuário inativo.");
-            MovimentacaoFixaValidacao.Verifica(contaUsuario.Acesso == TiposAcessos.Visualizador, "Usuário não possui permissão para esta ação.");
 
             if (status.HasValue)
             {

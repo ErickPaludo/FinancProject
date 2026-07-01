@@ -1,4 +1,6 @@
-﻿using Financ.Domain.Interfaces;
+﻿using Financ.Application;
+using Financ.Application.Services;
+using Financ.Domain.Interfaces;
 using Financ.Domain.Interfaces.Repositorios.ContasBancarias;
 using Financ.Domain.Interfaces.Repositorios.Segurança;
 using Financ.Domain.Interfaces.Repositorios.Usuarios;
@@ -31,6 +33,7 @@ namespace Financ.Infra.IoC
             services.AddScoped<IContasUsuariosRepositorio, ContasUsuariosRepositorio>();
             services.AddScoped<IUsuariosRepositorio, UsuariosRepositorio>();
             services.AddScoped<IAutenticacoesRepositorio, AutenticacoesRepositorio>();
+            services.AddScoped<IExisteContaUsuario, ExisteContaUsuario>();
 
         }
     }

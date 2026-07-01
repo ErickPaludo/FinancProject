@@ -35,7 +35,7 @@ namespace Financ.Domain.Entidades.Movimentações
         public MovimentacaoFixa? Fixa { get; private set; }
         #region Contrutores
         private Movimentacao() { }
-        public Movimentacao(TipoMovimentacao tipo, ContaUsuario? contaUsuario, decimal valor, string titulo, string? observacao, DateTime? dthrMovimentacao, DateTime? dthrConclusao, bool concluido, MovimentacaoFixa? movimentacaoFixa = null, bool movimentacaoVirtual = false)
+        public Movimentacao(TipoMovimentacao tipo, ContaUsuario contaUsuario, decimal valor, string titulo, string? observacao, DateTime? dthrMovimentacao, DateTime? dthrConclusao, bool concluido, MovimentacaoFixa? movimentacaoFixa = null, bool movimentacaoVirtual = false)
         {
             if (movimentacaoFixa is not null)
             {
@@ -56,18 +56,15 @@ namespace Financ.Domain.Entidades.Movimentações
 
             if (!movimentacaoVirtual)
             {
-                ValidaContaUsuario(contaUsuario);
                 IdUsuarioCriador = contaUsuario!.Id;
                 ContaUsuarioCriador = contaUsuario;
             }
 
-
             IdUsuarioExecutor = concluido ? contaUsuario.Id : null;
             ContaUsuarioExecutor = concluido ? contaUsuario : null;
 
-            ValidaConta(contaUsuario!.Conta);
-            IdConta = contaUsuario!.Conta!.Id;
-            Conta = contaUsuario!.Conta;
+            IdConta = contaUsuario.Conta.Id;
+            Conta = contaUsuario.Conta;
 
             ValidaValor(valor);
             Valor = valor;
@@ -198,7 +195,6 @@ namespace Financ.Domain.Entidades.Movimentações
             MovimentacaoValidacao.Verifica(contaUsuario is null, MensagemMovimentacao.USUARIO_NAO_PERTENCE_A_CONTA);
             MovimentacaoValidacao.Verifica(!contaUsuario!.Status.Equals(StatusContasUsuario.Ativo), MensagemMovimentacao.USUARIO_INATIVO);
             MovimentacaoValidacao.Verifica(contaUsuario.Expiracao is not null && contaUsuario.Expiracao < DateTime.UtcNow, MensagemMovimentacao.USUARIO_EXPIRADO);
-            MovimentacaoValidacao.Verifica(contaUsuario!.Acesso.Equals(TiposAcessos.Visualizador), MensagemMovimentacao.USUARIO_SEM_PERMISSAO);
         }
         private void ValidaConta(Conta? conta)
         {

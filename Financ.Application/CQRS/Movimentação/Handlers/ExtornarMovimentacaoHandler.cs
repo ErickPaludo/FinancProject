@@ -1,8 +1,11 @@
-﻿using Financ.Application.Comun.Resultado;
+﻿using Financ.Application.Comun.Enums;
+using Financ.Application.Comun.Resultado;
 using Financ.Application.CQRS.Movimentação.Commands;
 using Financ.Application.DTOs.Base;
 using Financ.Application.DTOs.Movimentações.Get;
+using Financ.Application.Interfaces;
 using Financ.Application.Mapeamento;
+using Financ.Application.Services;
 using Financ.Domain.Entidades.ContasBancarias;
 using Financ.Domain.Interfaces;
 using Financ.Domain.Validacoes.ContasBancarias;
@@ -20,9 +23,14 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
     public class ExtornarMovimentacaoHandler : IRequestHandler<ExtornarMovimentacaoCommand, Resultado<BasePost<MovimentacaoDTO>>>
     {
         private readonly IUnitOfWork _unitOfWork;
-        public ExtornarMovimentacaoHandler(IUnitOfWork unitOfWork)
+        private readonly IValidaPermissao _validaPermissao;
+        private readonly IExisteContaUsuario _encontraContaUsuario;
+
+        public ExtornarMovimentacaoHandler(IUnitOfWork unitOfWork, IValidaPermissao validaPermissao, IExisteContaUsuario encontraContaUsuario)
         {
             _unitOfWork = unitOfWork;
+            _validaPermissao = validaPermissao;
+            _encontraContaUsuario = encontraContaUsuario;
         }
         public async Task<Resultado<BasePost<MovimentacaoDTO>>> Handle(ExtornarMovimentacaoCommand request, CancellationToken cancellationToken)
         {
@@ -31,7 +39,8 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
             if (movimentacao is null)
                 return Resultado<BasePost<MovimentacaoDTO>>.GeraFalha(Falha.NaoEncontrado("Movimentação não encontrada"));
 
-            ContaUsuario? usuarioExecutor = await _unitOfWork.contasUsuariosRepositorio.ObterContaUsuarioComUsuario().FirstOrDefaultAsync(cu => cu.IdConta == movimentacao.IdConta && cu.IdUsuario == request.idUsuario);
+            ContaUsuario? usuarioExecutor = await _encontraContaUsuario.Buscar(cu => cu.IdConta == movimentacao.IdConta && cu.IdUsuario == request.idUsuario);
+            _validaPermissao.Valiidar(usuarioExecutor, PermissoesContasUsuarios.ExtornarMovimentacao);
 
             movimentacao.ExtornaMovimentacao(usuarioExecutor);
 

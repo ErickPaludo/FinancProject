@@ -1,8 +1,11 @@
-﻿using Financ.Application.Comun.Resultado;
+﻿using Financ.Application.Comun.Enums;
+using Financ.Application.Comun.Resultado;
 using Financ.Application.CQRS.Movimentação.Commands;
 using Financ.Application.DTOs.Base;
 using Financ.Application.DTOs.Movimentações.Get;
+using Financ.Application.Interfaces;
 using Financ.Application.Mapeamento;
+using Financ.Application.Services;
 using Financ.Domain.Entidades.Categorias;
 using Financ.Domain.Entidades.ContasBancarias;
 using Financ.Domain.Entidades.Movimentações;
@@ -19,9 +22,14 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
     public class AlterarCategoriaMovimentacaoHandler : IRequestHandler<AlterarCategoriaMovimentacaoCommand, Resultado<BasePost<MovimentacaoDTO>>>
     {
         private readonly IUnitOfWork _unitOfWork;
-        public AlterarCategoriaMovimentacaoHandler(IUnitOfWork unitOfWork)
+        private readonly IValidaPermissao _validaPermissao;
+        private readonly IExisteContaUsuario _encontraContaUsuario;
+
+        public AlterarCategoriaMovimentacaoHandler(IUnitOfWork unitOfWork, IValidaPermissao validaPermissao, IExisteContaUsuario encontraContaUsuario)
         {
             _unitOfWork = unitOfWork;
+            _validaPermissao = validaPermissao;
+            _encontraContaUsuario = encontraContaUsuario;
         }
         public async Task<Resultado<BasePost<MovimentacaoDTO>>> Handle(AlterarCategoriaMovimentacaoCommand request, CancellationToken cancellationToken)
         {
@@ -30,7 +38,9 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
             if (movimentacao is null)
                 return Resultado<BasePost<MovimentacaoDTO>>.GeraFalha(Falha.NaoEncontrado("Movimentação não encontrada"));
 
-            ContaUsuario? contaUsuario = movimentacao.Conta.ContaUsuarios.FirstOrDefault(cu => cu.IdUsuario == request.IdUsuario);
+            ContaUsuario contaUsuario = await _encontraContaUsuario.Buscar(cu => cu.IdUsuario == request.IdUsuario);
+            _validaPermissao.Valiidar(contaUsuario, PermissoesContasUsuarios.EditarMovimentacao);
+
             movimentacao.AlteraCategoriaMovimentacao(contaUsuario);
 
             movimentacao.CategoriasMovimentacao.ToList().ForEach(mc => _unitOfWork.movimentacaoCategoriaRepositorio.Delete(mc));

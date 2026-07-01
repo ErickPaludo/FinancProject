@@ -4,6 +4,7 @@ using Financ.Application.CQRS.Movimentação.Querys;
 using Financ.Application.DTOs.Base;
 using Financ.Application.DTOs.Movimentações.Get;
 using Financ.Application.DTOs.Movimentações.Get.Filtros;
+using Financ.Application.Interfaces;
 using Financ.Application.Mapeamento;
 using Financ.Application.Services;
 using Financ.Domain.Entidades.ContasBancarias;
@@ -28,9 +29,14 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
     public class RetornaMovimentacaoHandler : IRequestHandler<RetornaMovimentacaoQuery, Resultado<BaseGet<RetornaMovimentacaoDTO>>>
     {
         private readonly IUnitOfWork _unitOfWork;
-        public RetornaMovimentacaoHandler(IUnitOfWork unitOfWork)
+        private readonly IValidaPermissao _validaPermissao;
+        private readonly IExisteContaUsuario _encontraContaUsuario;
+
+        public RetornaMovimentacaoHandler(IUnitOfWork unitOfWork, IValidaPermissao validaPermissao, IExisteContaUsuario encontraContaUsuario)
         {
             _unitOfWork = unitOfWork;
+            _validaPermissao = validaPermissao;
+            _encontraContaUsuario = encontraContaUsuario;
         }
         public async Task<Resultado<BaseGet<RetornaMovimentacaoDTO>>> Handle(RetornaMovimentacaoQuery request, CancellationToken cancellationToken)
         {
@@ -40,11 +46,7 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
                 if (conta is null)
                     return Resultado<BaseGet<RetornaMovimentacaoDTO>>.GeraFalha(Falha.NaoEncontrado("Conta não encontrada"));
 
-                ContaUsuario? contaUsuario = conta!.ContaUsuarios.FirstOrDefault(x => x.IdUsuario == request.IdUsuario);
-
-                if (contaUsuario is null) return
-                        Resultado<BaseGet<RetornaMovimentacaoDTO>>.GeraFalha(Falha.NaoEncontrado("Usuário não pertence a conta!"));
-
+                ContaUsuario contaUsuario = await _encontraContaUsuario.Buscar(x => x.IdUsuario == request.IdUsuario);
                 contaUsuario!.ValidaSituacaoUsuarioParaConsulta();
 
                 decimal saldoRealConcluido = await _unitOfWork.movimentacaoRepositorio

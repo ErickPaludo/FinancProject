@@ -2,6 +2,7 @@
 using Financ.Application.CQRS.Movimentação.Commands;
 using Financ.Application.DTOs.Base;
 using Financ.Application.DTOs.Movimentações.Get;
+using Financ.Application.Interfaces;
 using Financ.Application.Mapeamento;
 using Financ.Domain.Entidades.ContasBancarias;
 using Financ.Domain.Enums.Movimentações;
@@ -20,6 +21,7 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
     public class DashMovimentacoesTotaisHandler : IRequestHandler<DashMovimentacoesTotaisCommand, Resultado<BaseGet<DashboardTotalContasDTO>>>
     {
         private readonly IUnitOfWork _unitOfWork;
+
         public DashMovimentacoesTotaisHandler(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;

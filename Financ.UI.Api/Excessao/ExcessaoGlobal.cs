@@ -1,4 +1,5 @@
-﻿using Financ.Domain.Validacoes.Categorias;
+﻿using Financ.Application.Exceções;
+using Financ.Domain.Validacoes.Categorias;
 using Financ.Domain.Validacoes.ContasBancarias;
 using Financ.Domain.Validacoes.Cor;
 using Financ.Domain.Validacoes.Movimentações;
@@ -31,6 +32,8 @@ namespace Financ.UI.Api.Excessao
                 CategoriaValidacao => (400, exception.Message),
                 CorValidacao => (400, exception.Message),
                 ConvitesValidacao => (400, exception.Message),
+                ExceptionPermissoes => (401, exception.Message),
+                ExceptionNaoEncontrado => (404, exception.Message),
                 KeyNotFoundException =>
                     (404, "Recurso não encontrado"),
 
@@ -74,7 +77,6 @@ namespace Financ.UI.Api.Excessao
                 problem,
                 cancellationToken);
 
-            // true = exceção foi tratada
             return true;
         }
     }

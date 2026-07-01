@@ -1,7 +1,9 @@
-﻿using Financ.Application.Comun.Resultado;
+﻿using Financ.Application.Comun.Enums;
+using Financ.Application.Comun.Resultado;
 using Financ.Application.CQRS.Fixas.Commands;
 using Financ.Application.DTOs.Base;
 using Financ.Application.DTOs.Movimentações.Get;
+using Financ.Application.Interfaces;
 using Financ.Application.Mapeamento;
 using Financ.Domain.Entidades.Categorias;
 using Financ.Domain.Entidades.ContasBancarias;
@@ -25,23 +27,32 @@ namespace Financ.Application.CQRS.Fixas.Handlers
     {
 
         private readonly IUnitOfWork _unitOfWork;
-        public MaterializaMovimentacaoFixaHandler(IUnitOfWork unitOfWork)
+        private readonly IValidaPermissao _validaPermissao;
+
+        public MaterializaMovimentacaoFixaHandler(IUnitOfWork unitOfWork, IValidaPermissao validaPermissao)
         {
             _unitOfWork = unitOfWork;
+            _validaPermissao = validaPermissao;
         }
         public async Task<Resultado<BasePost<MovimentacaoDTO>>> Handle(MaterializaMovimentacaoFixaCommand request, CancellationToken cancellationToken)
         {
-             MovimentacaoFixa? movimentacoaFixa = await _unitOfWork.movimentacaoFixaRepositorio.BuscaMovimentacaoFixaCompleta(x => x.Id == request.IdMovimentacao && x.Status == StatusMovimentacaoFixa.Ativo);
+            MovimentacaoFixa? movimentacoaFixa = await _unitOfWork.movimentacaoFixaRepositorio.BuscaMovimentacaoFixaCompleta(x => x.Id == request.IdMovimentacao && x.Status == StatusMovimentacaoFixa.Ativo);
 
-                if (movimentacoaFixa is null)
-                    return Resultado<BasePost<MovimentacaoDTO>>.GeraFalha(Falha.NaoEncontrado("Movimentação fixa não encontrada!"));
+            if (movimentacoaFixa is null)
+                return Resultado<BasePost<MovimentacaoDTO>>.GeraFalha(Falha.NaoEncontrado("Movimentação fixa não encontrada!"));
 
-                ContaUsuario? contaUsuario = movimentacoaFixa.Movimentacao.Conta.ContaUsuarios.FirstOrDefault(x => x.IdUsuario == request.IdUsuario);
-                Movimentacao movimentacao = movimentacoaFixa.MaterializaMovimentacao(request.DataMovimentacao, contaUsuario);
-                await _unitOfWork.movimentacaoRepositorio.Adicionar(movimentacao);
+            ContaUsuario? contaUsuario = movimentacoaFixa.Movimentacao.Conta.ContaUsuarios.FirstOrDefault(x => x.IdUsuario == request.IdUsuario);
 
-                await _unitOfWork.Commit();
-                return Resultado<BasePost<MovimentacaoDTO>>.GeraSucesso(new BasePost<MovimentacaoDTO>(MovimentacaoMapper.ParaDTO(movimentacao)));
+            if (contaUsuario is null)
+                return Resultado<BasePost<MovimentacaoDTO>>.GeraFalha(Falha.NaoEncontrado($"Usuário não pertence a conta!"));
+
+            _validaPermissao.Valiidar(contaUsuario, PermissoesContasUsuarios.CadastrarMovimentacaoFixa);
+
+            Movimentacao movimentacao = movimentacoaFixa.MaterializaMovimentacao(request.DataMovimentacao, contaUsuario);
+            await _unitOfWork.movimentacaoRepositorio.Adicionar(movimentacao);
+
+            await _unitOfWork.Commit();
+            return Resultado<BasePost<MovimentacaoDTO>>.GeraSucesso(new BasePost<MovimentacaoDTO>(MovimentacaoMapper.ParaDTO(movimentacao)));
         }
     }
 }

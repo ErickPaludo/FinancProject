@@ -1,22 +1,26 @@
-﻿using Financ.Domain.Interfaces.Repositorios;
-using Financ.Domain.Interfaces;
-using Financ.Infra.Data.Contexto;
-using Financ.Infra.Data.Repositorios;
-using Financ.Infra.Data;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using NetDevPack.SimpleMediator;
-using Financ.Application.Comun.Resultado;
-using Financ.Application.DTOs.Autenticação.Get;
-using Financ.Application.DTOs.ContasUsuarios.Get;
-using Financ.Application.DTOs.Usuarios.Get;
+﻿using Financ.Application.Comun.Resultado;
+using Financ.Application.CQRS.Autenticação.Commands;
+using Financ.Application.CQRS.Autenticação.Handler;
 using Financ.Application.CQRS.Contas_Usuarios.Commands;
 using Financ.Application.CQRS.Contas_Usuarios.Handler;
 using Financ.Application.CQRS.Usuarios.Commands;
 using Financ.Application.CQRS.Usuarios.Handler;
 using Financ.Application.CQRS.Usuarios.Querys;
-using Financ.Application.CQRS.Autenticação.Handler;
-using Financ.Application.CQRS.Autenticação.Commands;
+using Financ.Application.DTOs.Autenticação.Get;
+using Financ.Application.DTOs.ContasUsuarios.Get;
+using Financ.Application.DTOs.Usuarios.Get;
+using Financ.Application.Interfaces;
+using Financ.Application.Interfaces.Segurança;
+using Financ.Application.Services.PermissoesUsuarios;
+using Financ.Application.Services.Segurança;
+using Financ.Domain.Interfaces;
+using Financ.Domain.Interfaces.Repositorios;
+using Financ.Infra.Data;
+using Financ.Infra.Data.Contexto;
+using Financ.Infra.Data.Repositorios;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using NetDevPack.SimpleMediator;
 
 
 namespace Financ.Infra.IoC
@@ -32,6 +36,8 @@ namespace Financ.Infra.IoC
             services.AddScoped<IRequestHandler<CadastraUsuarioCommand, Resultado<string>>, CadastraUsuarioHandler>();
             services.AddScoped<IRequestHandler<AutenticacaoCommand, Resultado<RetornaTokenDTO>>, AutenticacaoHandler>();
             services.AddScoped<IRequestHandler<RetornaUsuarioPorIdQuery, Resultado<RetornaUsuarioDTO>>, RetornaUsuarioHandler>();
+            services.AddScoped<IValidaPermissao, ValidaPermissao>();
+
         }
     }
 }

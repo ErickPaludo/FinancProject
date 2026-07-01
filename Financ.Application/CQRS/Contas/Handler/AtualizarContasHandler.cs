@@ -33,7 +33,7 @@ namespace Financ.Application.CQRS.Contas_.Handler
 
                 ContaUsuario? contaUsuario = conta.ContaUsuarios.FirstOrDefault(x => x.IdUsuario == request.IdUsuario);
 
-                conta.AtualizaConta(contaUsuario, request.Titulo,request.Status,request.Cor);
+                conta.AtualizaConta(request.Titulo,request.Status,request.Cor);
 
                 _unitOfWork.contasRepositorio.Atualiza(conta);
                 await _unitOfWork.Commit();

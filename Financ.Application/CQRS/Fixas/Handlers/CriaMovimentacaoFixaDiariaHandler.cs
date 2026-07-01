@@ -1,6 +1,9 @@
-﻿using Financ.Application.Comun.Resultado;
+﻿using Financ.Application.Comun.Enums;
+using Financ.Application.Comun.Resultado;
 using Financ.Application.CQRS.Fixas.Commands;
 using Financ.Application.DTOs.Base;
+using Financ.Application.DTOs.Fixas.Get;
+using Financ.Application.Interfaces;
 using Financ.Domain.Entidades.Categorias;
 using Financ.Domain.Entidades.ContasBancarias;
 using Financ.Domain.Entidades.Movimentações;
@@ -21,13 +24,21 @@ namespace Financ.Application.CQRS.Fixas.Handlers
     public class CriaMovimentacaoFixaDiariaHandler : IRequestHandler<CriaMovimentacaoFixaDiariaCommand, Resultado<BasePost<string>>>
     {
         private readonly IUnitOfWork _unitOfWork;
-        public CriaMovimentacaoFixaDiariaHandler(IUnitOfWork unitOfWork)
+        private readonly IValidaPermissao _validaPermissao;
+
+        public CriaMovimentacaoFixaDiariaHandler(IUnitOfWork unitOfWork, IValidaPermissao validaPermissao)
         {
             _unitOfWork = unitOfWork;
+            _validaPermissao = validaPermissao;
         }
         public async Task<Resultado<BasePost<string>>> Handle(CriaMovimentacaoFixaDiariaCommand request, CancellationToken cancellationToken)
         {
             ContaUsuario? contaUsuario = await _unitOfWork.contasUsuariosRepositorio.ObterContaUsuarioComUsuarioPredicado(x => x.IdUsuario == request.idUsuario && x.IdConta == request.idConta);
+
+            if (contaUsuario is null)
+                return Resultado<BasePost<string>>.GeraFalha(Falha.NaoEncontrado($"Usuário não pertence a conta!"));
+
+            _validaPermissao.Valiidar(contaUsuario, PermissoesContasUsuarios.CadastrarMovimentacaoFixa);
 
             Movimentacao movimentacao = new Movimentacao(request.tipo, contaUsuario, request.valor, request.titulo, request.observacao, null, null, false);
 

@@ -33,17 +33,12 @@ namespace Financ.Domain.Entidades.ContasBancarias
         public Conta Conta { get; private set; }
 
         private Convite() { }
-        public Convite(TiposAcessos acesso, ContaUsuario? usuarioRemetente, Usuario? usuairoDestinatario, int? expiracaoContaUsuario = null)
+        public Convite(TiposAcessos acesso, ContaUsuario usuarioRemetente, Usuario usuairoDestinatario, int? expiracaoContaUsuario = null)
         {
             ConvitesValidacao.Verifica(!Enum.IsDefined(typeof(TiposAcessos), acesso), MensagensContasUsuarios.ACESSO_INVALIDO);
 
             ConvitesValidacao.Verifica(usuarioRemetente is null, MensagensConvite.USUARIO_DESTINATARIO_NAO_ENCONTRADO);
             ConvitesValidacao.Verifica(usuairoDestinatario is null, MensagensConvite.USUARIO_DESTINATARIO_NAO_ENCONTRADO);
-
-            ConvitesValidacao.Verifica(usuarioRemetente!.Acesso != TiposAcessos.Mestre, MensagensConvite.USUARIO_SEM_PERMISSAO);
-            ConvitesValidacao.Verifica(usuarioRemetente.Status != StatusContasUsuario.Ativo, MensagensConvite.USUARIO_CONTA_REMETENTE_INATIVO);
-            ConvitesValidacao.Verifica(usuarioRemetente.Conta.Status != StatusContas.Ativo, MensagensContas.CONTA_INATIVA);
-
 
             ConvitesValidacao.Verifica(usuarioRemetente.Conta.UsuarioPertenceConta(usuairoDestinatario!.Id), MensagensConvite.USUARIO_JA_PERTENCE_A_CONTA);
             ConvitesValidacao.Verifica(usuarioRemetente.Conta.ConviteEmAndamento(usuairoDestinatario!.Id), MensagensConvite.CONVITE_EM_ANDAMENTO);

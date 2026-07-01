@@ -1,8 +1,11 @@
-﻿using Financ.Application.Comun.Resultado;
+﻿using Financ.Application.Comun.Enums;
+using Financ.Application.Comun.Resultado;
 using Financ.Application.CQRS.Movimentação.Commands;
 using Financ.Application.DTOs.Base;
 using Financ.Application.DTOs.Movimentações.Get;
+using Financ.Application.Interfaces;
 using Financ.Application.Mapeamento;
+using Financ.Application.Services;
 using Financ.Domain.Entidades.ContasBancarias;
 using Financ.Domain.Interfaces;
 using Financ.Domain.Validacoes.ContasBancarias;
@@ -20,29 +23,34 @@ namespace Financ.Application.CQRS.Movimentação.Handlers
     public class ConcluirMovimentacaoHandler : IRequestHandler<ConcluirMovimentacaoCommand, Resultado<BasePost<MovimentacaoDTO>>>
     {
         private readonly IUnitOfWork _unitOfWork;
-        public ConcluirMovimentacaoHandler(IUnitOfWork unitOfWork)
+        private readonly IValidaPermissao _validaPermissao;
+        private readonly IExisteContaUsuario _encontraContaUsuario;
+
+        public ConcluirMovimentacaoHandler(IUnitOfWork unitOfWork, IValidaPermissao validaPermissao, IExisteContaUsuario encontraContaUsuario)
         {
             _unitOfWork = unitOfWork;
+            _validaPermissao = validaPermissao;
         }
         public async Task<Resultado<BasePost<MovimentacaoDTO>>> Handle(ConcluirMovimentacaoCommand request, CancellationToken cancellationToken)
         {
-                var movimentacao = await _unitOfWork.movimentacaoRepositorio.BuscaMovimentacaoUnicaComContasUsuarios(m => m.Id == request.idMovimentacao);
+            var movimentacao = await _unitOfWork.movimentacaoRepositorio.BuscaMovimentacaoUnicaComContasUsuarios(m => m.Id == request.idMovimentacao);
 
-                if (movimentacao is null)
-                    return Resultado<BasePost<MovimentacaoDTO>>.GeraFalha(Falha.NaoEncontrado("Movimentação não encontrada"));
+            if (movimentacao is null)
+                return Resultado<BasePost<MovimentacaoDTO>>.GeraFalha(Falha.NaoEncontrado("Movimentação não encontrada"));
 
-                ContaUsuario? usuarioExecutor = await _unitOfWork.contasUsuariosRepositorio.ObterContaUsuarioComUsuario().FirstOrDefaultAsync(cu => cu.IdConta == movimentacao.IdConta && cu.IdUsuario == request.idUsuario); 
+            ContaUsuario usuarioExecutor = await _encontraContaUsuario.Buscar(cu => cu.IdConta == movimentacao.IdConta && cu.IdUsuario == request.idUsuario);
+            _validaPermissao.Valiidar(usuarioExecutor, PermissoesContasUsuarios.ConcluirMovimentcao);
 
-                movimentacao.ExecutarMovimentacao(usuarioExecutor, request.dthrConclusao);
+            movimentacao.ExecutarMovimentacao(usuarioExecutor, request.dthrConclusao);
 
-                Conta conta = movimentacao.Conta;
-                conta.ProcessaMovimentacao(movimentacao);
+            Conta conta = movimentacao.Conta;
+            conta.ProcessaMovimentacao(movimentacao);
 
-                _unitOfWork.movimentacaoRepositorio.Atualiza(movimentacao);
-                _unitOfWork.contasRepositorio.Atualiza(conta);
-                await _unitOfWork.Commit();
+            _unitOfWork.movimentacaoRepositorio.Atualiza(movimentacao);
+            _unitOfWork.contasRepositorio.Atualiza(conta);
+            await _unitOfWork.Commit();
 
-                return Resultado<BasePost<MovimentacaoDTO>>.GeraSucesso(new BasePost<MovimentacaoDTO>(MovimentacaoMapper.ParaDTO(movimentacao)));
+            return Resultado<BasePost<MovimentacaoDTO>>.GeraSucesso(new BasePost<MovimentacaoDTO>(MovimentacaoMapper.ParaDTO(movimentacao)));
         }
     }
 }

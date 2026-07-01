@@ -3,6 +3,7 @@ using Financ.Application.CQRS.Fixas.Commands;
 using Financ.Application.DTOs.Base;
 using Financ.Application.DTOs.Fixas.Get;
 using Financ.Application.DTOs.Movimentações.Get;
+using Financ.Application.Interfaces;
 using Financ.Application.Mapeamento;
 using Financ.Domain.Entidades.ContasBancarias;
 using Financ.Domain.Entidades.Movimentações.Fixas;
@@ -21,9 +22,12 @@ namespace Financ.Application.CQRS.Fixas.Handlers
     public class RetornarMovimentacoesFixasHandler : IRequestHandler<RetornarMovimentacoesFixasCommand, Resultado<BaseGetList<GetMovimentacaoFixaDTO>>>
     {
         private readonly IUnitOfWork _unitOfWork;
-        public RetornarMovimentacoesFixasHandler(IUnitOfWork unitOfWork)
+        private readonly IValidaPermissao _validaPermissao;
+
+        public RetornarMovimentacoesFixasHandler(IUnitOfWork unitOfWork, IValidaPermissao validaPermissao)
         {
             _unitOfWork = unitOfWork;
+            _validaPermissao = validaPermissao;
         }
         public async Task<Resultado<BaseGetList<GetMovimentacaoFixaDTO>>> Handle(RetornarMovimentacoesFixasCommand request, CancellationToken cancellationToken)
         {

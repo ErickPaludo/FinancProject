@@ -1,6 +1,10 @@
-﻿using Financ.Application.Comun.Resultado;
+﻿using Financ.Application.Comun.Enums;
+using Financ.Application.Comun.Resultado;
 using Financ.Application.CQRS.Fixas.Commands;
+using Financ.Application.DTOs.Base;
 using Financ.Application.DTOs.Fixas.Get;
+using Financ.Application.DTOs.Movimentações.Get;
+using Financ.Application.Interfaces;
 using Financ.Application.Mapeamento;
 using Financ.Domain.Entidades.ContasBancarias;
 using Financ.Domain.Entidades.Movimentações.Fixas;
@@ -19,9 +23,12 @@ namespace Financ.Application.CQRS.Fixas.Handlers
     public class AlterarMovimentacaoFixaDiariaHandler : IRequestHandler<AlterarMovimentacaoFixaDiariaCommand, Resultado<GetMovimentacaoFixaDTO>>
     {
         private readonly IUnitOfWork _unitOfWork;
-        public AlterarMovimentacaoFixaDiariaHandler(IUnitOfWork unitOfWork)
+        private readonly IValidaPermissao _validaPermissao;
+
+        public AlterarMovimentacaoFixaDiariaHandler(IUnitOfWork unitOfWork, IValidaPermissao validaPermissao)
         {
             _unitOfWork = unitOfWork;
+            _validaPermissao = validaPermissao;
         }
         public async Task<Resultado<GetMovimentacaoFixaDTO>> Handle(AlterarMovimentacaoFixaDiariaCommand request, CancellationToken cancellationToken)
         {
@@ -31,6 +38,11 @@ namespace Financ.Application.CQRS.Fixas.Handlers
                 return Resultado<GetMovimentacaoFixaDTO>.GeraFalha(Falha.NaoEncontrado("Movimentação fixa não encontrada!"));
 
             ContaUsuario? contaUsuario = movimentacoaFixa.Movimentacao.Conta.ContaUsuarios.FirstOrDefault(x => x.IdUsuario == request.IdUsuario);
+
+            if (contaUsuario is null)
+                return Resultado<GetMovimentacaoFixaDTO>.GeraFalha(Falha.NaoEncontrado($"Usuário não pertence a conta!"));
+
+            _validaPermissao.Valiidar(contaUsuario, PermissoesContasUsuarios.EditarMovimentacaoFixa);
 
             movimentacoaFixa.AlteraMovimentacaoFixaDiaria(contaUsuario, request.Status, request.DataInicio, request.DataFim, request.OcorrenciasDiarias);
 
