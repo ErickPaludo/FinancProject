@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace Financ.Domain.Enums.ContasBancarias
 {
-    public enum TiposAcessos
+    public enum ETipoConta
     {
-        Mestre,
-        Administrador,
-        Visualizador
+        Corrente,
+        Poupanca
     }
 }

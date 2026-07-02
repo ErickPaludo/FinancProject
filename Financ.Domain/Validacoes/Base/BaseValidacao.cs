@@ -14,5 +14,6 @@ namespace Financ.Domain.Validacoes.Base
             if (condicao)
                 throw (T)Activator.CreateInstance(typeof(T), mensagem)!;
         }
+
     }
 }

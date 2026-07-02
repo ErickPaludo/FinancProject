@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace Financ.Domain.Enums.ContasBancarias
 {
-    public enum TipoConta
+    public enum EStatusContas
     {
-        Corrente,
-        Poupanca
+        Ativo,
+        Inativo,
+        Oculto
     }
 }

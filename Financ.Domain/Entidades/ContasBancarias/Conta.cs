@@ -20,8 +20,8 @@ namespace Financ.Domain.Entidades.ContasBancarias
     public sealed class Conta : BaseConta
     {
         public string Titulo { get; private set; }
-        public StatusContas Status { get; private set; }
-        public TipoConta TipoConta { get; private set; }
+        public EStatusContas Status { get; private set; }
+        public ETipoConta TipoConta { get; private set; }
         public decimal Saldo { get; private set; }
         public Cor Cor { get; private set; }
         public byte[] RowVersion { get; private set; }
@@ -36,13 +36,13 @@ namespace Financ.Domain.Entidades.ContasBancarias
             titulo = titulo.Trim();
             ValidaTitulo(titulo);
             Titulo = titulo;
-            Status = StatusContas.Ativo;
-            TipoConta = TipoConta.Corrente;
+            Status = EStatusContas.Ativo;
+            TipoConta = ETipoConta.Corrente;
             Cor = new Cor(cor);
             DthrReg = DateTime.UtcNow;
 
         }
-        public void AtualizaConta(string? titulo, StatusContas? status, string? cor = null)
+        public void AtualizaConta(string? titulo, EStatusContas? status, string? cor = null)
         {
            
             if (cor != null)
@@ -69,27 +69,27 @@ namespace Financ.Domain.Entidades.ContasBancarias
         }
         public void ProcessaMovimentacao(Movimentacao movimentacao)
         {
-            if (movimentacao.Status is StatusMovimentacao.Concluido)
+            if (movimentacao.Status is EStatusMovimentacao.Concluido)
             {
                 ContasValidacao.Verifica(movimentacao.Extorno, MensagensContas.NAO_PODE_PROCESSAR_MOVIMENTACAO_COM_EXTORNO);
-                ContasValidacao.Verifica(movimentacao.Tipo.Equals(TipoMovimentacao.Saida) && movimentacao.Valor > Saldo, MensagensContas.SALDO_INSUFICIENTE);
-                Saldo = movimentacao.Tipo.Equals(TipoMovimentacao.Entrada) ? Saldo + movimentacao.Valor : Saldo - movimentacao.Valor;
+                ContasValidacao.Verifica(movimentacao.Tipo.Equals(ETipoMovimentacao.Saida) && movimentacao.Valor > Saldo, MensagensContas.SALDO_INSUFICIENTE);
+                Saldo = movimentacao.Tipo.Equals(ETipoMovimentacao.Entrada) ? Saldo + movimentacao.Valor : Saldo - movimentacao.Valor;
             }
         }
         public void ProcessaExtornoMovimentacao(Movimentacao movimentacao)
         {
             ContasValidacao.Verifica(!movimentacao.Extorno, MensagensContas.NAO_PODE_PROCESSAR_MOVIMENTACAO_SEM_EXTORNO);
-            ContasValidacao.Verifica(movimentacao.Status is not StatusMovimentacao.Pendente, MensagensContas.EXTORNO_DE_MOVIMENTACAO_COM_DATA_DE_CONCLUSAO);
+            ContasValidacao.Verifica(movimentacao.Status is not EStatusMovimentacao.Pendente, MensagensContas.EXTORNO_DE_MOVIMENTACAO_COM_DATA_DE_CONCLUSAO);
             ContasValidacao.Verifica(movimentacao.DthrConclusao is not null, MensagensContas.EXTORNO_DE_MOVIMENTACAO_COM_DATA_DE_CONCLUSAO);
-            ContasValidacao.Verifica(movimentacao.Tipo.Equals(TipoMovimentacao.Entrada) && movimentacao.Valor > Saldo, MensagensContas.SALDO_INSUFICIENTE);
-            Saldo = movimentacao.Tipo.Equals(TipoMovimentacao.Entrada) ? Saldo - movimentacao.Valor : Saldo + movimentacao.Valor;
+            ContasValidacao.Verifica(movimentacao.Tipo.Equals(ETipoMovimentacao.Entrada) && movimentacao.Valor > Saldo, MensagensContas.SALDO_INSUFICIENTE);
+            Saldo = movimentacao.Tipo.Equals(ETipoMovimentacao.Entrada) ? Saldo - movimentacao.Valor : Saldo + movimentacao.Valor;
         }
 
         public void RemoverMovimentacao(Movimentacao movimentacao)
         {
             if (movimentacao.Extorno)
             {
-                if (movimentacao.Tipo.Equals(TipoMovimentacao.Entrada))
+                if (movimentacao.Tipo.Equals(ETipoMovimentacao.Entrada))
                 {
                     ContasValidacao.Verifica(movimentacao.Valor > Saldo, MensagensContas.SALDO_INSUFICIENTE);
                     Saldo -= movimentacao.Valor;
@@ -104,9 +104,9 @@ namespace Financ.Domain.Entidades.ContasBancarias
             ContasValidacao.Verifica(string.IsNullOrWhiteSpace(titulo), MensagensContas.TITULO_OBRIGATORIO);
             ContasValidacao.Verifica(titulo.Length < 2 || titulo.Length > 30, MensagensContas.TITULO_TAMANHO_INVALIDO);
         }
-        private void ValidaStatusConta(StatusContas status)
+        private void ValidaStatusConta(EStatusContas status)
         {
-            ContasValidacao.Verifica(!Enum.IsDefined(typeof(StatusContas), status), MensagensBase.STATUS_INVALIDO);
+            ContasValidacao.Verifica(!Enum.IsDefined(typeof(EStatusContas), status), MensagensBase.STATUS_INVALIDO);
             Status = status;
         }
     

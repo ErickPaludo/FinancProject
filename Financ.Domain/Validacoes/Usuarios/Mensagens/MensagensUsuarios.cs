@@ -24,5 +24,11 @@ namespace Financ.Domain.Validacoes.Usuarios.Mensagens
         public const string SEGUNDO_NOME_INVALIDO = "Sobrenome inválido";
 
         public const string EMAIL_INVALIDO = "Email inválido";
+
+        public const string NOME_NULO = "Nome não pode ser nulo";
+        public const string EMAIL_NULO = "Email não pode ser nulo";
+        public const string SENHA_NULA = "Senha não pode ser nula";
+
+
     }
 }

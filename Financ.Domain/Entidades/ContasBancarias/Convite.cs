@@ -19,7 +19,7 @@ namespace Financ.Domain.Entidades.ContasBancarias
         public string IdUsuarioRemetente { get; private set; }
         public string IdUsuarioDestinatario { get; private set; }
         public int IdConta { get; private set; }
-        public TiposAcessos Acesso { get; private set; }
+        public ETiposAcessos Acesso { get; private set; }
         public bool? Aceito { get; private set; }
         public int? ExpiracaoContaUsuario { get; private set; }
 
@@ -33,16 +33,16 @@ namespace Financ.Domain.Entidades.ContasBancarias
         public Conta Conta { get; private set; }
 
         private Convite() { }
-        public Convite(TiposAcessos acesso, ContaUsuario usuarioRemetente, Usuario usuairoDestinatario, int? expiracaoContaUsuario = null)
+        public Convite(ETiposAcessos acesso, ContaUsuario usuarioRemetente, Usuario usuairoDestinatario, int? expiracaoContaUsuario = null)
         {
-            ConvitesValidacao.Verifica(!Enum.IsDefined(typeof(TiposAcessos), acesso), MensagensContasUsuarios.ACESSO_INVALIDO);
+            ConvitesValidacao.Verifica(!Enum.IsDefined(typeof(ETiposAcessos), acesso), MensagensContasUsuarios.ACESSO_INVALIDO);
 
             ConvitesValidacao.Verifica(usuarioRemetente is null, MensagensConvite.USUARIO_DESTINATARIO_NAO_ENCONTRADO);
             ConvitesValidacao.Verifica(usuairoDestinatario is null, MensagensConvite.USUARIO_DESTINATARIO_NAO_ENCONTRADO);
 
             ConvitesValidacao.Verifica(usuarioRemetente.Conta.UsuarioPertenceConta(usuairoDestinatario!.Id), MensagensConvite.USUARIO_JA_PERTENCE_A_CONTA);
             ConvitesValidacao.Verifica(usuarioRemetente.Conta.ConviteEmAndamento(usuairoDestinatario!.Id), MensagensConvite.CONVITE_EM_ANDAMENTO);
-            ConvitesValidacao.Verifica(acesso == TiposAcessos.Mestre && usuarioRemetente.Conta.Convites.Count(x => x.Aceito is null && x.Acesso is TiposAcessos.Mestre && x.Expiracao >= DateTime.UtcNow) >= 1, MensagensBase.LIMITE_DE_CONVITES_PARA_USUARIOS_MESTRE);
+            ConvitesValidacao.Verifica(acesso == ETiposAcessos.Mestre && usuarioRemetente.Conta.Convites.Count(x => x.Aceito is null && x.Acesso is ETiposAcessos.Mestre && x.Expiracao >= DateTime.UtcNow) >= 1, MensagensBase.LIMITE_DE_CONVITES_PARA_USUARIOS_MESTRE);
             ConvitesValidacao.Verifica(!usuarioRemetente.ValidaPermissoeNaConta(acesso), MensagensBase.LIMITE_USUARIOS_MESTRES);
 
             if (expiracaoContaUsuario.HasValue)

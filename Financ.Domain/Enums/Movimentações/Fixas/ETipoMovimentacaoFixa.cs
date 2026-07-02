@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace Financ.Domain.Enums.Movimentações.Fixas
 {
-    public enum StatusMovimentacaoFixa
+    public  enum ETipoMovimentacaoFixa
     {
-        Ativo,
-        Inativo,
+        Diaria,
+        Mensal,
+        Anual
     }
 }

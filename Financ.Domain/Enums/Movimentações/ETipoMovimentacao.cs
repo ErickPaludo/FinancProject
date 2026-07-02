@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace Financ.Domain.Enums.Movimentações
 {
-    public enum StatusMovimentacao
+    public enum ETipoMovimentacao
     {
-        Pendente,
-        Concluido,
-        Excluido,
-        Oculta //Exclusivo para movimentação fixa base
+        Entrada,
+        Saida
     }
 }

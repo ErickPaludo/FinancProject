@@ -17,8 +17,8 @@ namespace Financ.Domain.Entidades.ContasBancarias
     {
         public int IdConta { get; private set; }
         public string IdUsuario { get; private set; }
-        public TiposAcessos Acesso { get; private set; }
-        public StatusContasUsuario Status { get; private set; }
+        public ETiposAcessos Acesso { get; private set; }
+        public EStatusContasUsuario Status { get; private set; }
         public DateTime? Expiracao { get; private set; }
         public bool ContaFavorita { get; private set; } = false;
         public bool AutoSoma { get; private set; } = true;
@@ -38,7 +38,7 @@ namespace Financ.Domain.Entidades.ContasBancarias
             DthrReg = DateTime.UtcNow;
             ValidaEnums(convite.Acesso, null);
             Acesso = convite.Acesso;
-            Status = StatusContasUsuario.Ativo;
+            Status = EStatusContasUsuario.Ativo;
             Usuario = convite.Destinatario;
             if (convite.ExpiracaoContaUsuario.HasValue)
             {
@@ -51,13 +51,13 @@ namespace Financ.Domain.Entidades.ContasBancarias
             IdUsuario = usuario.Id;
             Usuario = usuario;
             DthrReg = DateTime.UtcNow;
-            Status = StatusContasUsuario.Ativo;
-            Acesso = TiposAcessos.Mestre;
+            Status = EStatusContasUsuario.Ativo;
+            Acesso = ETiposAcessos.Mestre;
         }
         #endregion
 
         #region Metodos Publicos
-        public void AtualizaOutraContaUsuario(ContaUsuario? contasUsuarioRemetente, TiposAcessos? acesso, StatusContasUsuario? status, int? expiracao = null, bool? removerExpiracao = null)
+        public void AtualizaOutraContaUsuario(ContaUsuario? contasUsuarioRemetente, ETiposAcessos? acesso, EStatusContasUsuario? status, int? expiracao = null, bool? removerExpiracao = null)
         {
 
             #region Validação Remetente
@@ -85,7 +85,7 @@ namespace Financ.Domain.Entidades.ContasBancarias
 
             if (status.HasValue)
             {
-                ContasUsuariosValidacao.Verifica(!status.Value.Equals(StatusContasUsuario.Ativo) && ValidaUsuarioMestre(Acesso), MensagensContasUsuarios.ATUALIZA_PARA_USUARIO_MESTRE_DIFERENTE_DE_ATIVO);
+                ContasUsuariosValidacao.Verifica(!status.Value.Equals(EStatusContasUsuario.Ativo) && ValidaUsuarioMestre(Acesso), MensagensContasUsuarios.ATUALIZA_PARA_USUARIO_MESTRE_DIFERENTE_DE_ATIVO);
                 Status = status.Value;
             }
 
@@ -105,15 +105,15 @@ namespace Financ.Domain.Entidades.ContasBancarias
         public void SairDaConta()
         {
             ContasUsuariosValidacao.Verifica(
-                Acesso.Equals(TiposAcessos.Mestre)
-                && Conta.ContaUsuarios.Any(x => !x.Acesso.Equals(TiposAcessos.Mestre)
+                Acesso.Equals(ETiposAcessos.Mestre)
+                && Conta.ContaUsuarios.Any(x => !x.Acesso.Equals(ETiposAcessos.Mestre)
                 && !x.IdUsuario.Equals(IdUsuario))
-                && Conta.ContaUsuarios.Where(x => x.Acesso.Equals(TiposAcessos.Mestre)).Take(2).Count() == 1,
+                && Conta.ContaUsuarios.Where(x => x.Acesso.Equals(ETiposAcessos.Mestre)).Take(2).Count() == 1,
                 MensagensContasUsuarios.UNICO_USUARIO_MESTRE_NA_CONTA);
 
             ContasUsuariosValidacao.Verifica(Conta.Convites.Any(x => DateTime.UtcNow <= x.Expiracao && x.Aceito is null && x.IdUsuarioRemetente.Equals(IdUsuario)), MensagensContasUsuarios.USUARIO_POSSUI_CONVITES_EM_ANDAMENTO);
 
-            Status = StatusContasUsuario.Removido;
+            Status = EStatusContasUsuario.Removido;
 
 
         }
@@ -121,20 +121,20 @@ namespace Financ.Domain.Entidades.ContasBancarias
         {
             ValidaUsuarioRemetenteMestreAtivoDaConta(contasUsuarioRemetente);
             ContasUsuariosValidacao.Verifica(contasUsuarioRemetente == this, MensagensContasUsuarios.USUARIO_TENTA_SE_EXPULSAR);
-            ContasUsuariosValidacao.Verifica(Acesso == TiposAcessos.Mestre, MensagensContasUsuarios.USUARIO_MESTRE_NAO_PODE_SER_REMOVIDO);
-            Status = StatusContasUsuario.Removido;
+            ContasUsuariosValidacao.Verifica(Acesso == ETiposAcessos.Mestre, MensagensContasUsuarios.USUARIO_MESTRE_NAO_PODE_SER_REMOVIDO);
+            Status = EStatusContasUsuario.Removido;
         }
-        public bool ValidaPermissoeNaConta(TiposAcessos acessoDestinatario)
+        public bool ValidaPermissoeNaConta(ETiposAcessos acessoDestinatario)
         {
-            return !(acessoDestinatario.Equals(TiposAcessos.Mestre) && Conta.ContaUsuarios.Where(x => x.Acesso.Equals(TiposAcessos.Mestre) && x.Status.Equals(StatusContasUsuario.Ativo)).Take(2).Count() == 2);
+            return !(acessoDestinatario.Equals(ETiposAcessos.Mestre) && Conta.ContaUsuarios.Where(x => x.Acesso.Equals(ETiposAcessos.Mestre) && x.Status.Equals(EStatusContasUsuario.Ativo)).Take(2).Count() == 2);
         }
-        public bool ValidaUsuarioMestre(TiposAcessos acesso)
+        public bool ValidaUsuarioMestre(ETiposAcessos acesso)
         {
-            return TiposAcessos.Mestre.Equals(acesso);
+            return ETiposAcessos.Mestre.Equals(acesso);
         }
-        public bool ExpiracaoPorAcesso(TiposAcessos acesso)
+        public bool ExpiracaoPorAcesso(ETiposAcessos acesso)
         {
-            return acesso.Equals(TiposAcessos.Mestre);
+            return acesso.Equals(ETiposAcessos.Mestre);
         }
         public bool ValidaExpiracao(int minutos)
         {
@@ -149,7 +149,7 @@ namespace Financ.Domain.Entidades.ContasBancarias
             ValidaContaBancaria(convite.Conta, convite.IdUsuarioDestinatario);
             ValidaEnums(convite.Acesso, null);
             Acesso = convite.Acesso;
-            Status = StatusContasUsuario.Ativo;
+            Status = EStatusContasUsuario.Ativo;
             if (convite.ExpiracaoContaUsuario.HasValue)
             {
                 Expiracao = DateTime.UtcNow.AddMinutes(convite.ExpiracaoContaUsuario.Value);
@@ -172,18 +172,18 @@ namespace Financ.Domain.Entidades.ContasBancarias
         #endregion
 
         #region Metodos Privados
-        private void ValidaEnums(TiposAcessos? acesso, StatusContasUsuario? status)
+        private void ValidaEnums(ETiposAcessos? acesso, EStatusContasUsuario? status)
         {
 
             if (status.HasValue)
-                ContasUsuariosValidacao.Verifica(!Enum.IsDefined(typeof(StatusContasUsuario), status), MensagensBase.STATUS_INVALIDO);
+                ContasUsuariosValidacao.Verifica(!Enum.IsDefined(typeof(EStatusContasUsuario), status), MensagensBase.STATUS_INVALIDO);
 
             if (acesso.HasValue)
-                ContasUsuariosValidacao.Verifica(!Enum.IsDefined(typeof(TiposAcessos), acesso), MensagensContasUsuarios.ACESSO_INVALIDO);
+                ContasUsuariosValidacao.Verifica(!Enum.IsDefined(typeof(ETiposAcessos), acesso), MensagensContasUsuarios.ACESSO_INVALIDO);
         }
         private void ValidaContaBancaria(Conta conta, string idUsuario)
         {
-            ContasUsuariosValidacao.Verifica(conta!.Status != StatusContas.Ativo, MensagensContasUsuarios.CONTA_NAO_ESTA_ATIVA);
+            ContasUsuariosValidacao.Verifica(conta!.Status != EStatusContas.Ativo, MensagensContasUsuarios.CONTA_NAO_ESTA_ATIVA);
         }
         private void ValidaUsuarioRemetenteMestreAtivoDaConta(ContaUsuario? usuario)
         {

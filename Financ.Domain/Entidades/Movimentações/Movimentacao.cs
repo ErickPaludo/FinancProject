@@ -12,13 +12,13 @@ namespace Financ.Domain.Entidades.Movimentações
     public class Movimentacao
     {
         public int Id { get; private set; }
-        public TipoMovimentacao Tipo { get; private set; }
+        public ETipoMovimentacao Tipo { get; private set; }
         public int IdConta { get; private set; }
         public int IdUsuarioCriador { get; private set; }
         public int? IdUsuarioExecutor { get; private set; }
         public int? IdFixo { get; private set; }
         public decimal Valor { get; private set; }
-        public StatusMovimentacao Status { get; private set; } = StatusMovimentacao.Pendente;
+        public EStatusMovimentacao Status { get; private set; } = EStatusMovimentacao.Pendente;
         public string Titulo { get; private set; }
         public string? Observacao { get; private set; }
         public DateTime DthrReg { get; private set; }
@@ -35,7 +35,7 @@ namespace Financ.Domain.Entidades.Movimentações
         public MovimentacaoFixa? Fixa { get; private set; }
         #region Contrutores
         private Movimentacao() { }
-        public Movimentacao(TipoMovimentacao tipo, ContaUsuario contaUsuario, decimal valor, string titulo, string? observacao, DateTime? dthrMovimentacao, DateTime? dthrConclusao, bool concluido, MovimentacaoFixa? movimentacaoFixa = null, bool movimentacaoVirtual = false)
+        public Movimentacao(ETipoMovimentacao tipo, ContaUsuario contaUsuario, decimal valor, string titulo, string? observacao, DateTime? dthrMovimentacao, DateTime? dthrConclusao, bool concluido, MovimentacaoFixa? movimentacaoFixa = null, bool movimentacaoVirtual = false)
         {
             if (movimentacaoFixa is not null)
             {
@@ -46,7 +46,7 @@ namespace Financ.Domain.Entidades.Movimentações
             ValidaTipoMovimentacao(tipo);
             Tipo = tipo;
 
-            Status = concluido ? StatusMovimentacao.Concluido : StatusMovimentacao.Pendente;
+            Status = concluido ? EStatusMovimentacao.Concluido : EStatusMovimentacao.Pendente;
 
             ValidaTitulo(titulo);
             Titulo = titulo;
@@ -87,8 +87,8 @@ namespace Financ.Domain.Entidades.Movimentações
         {
             ValidaContaUsuario(contaUsuario);
             ValidaConta(contaUsuario!.Conta);
-            MovimentacaoValidacao.Verifica(Status is StatusMovimentacao.Concluido, MensagemMovimentacao.MOVIMENTACAO_COM_STATUS_IGUAL_NA_EXECUCAO);
-            Status = StatusMovimentacao.Concluido;
+            MovimentacaoValidacao.Verifica(Status is EStatusMovimentacao.Concluido, MensagemMovimentacao.MOVIMENTACAO_COM_STATUS_IGUAL_NA_EXECUCAO);
+            Status = EStatusMovimentacao.Concluido;
             ValidaDataConclusao(dthrConclusao);
 
             ContaUsuarioExecutor = contaUsuario;
@@ -103,7 +103,7 @@ namespace Financ.Domain.Entidades.Movimentações
             ValidaExtorno(contaUsuario);
 
             DthrConclusao = null;
-            Status = StatusMovimentacao.Pendente;
+            Status = EStatusMovimentacao.Pendente;
             ContaUsuarioExecutor = contaUsuario;
             IdUsuarioExecutor = contaUsuario!.Id;
             Extorno = true;
@@ -112,10 +112,10 @@ namespace Financ.Domain.Entidades.Movimentações
         {
             ValidaContaUsuario(contaUsuario);
             ValidaConta(contaUsuario!.Conta);
-            Extorno = Status is StatusMovimentacao.Concluido ? true : false;
-            Status = StatusMovimentacao.Excluido;
+            Extorno = Status is EStatusMovimentacao.Concluido ? true : false;
+            Status = EStatusMovimentacao.Excluido;
         }
-        public void AlterarMovimentacao(ContaUsuario? contaUsuario, decimal? valor, TipoMovimentacao? tipo, string? titulo, string? observacao, DateTime? dthrMovimentacao, DateTime? dthrConclusao)
+        public void AlterarMovimentacao(ContaUsuario? contaUsuario, decimal? valor, ETipoMovimentacao? tipo, string? titulo, string? observacao, DateTime? dthrMovimentacao, DateTime? dthrConclusao)
         {
             ValidaContaUsuario(contaUsuario);
             ValidaConta(contaUsuario!.Conta);
@@ -136,7 +136,7 @@ namespace Financ.Domain.Entidades.Movimentações
             }
             if (dthrConclusao is not null)
             {
-                MovimentacaoValidacao.Verifica(Status is not StatusMovimentacao.Concluido, MensagemMovimentacao.MOVIMENTACAO_NAO_ESTA_CONCLUIDA);
+                MovimentacaoValidacao.Verifica(Status is not EStatusMovimentacao.Concluido, MensagemMovimentacao.MOVIMENTACAO_NAO_ESTA_CONCLUIDA);
                 DthrConclusao = dthrConclusao;
             }
             if (dthrMovimentacao is not null && dthrConclusao is not null)
@@ -146,13 +146,13 @@ namespace Financ.Domain.Entidades.Movimentações
             if (valor is not null)
             {
                 ValidaValor(valor.Value);
-                MovimentacaoValidacao.Verifica(Status is StatusMovimentacao.Concluido, MensagemMovimentacao.NAO_PODE_ALTERAR_VALOR_DE_MOVIMENTACAO_CONCLUIDA);
+                MovimentacaoValidacao.Verifica(Status is EStatusMovimentacao.Concluido, MensagemMovimentacao.NAO_PODE_ALTERAR_VALOR_DE_MOVIMENTACAO_CONCLUIDA);
                 Valor = valor.Value;
             }
             if (tipo is not null)
             {
                 ValidaTipoMovimentacao(tipo.Value);
-                MovimentacaoValidacao.Verifica(Status is StatusMovimentacao.Concluido, MensagemMovimentacao.NAO_PODE_ALTERAR_TIPO_DE_MOVIMENTACAO_CONCLUIDA);
+                MovimentacaoValidacao.Verifica(Status is EStatusMovimentacao.Concluido, MensagemMovimentacao.NAO_PODE_ALTERAR_TIPO_DE_MOVIMENTACAO_CONCLUIDA);
                 Tipo = tipo.Value;
             }
             Editado = true;
@@ -163,7 +163,7 @@ namespace Financ.Domain.Entidades.Movimentações
         }
         public void CriaMovimentacaoFixa(MovimentacaoFixa fixa)
         {
-            Status = StatusMovimentacao.Oculta;
+            Status = EStatusMovimentacao.Oculta;
         }
         #endregion
         #region Metodos Privados
@@ -171,15 +171,15 @@ namespace Financ.Domain.Entidades.Movimentações
         {
             ValidaContaUsuario(contaUsuario);
             ValidaConta(contaUsuario!.Conta);
-            MovimentacaoValidacao.Verifica(Status is StatusMovimentacao.Pendente, MensagemMovimentacao.MOVIMENTACAO_COM_STATUS_IGUAL_NO_EXTORNO);
+            MovimentacaoValidacao.Verifica(Status is EStatusMovimentacao.Pendente, MensagemMovimentacao.MOVIMENTACAO_COM_STATUS_IGUAL_NO_EXTORNO);
         }
-        private void ValidaStatusMovimentacao(StatusMovimentacao? status)
+        private void ValidaStatusMovimentacao(EStatusMovimentacao? status)
         {
-            MovimentacaoValidacao.Verifica(status is not null && !Enum.IsDefined(typeof(StatusMovimentacao), status), MensagemMovimentacao.STATUS_INVALIDO);
+            MovimentacaoValidacao.Verifica(status is not null && !Enum.IsDefined(typeof(EStatusMovimentacao), status), MensagemMovimentacao.STATUS_INVALIDO);
         }
-        private void ValidaTipoMovimentacao(TipoMovimentacao tipo)
+        private void ValidaTipoMovimentacao(ETipoMovimentacao tipo)
         {
-            MovimentacaoValidacao.Verifica(!Enum.IsDefined(typeof(TipoMovimentacao), tipo), MensagemMovimentacao.TIPO_MOV_INVALIDO);
+            MovimentacaoValidacao.Verifica(!Enum.IsDefined(typeof(ETipoMovimentacao), tipo), MensagemMovimentacao.TIPO_MOV_INVALIDO);
         }
         private void ValidaTitulo(string titulo)
         {
@@ -193,7 +193,7 @@ namespace Financ.Domain.Entidades.Movimentações
         private void ValidaContaUsuario(ContaUsuario? contaUsuario)
         {
             MovimentacaoValidacao.Verifica(contaUsuario is null, MensagemMovimentacao.USUARIO_NAO_PERTENCE_A_CONTA);
-            MovimentacaoValidacao.Verifica(!contaUsuario!.Status.Equals(StatusContasUsuario.Ativo), MensagemMovimentacao.USUARIO_INATIVO);
+            MovimentacaoValidacao.Verifica(!contaUsuario!.Status.Equals(EStatusContasUsuario.Ativo), MensagemMovimentacao.USUARIO_INATIVO);
             MovimentacaoValidacao.Verifica(contaUsuario.Expiracao is not null && contaUsuario.Expiracao < DateTime.UtcNow, MensagemMovimentacao.USUARIO_EXPIRADO);
         }
         private void ValidaConta(Conta? conta)
@@ -206,7 +206,7 @@ namespace Financ.Domain.Entidades.Movimentações
         }
         private void ValidaDataConclusao(DateTime? dthrConclusao)
         {
-            MovimentacaoValidacao.Verifica(dthrConclusao is not null && Status is not StatusMovimentacao.Concluido, MensagemMovimentacao.MOVIMENTACAO_NAO_ESTA_CONCLUIDA);
+            MovimentacaoValidacao.Verifica(dthrConclusao is not null && Status is not EStatusMovimentacao.Concluido, MensagemMovimentacao.MOVIMENTACAO_NAO_ESTA_CONCLUIDA);
             MovimentacaoValidacao.Verifica(dthrConclusao is not null && dthrConclusao < DthrMovimentacao, MensagemMovimentacao.DATAS_MOV_INVALIDAS);
         }
         #endregion
