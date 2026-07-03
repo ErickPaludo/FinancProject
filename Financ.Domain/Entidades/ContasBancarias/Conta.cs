@@ -2,6 +2,8 @@
 using Financ.Domain.Enums.ContasBancarias;
 using Financ.Domain.Enums.Movimentações;
 using Financ.Domain.Objetos_de_Valor;
+using Financ.Domain.Objetos_de_Valor.Titulo;
+using Financ.Domain.Validacoes;
 using Financ.Domain.Validacoes.Base.Mensagens;
 using Financ.Domain.Validacoes.ContasBancarias;
 using Financ.Domain.Validacoes.ContasBancarias.Mensagens;
@@ -17,12 +19,12 @@ using System.Threading.Tasks;
 
 namespace Financ.Domain.Entidades.ContasBancarias
 {
-    public sealed class Conta : BaseConta
+    public sealed class Conta : EntidadeBase
     {
-        public string Titulo { get; private set; }
+        public TituloConta Titulo { get; private set; }
         public EStatusContas Status { get; private set; }
         public ETipoConta TipoConta { get; private set; }
-        public decimal Saldo { get; private set; }
+        public Saldo Saldo { get; private set; }
         public Cor Cor { get; private set; }
         public byte[] RowVersion { get; private set; }
         private readonly List<ContaUsuario> _contasUsuarios = new();
@@ -31,84 +33,75 @@ namespace Financ.Domain.Entidades.ContasBancarias
         public IReadOnlyCollection<Convite> Convites => _convites;
         private Conta() { }
 
-        public Conta(string titulo, string? cor)
-        {   
-            titulo = titulo.Trim();
-            ValidaTitulo(titulo);
+        public Conta(TituloConta titulo, string? cor)
+        {
+            ValidaNullo.Verifica(titulo, MensagensBase.TITULO_NULO);
             Titulo = titulo;
             Status = EStatusContas.Ativo;
             TipoConta = ETipoConta.Corrente;
             Cor = new Cor(cor);
-            DthrReg = DateTime.UtcNow;
-
         }
         public void AtualizaConta(string? titulo, EStatusContas? status, string? cor = null)
         {
-           
+
             if (cor != null)
                 Cor = new Cor(cor);
 
             if (titulo is not null)
             {
-                titulo = titulo.Trim();
-                ValidaTitulo(titulo);
+                Titulo = TituloConta.Create(titulo);
             }
 
             if (status.HasValue)
                 ValidaStatusConta(status.Value);
         }
-        public bool ConviteEmAndamento(string idUsuario)
-        {
-            return Convites.Any(x => x.IdUsuarioDestinatario == idUsuario
-            && DateTime.UtcNow <= x.Expiracao
-            && x.Aceito == null);
-        }
-        public bool UsuarioPertenceConta(string idUsuario)
-        {
-            return ContaUsuarios.Any(x => x.IdUsuario == idUsuario && (x.Expiracao is null || x.Expiracao >= DateTime.UtcNow));
-        }
-        public void ProcessaMovimentacao(Movimentacao movimentacao)
-        {
-            if (movimentacao.Status is EStatusMovimentacao.Concluido)
-            {
-                ContasValidacao.Verifica(movimentacao.Extorno, MensagensContas.NAO_PODE_PROCESSAR_MOVIMENTACAO_COM_EXTORNO);
-                ContasValidacao.Verifica(movimentacao.Tipo.Equals(ETipoMovimentacao.Saida) && movimentacao.Valor > Saldo, MensagensContas.SALDO_INSUFICIENTE);
-                Saldo = movimentacao.Tipo.Equals(ETipoMovimentacao.Entrada) ? Saldo + movimentacao.Valor : Saldo - movimentacao.Valor;
-            }
-        }
-        public void ProcessaExtornoMovimentacao(Movimentacao movimentacao)
-        {
-            ContasValidacao.Verifica(!movimentacao.Extorno, MensagensContas.NAO_PODE_PROCESSAR_MOVIMENTACAO_SEM_EXTORNO);
-            ContasValidacao.Verifica(movimentacao.Status is not EStatusMovimentacao.Pendente, MensagensContas.EXTORNO_DE_MOVIMENTACAO_COM_DATA_DE_CONCLUSAO);
-            ContasValidacao.Verifica(movimentacao.DthrConclusao is not null, MensagensContas.EXTORNO_DE_MOVIMENTACAO_COM_DATA_DE_CONCLUSAO);
-            ContasValidacao.Verifica(movimentacao.Tipo.Equals(ETipoMovimentacao.Entrada) && movimentacao.Valor > Saldo, MensagensContas.SALDO_INSUFICIENTE);
-            Saldo = movimentacao.Tipo.Equals(ETipoMovimentacao.Entrada) ? Saldo - movimentacao.Valor : Saldo + movimentacao.Valor;
-        }
+        //public bool ConviteEmAndamento(string idUsuario)
+        //{
+        //    return Convites.Any(x => x.IdUsuarioDestinatario == idUsuario
+        //    && DateTime.UtcNow <= x.Expiracao
+        //    && x.Aceito == null);
+        //}
+        //public bool UsuarioPertenceConta(string idUsuario)
+        //{
+        //   return ContaUsuarios.Any(x => x.IdUsuario == idUsuario && (x.Expiracao is null || x.Expiracao >= DateTime.UtcNow));
+        //} 
+        //public void ProcessaMovimentacao(Movimentacao movimentacao)
+        //{
+        //    if (movimentacao.Status is EStatusMovimentacao.Concluido)
+        //    {
+        //        ContasValidacao.Verifica(movimentacao.Extorno, MensagensContas.NAO_PODE_PROCESSAR_MOVIMENTACAO_COM_EXTORNO);
+        //        ContasValidacao.Verifica(movimentacao.Tipo.Equals(ETipoMovimentacao.Saida) && movimentacao.Valor > Saldo, MensagensContas.SALDO_INSUFICIENTE);
+        //        Saldo = movimentacao.Tipo.Equals(ETipoMovimentacao.Entrada) ? Saldo + movimentacao.Valor : Saldo - movimentacao.Valor;
+        //    }
+        //}
+        //public void ProcessaExtornoMovimentacao(Movimentacao movimentacao)
+        //{
+        //    ContasValidacao.Verifica(!movimentacao.Extorno, MensagensContas.NAO_PODE_PROCESSAR_MOVIMENTACAO_SEM_EXTORNO);
+        //    ContasValidacao.Verifica(movimentacao.Status is not EStatusMovimentacao.Pendente, MensagensContas.EXTORNO_DE_MOVIMENTACAO_COM_DATA_DE_CONCLUSAO);
+        //    ContasValidacao.Verifica(movimentacao.DthrConclusao is not null, MensagensContas.EXTORNO_DE_MOVIMENTACAO_COM_DATA_DE_CONCLUSAO);
+        //    ContasValidacao.Verifica(movimentacao.Tipo.Equals(ETipoMovimentacao.Entrada) && movimentacao.Valor > Saldo, MensagensContas.SALDO_INSUFICIENTE);
+        //    Saldo = movimentacao.Tipo.Equals(ETipoMovimentacao.Entrada) ? Saldo - movimentacao.Valor : Saldo + movimentacao.Valor;
+        //}
 
-        public void RemoverMovimentacao(Movimentacao movimentacao)
-        {
-            if (movimentacao.Extorno)
-            {
-                if (movimentacao.Tipo.Equals(ETipoMovimentacao.Entrada))
-                {
-                    ContasValidacao.Verifica(movimentacao.Valor > Saldo, MensagensContas.SALDO_INSUFICIENTE);
-                    Saldo -= movimentacao.Valor;
-                }
-                else
-                    Saldo += movimentacao.Valor;
-            }
-        }
+        //public void RemoverMovimentacao(Movimentacao movimentacao)
+        //{
+        //    if (movimentacao.Extorno)
+        //    {
+        //        if (movimentacao.Tipo.Equals(ETipoMovimentacao.Entrada))
+        //        {
+        //            ContasValidacao.Verifica(movimentacao.Valor > Saldo, MensagensContas.SALDO_INSUFICIENTE);
+        //            Saldo -= movimentacao.Valor;
+        //        }
+        //        else
+        //            Saldo += movimentacao.Valor;
+        //    }
+        //}
 
-        private void ValidaTitulo(string titulo)
-        {
-            ContasValidacao.Verifica(string.IsNullOrWhiteSpace(titulo), MensagensContas.TITULO_OBRIGATORIO);
-            ContasValidacao.Verifica(titulo.Length < 2 || titulo.Length > 30, MensagensContas.TITULO_TAMANHO_INVALIDO);
-        }
         private void ValidaStatusConta(EStatusContas status)
         {
             ContasValidacao.Verifica(!Enum.IsDefined(typeof(EStatusContas), status), MensagensBase.STATUS_INVALIDO);
             Status = status;
         }
-    
+
     }
 }

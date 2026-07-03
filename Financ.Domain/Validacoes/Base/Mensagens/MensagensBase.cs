@@ -16,5 +16,8 @@ namespace Financ.Domain.Validacoes.Base.Mensagens
         public const string USUARIO_INATIVO_NAO_PODE_SER_ATUALIZADO = "O usuário não está ativo!";
         public const string LIMITE_DE_CONVITES_PARA_USUARIOS_MESTRE = "Numero máximo de convites para usuários mestres atingido.";
 
+        public static string TITULO_NULO = "Título não pode ser nulo.";
+        public static string TITULO_TAMANHO_INVALIDO(int min, int max) => $"O título deve possuir entre {min} e {max} caracteres.";
+
     }
 }

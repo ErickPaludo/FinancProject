@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Financ.Domain.Validacoes.ContasBancarias.Mensagens
 {
-    public static class MensagensContasUsuarios
+    public static class MensagensContaUsuario
     {
  
             public const string IDCONTA_IGUAL_MENOR_ZERO = "O Id da conta deve ser maior que zero.";

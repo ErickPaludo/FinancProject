@@ -15,75 +15,75 @@ namespace Financ.Domain.Entidades.ContasBancarias
 {
     public sealed class Convite
     {
-        public int Id { get; private set; }
-        public string IdUsuarioRemetente { get; private set; }
-        public string IdUsuarioDestinatario { get; private set; }
-        public int IdConta { get; private set; }
-        public ETiposAcessos Acesso { get; private set; }
-        public bool? Aceito { get; private set; }
-        public int? ExpiracaoContaUsuario { get; private set; }
+        //public int Id { get; private set; }
+        //public string IdUsuarioRemetente { get; private set; }
+        //public string IdUsuarioDestinatario { get; private set; }
+        //public int IdConta { get; private set; }
+        //public ETiposAcessos Acesso { get; private set; }
+        //public bool? Aceito { get; private set; }
+        //public int? ExpiracaoContaUsuario { get; private set; }
 
-        public DateTime DataEnvio { get; private set; }
-        public DateTime Expiracao { get; private set; }
-        public string? Observacao { get; private set; }
+        //public DateTime DataEnvio { get; private set; }
+        //public DateTime Expiracao { get; private set; }
+        //public string? Observacao { get; private set; }
 
-        public Usuario Remetente { get; set; }
-        public Usuario Destinatario { get; set; }
+        //public Usuario Remetente { get; set; }
+        //public Usuario Destinatario { get; set; }
 
-        public Conta Conta { get; private set; }
+        //public Conta Conta { get; private set; }
 
-        private Convite() { }
-        public Convite(ETiposAcessos acesso, ContaUsuario usuarioRemetente, Usuario usuairoDestinatario, int? expiracaoContaUsuario = null)
-        {
-            ConvitesValidacao.Verifica(!Enum.IsDefined(typeof(ETiposAcessos), acesso), MensagensContasUsuarios.ACESSO_INVALIDO);
+        //private Convite() { }
+        //public Convite(ETiposAcessos acesso, ContaUsuario usuarioRemetente, Usuario usuairoDestinatario, int? expiracaoContaUsuario = null)
+        //{
+        //    ConvitesValidacao.Verifica(!Enum.IsDefined(typeof(ETiposAcessos), acesso), MensagensContasUsuarios.ACESSO_INVALIDO);
 
-            ConvitesValidacao.Verifica(usuarioRemetente is null, MensagensConvite.USUARIO_DESTINATARIO_NAO_ENCONTRADO);
-            ConvitesValidacao.Verifica(usuairoDestinatario is null, MensagensConvite.USUARIO_DESTINATARIO_NAO_ENCONTRADO);
+        //    ConvitesValidacao.Verifica(usuarioRemetente is null, MensagensConvite.USUARIO_DESTINATARIO_NAO_ENCONTRADO);
+        //    ConvitesValidacao.Verifica(usuairoDestinatario is null, MensagensConvite.USUARIO_DESTINATARIO_NAO_ENCONTRADO);
 
-            ConvitesValidacao.Verifica(usuarioRemetente.Conta.UsuarioPertenceConta(usuairoDestinatario!.Id), MensagensConvite.USUARIO_JA_PERTENCE_A_CONTA);
-            ConvitesValidacao.Verifica(usuarioRemetente.Conta.ConviteEmAndamento(usuairoDestinatario!.Id), MensagensConvite.CONVITE_EM_ANDAMENTO);
-            ConvitesValidacao.Verifica(acesso == ETiposAcessos.Mestre && usuarioRemetente.Conta.Convites.Count(x => x.Aceito is null && x.Acesso is ETiposAcessos.Mestre && x.Expiracao >= DateTime.UtcNow) >= 1, MensagensBase.LIMITE_DE_CONVITES_PARA_USUARIOS_MESTRE);
-            ConvitesValidacao.Verifica(!usuarioRemetente.ValidaPermissoeNaConta(acesso), MensagensBase.LIMITE_USUARIOS_MESTRES);
+        //    ConvitesValidacao.Verifica(usuarioRemetente.Conta.UsuarioPertenceConta(usuairoDestinatario!.Id), MensagensConvite.USUARIO_JA_PERTENCE_A_CONTA);
+        //    ConvitesValidacao.Verifica(usuarioRemetente.Conta.ConviteEmAndamento(usuairoDestinatario!.Id), MensagensConvite.CONVITE_EM_ANDAMENTO);
+        //    ConvitesValidacao.Verifica(acesso == ETiposAcessos.Mestre && usuarioRemetente.Conta.Convites.Count(x => x.Aceito is null && x.Acesso is ETiposAcessos.Mestre && x.Expiracao >= DateTime.UtcNow) >= 1, MensagensBase.LIMITE_DE_CONVITES_PARA_USUARIOS_MESTRE);
+        //    ConvitesValidacao.Verifica(!usuarioRemetente.ValidaPermissoeNaConta(acesso), MensagensBase.LIMITE_USUARIOS_MESTRES);
 
-            if (expiracaoContaUsuario.HasValue)
-            {
-                ConvitesValidacao.Verifica(usuarioRemetente.ExpiracaoPorAcesso(acesso), MensagensContasUsuarios.MESTRE_NAO_POSSUI_TEMPO_LIMITE);
-                ConvitesValidacao.Verifica(usuarioRemetente.ValidaExpiracao(expiracaoContaUsuario.Value), MensagensContasUsuarios.TEMPO_MIN_EXPIRACAO);
-            }
+        //    if (expiracaoContaUsuario.HasValue)
+        //    {
+        //        ConvitesValidacao.Verifica(usuarioRemetente.ExpiracaoPorAcesso(acesso), MensagensContasUsuarios.MESTRE_NAO_POSSUI_TEMPO_LIMITE);
+        //        ConvitesValidacao.Verifica(usuarioRemetente.ValidaExpiracao(expiracaoContaUsuario.Value), MensagensContasUsuarios.TEMPO_MIN_EXPIRACAO);
+        //    }
 
-            IdUsuarioRemetente = usuarioRemetente.IdUsuario;
-            IdUsuarioDestinatario = usuairoDestinatario!.Id;
-            DataEnvio = DateTime.UtcNow;
-            IdConta = usuarioRemetente.Conta.Id;
-            Acesso = acesso;
-            Expiracao = DateTime.UtcNow.AddDays(7);
-            Conta = usuarioRemetente.Conta;
-            ExpiracaoContaUsuario = expiracaoContaUsuario;
-        }
+        //    IdUsuarioRemetente = usuarioRemetente.IdUsuario;
+        //    IdUsuarioDestinatario = usuairoDestinatario!.Id;
+        //    DataEnvio = DateTime.UtcNow;
+        //    IdConta = usuarioRemetente.Conta.Id;
+        //    Acesso = acesso;
+        //    Expiracao = DateTime.UtcNow.AddDays(7);
+        //    Conta = usuarioRemetente.Conta;
+        //    ExpiracaoContaUsuario = expiracaoContaUsuario;
+        //}
 
-        private void ValidaConviteAtivo(bool? aceito)
-        {
-            if (Aceito.HasValue)
-            {
-                string msg = Aceito.Value ? "aceito" : "rejeitado";
-                ConvitesValidacao.Verifica(true, MensagensConvite.CONVITE_JA_VISUALIZADO + msg);
-            }
-            ConvitesValidacao.Verifica(DateTime.UtcNow > Expiracao, MensagensConvite.CONVITE_EXPIRADO);
-        }
-        public void AceitaConvite(bool aceito)
-        {
-            ValidaConviteAtivo(aceito);
-            Aceito = aceito;
-        }
-        public void InsereObservacao(string observacao)
-        {
-            Observacao = observacao;
-        }
-        public void RevogaConvite(string idUsuarioRemetente)
-        {
-            ConvitesValidacao.Verifica(IdUsuarioRemetente != idUsuarioRemetente, MensagensConvite.CONVITE_EXPIRADO);
-            ValidaConviteAtivo(Aceito);
-        }
+        //private void ValidaConviteAtivo(bool? aceito)
+        //{
+        //    if (Aceito.HasValue)
+        //    {
+        //        string msg = Aceito.Value ? "aceito" : "rejeitado";
+        //        ConvitesValidacao.Verifica(true, MensagensConvite.CONVITE_JA_VISUALIZADO + msg);
+        //    }
+        //    ConvitesValidacao.Verifica(DateTime.UtcNow > Expiracao, MensagensConvite.CONVITE_EXPIRADO);
+        //}
+        //public void AceitaConvite(bool aceito)
+        //{
+        //    ValidaConviteAtivo(aceito);
+        //    Aceito = aceito;
+        //}
+        //public void InsereObservacao(string observacao)
+        //{
+        //    Observacao = observacao;
+        //}
+        //public void RevogaConvite(string idUsuarioRemetente)
+        //{
+        //    ConvitesValidacao.Verifica(IdUsuarioRemetente != idUsuarioRemetente, MensagensConvite.CONVITE_EXPIRADO);
+        //    ValidaConviteAtivo(Aceito);
+        //}
 
     }
 }

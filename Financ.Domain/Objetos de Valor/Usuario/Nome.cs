@@ -1,4 +1,5 @@
-﻿using Financ.Domain.Validacoes.Usuarios;
+﻿using Financ.Domain.Validacoes;
+using Financ.Domain.Validacoes.Usuarios;
 using Financ.Domain.Validacoes.Usuarios.Mensagens;
 
 namespace Financ.Domain.Objetos_de_Valor
@@ -11,12 +12,12 @@ namespace Financ.Domain.Objetos_de_Valor
 
         private Nome(string primeiroNome, string segundoNome)
         {
-            Primeiro = primeiroNome;
-            Segundo = segundoNome;
+            Primeiro = Prepara(primeiroNome);
+            Segundo = Prepara(segundoNome);
         }
         public static Nome Create(string primeiroNome, string segundoNome)
         { 
-            return new Nome(Prepara(primeiroNome), Prepara(segundoNome));
+            return new Nome(primeiroNome, segundoNome);
         }
         private static string Prepara(string valor)
         {

@@ -10,13 +10,13 @@
 
             private Senha(string salt, string hash)
             {
-                Salt = salt;
-                Hash = hash;
+                Salt = Preparar(salt);
+                Hash = Preparar(hash);
             }
 
             public static Senha Create(string salt, string hash)
             {
-                return new Senha(Preparar(salt), Preparar(hash));
+                return new Senha(salt, hash);
             }
             private static string Preparar(string valor)
             {

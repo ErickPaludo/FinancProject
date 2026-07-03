@@ -8,7 +8,7 @@ namespace Financ.Domain.Entidades
 {
     public abstract class EntidadeBase
     {
-        public Guid Id { get; private set; } = new Guid();
-        public DateTime DataHoraHoraRegistro { get; private set; } = DateTime.UtcNow;
+        public Guid Id { get; } = new Guid();
+        public DateTime DataHoraRegistro { get;} = DateTime.UtcNow;
     }
 }

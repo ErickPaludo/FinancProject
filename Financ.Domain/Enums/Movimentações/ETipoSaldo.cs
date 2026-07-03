@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Financ.Domain.Enums.Movimentações
 {
-    public enum ETipoMovimentacao
+    public enum ETipoSaldo
     {
         Entrada,
         Saida

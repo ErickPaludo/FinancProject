@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Financ.Domain.Validacoes.ContasBancarias.Mensagens
 {
-    public static class MensagensContas 
+    public static class MensagensConta 
     {
         public const string ID_NAO_PODE_SER_IGUAL_A_ZERO = "O id da conta deve ser superior a zero.";
         public const string TITULO_OBRIGATORIO = "O título é obrigatório.";
-        public const string TITULO_TAMANHO_INVALIDO = "O título deve possuir entre 3 e 100 caracteres.";
+        public const string TITULO_TAMANHO_INVALIDO = "O título deve possuir entre 2 e 45 caracteres.";
         public const string TIPO_CONTA_INVALIDO = "Tipo de conta inválido.";
         public const string FECHAMENTO_INVALIDO = "Dia de fechamento inválido, deve estar entre 1 e 16.";
         public const string VENCIMENTO_MENOR_FECHAMENTO = "O vencimento deve ser maior que o fechamento.";
