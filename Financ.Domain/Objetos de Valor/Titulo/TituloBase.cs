@@ -22,7 +22,8 @@ namespace Financ.Domain.Objetos_de_Valor.Titulo
         protected virtual string Prepara(string texto)
         {
             texto = texto.Trim();
-            texto = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(texto.ToLower());
+            var culturaBR = new CultureInfo("pt-BR");
+            texto = culturaBR.TextInfo.ToTitleCase(texto.ToLower());
             return texto;
         }
 

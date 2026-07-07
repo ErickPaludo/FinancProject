@@ -13,7 +13,6 @@ namespace Financ.Domain.Objetos_de_Valor.Titulo
         protected override int TamanhoMaximo => 50;
         private TituloMovimentacao(string texto) : base(texto){}
         public static TituloMovimentacao Create(string texto) => new(texto);
-
         protected override void Valida(string texto)
         {
             ContasValidacao.Verifica(texto.Length < TamanhoMinimo || texto.Length > TamanhoMaximo, MensagensBase.TITULO_TAMANHO_INVALIDO(TamanhoMinimo, TamanhoMaximo));

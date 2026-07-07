@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Financ.Domain.Enums.Convites;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,5 +25,10 @@ namespace Financ.Domain.Validacoes.ContasBancarias.Mensagens
 
         public const string CONVITE_EM_ANDAMENTO = "Já existe um convite pendente para este usuário.";
         public const string USUARIO_JA_PERTENCE_A_CONTA = "Usuário já está cadastrado nesta conta.";
+
+        public static string TEMPO_MIN_EXPIRACAO(int tempoMinimo) => $"O tempo mínimo de expiração para convites é  de {tempoMinimo} minutos.";
+        public static string CONVITE_VISUALIZADO(EStatusConvite status) => $"Este convite foi {(status == EStatusConvite.Aceito ? "aceito" : "rejeitado")}";
+        
+
     }
 }
