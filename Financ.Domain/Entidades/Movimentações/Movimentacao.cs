@@ -2,6 +2,9 @@
 using Financ.Domain.Entidades.Movimentações.Fixas;
 using Financ.Domain.Enums.ContasBancarias;
 using Financ.Domain.Enums.Movimentações;
+using Financ.Domain.Enums.Movimentações.Fixas;
+using Financ.Domain.Objetos_de_Valor;
+using Financ.Domain.Objetos_de_Valor.Observação;
 using Financ.Domain.Objetos_de_Valor.Titulo;
 using Financ.Domain.Validacoes.ContasBancarias;
 using Financ.Domain.Validacoes.Movimentações;
@@ -13,23 +16,19 @@ namespace Financ.Domain.Entidades.Movimentações
     public class Movimentacao : EntidadeBase
     {
         public TituloMovimentacao Titulo { get; private set; }
-        //public ETipoMovimentacao Tipo { get; private set; }
-        //public int IdConta { get; private set; }
-        //public int IdUsuarioCriador { get; private set; }
-        //public int? IdUsuarioExecutor { get; private set; }
-        //public int? IdFixo { get; private set; }
-        //public decimal Valor { get; private set; }
-        //public EStatusMovimentacao Status { get; private set; } = EStatusMovimentacao.Pendente;
-        //public string? Observacao { get; private set; }
-        //public DateTime DthrReg { get; private set; }
-        //public DateTime DthrMovimentacao { get; private set; }
-        //public DateTime? DthrConclusao { get; private set; }
-        //public bool Editado { get; set; } = false;
-        //public bool Extorno { get; private set; }
-        //public Conta Conta { get; private set; }
-        //public ContaUsuario ContaUsuarioCriador { get; private set; }
-        //public ContaUsuario? ContaUsuarioExecutor { get; private set; }
+        public Saldo Saldo { get; private set; }
+        public ETipoMovimentacao TipoMovimentacao { get; private set; }
+        public ETipoTransacao TipoTransacao { get; private set; }
+        public EStatusMovimentacao Status { get; private set; } = EStatusMovimentacao.Pendente;
+        public ObservacaoMovimentacao? Observacao { get; private set; }
+        public DateTime DthrMovimentacao { get; private set; }
+        public bool Extorno { get; private set; }
+        public ContaBancaria Conta { get; private set; }
+        public ContaUsuario ContaUsuarioCriador { get; private set; }
+        public ContaUsuario? ContaUsuarioExecutor { get; private set; }
 
+
+        public bool EhSaida() => TipoTransacao == ETipoTransacao.Saida;
         //private readonly List<MovimentacaoCategoria> _movCategorais = new();
         //public IReadOnlyCollection<MovimentacaoCategoria> CategoriasMovimentacao => _movCategorais;
         //public MovimentacaoFixa? Fixa { get; private set; }

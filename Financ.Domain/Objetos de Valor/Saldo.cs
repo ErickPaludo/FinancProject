@@ -26,19 +26,19 @@ namespace Financ.Domain.Objetos_de_Valor
 
         public Saldo Soma(Saldo saldo)
         {
-            ValidaNullo.Verifica(saldo, MensagensMovimentacao.VALOR_NULO);
+            ValidaNulo.Verifica(saldo, MensagensMovimentacao.VALOR_NULO);
             return new Saldo(Valor + saldo.Valor);
         }
 
         public Saldo Subtrai(Saldo saldo)
         {
-            ValidaNullo.Verifica(saldo, MensagensMovimentacao.VALOR_NULO);
+            ValidaNulo.Verifica(saldo, MensagensMovimentacao.VALOR_NULO);
             return new Saldo(Valor - saldo.Valor);
         }
 
         private void ValidaValor(decimal valor)
         {
-            ValidaNullo.Verifica(valor, MensagensMovimentacao.VALOR_NULO);
+            ValidaNulo.Verifica(valor, MensagensMovimentacao.VALOR_NULO);
         }
     }
 }

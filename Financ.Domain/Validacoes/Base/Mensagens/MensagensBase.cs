@@ -21,8 +21,12 @@ namespace Financ.Domain.Validacoes.Base.Mensagens
         public static string CONTA_NULA = "Conta não pode ser nula.";
         public static string USUARIO_NULO = "Usuário não pode ser nulo.";
         public static string CONVITE_NULO = "Convite não pode ser nulo.";
+        public static string SALDO_NULO = "Saldo não pode ser nulo.";
 
         public static string TITULO_TAMANHO_INVALIDO(int min, int max) => $"O título deve possuir entre {min} e {max} caracteres.";
+
+        public static string OBSERVACAO_TAMANHO_INVALIDO(int tamanhoMaximo) => $"A observação deve possuir no máximo {tamanhoMaximo} caracteres.";
+        
 
         public const string REMETENTE_NULO = "O remetente do convite não pode ser nulo.";
         public const string DESTINATARIO_NULO = "O destinatário do convite não pode ser nulo.";

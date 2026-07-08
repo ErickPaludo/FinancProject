@@ -14,7 +14,7 @@ namespace Financ.Domain.Objetos_de_Valor.Titulo
         protected abstract int TamanhoMaximo { get; }
         protected TituloBase(string texto)
         {
-            ValidaNullo.Verifica(texto, MensagensBase.TITULO_NULO);
+            ValidaNulo.Verifica(texto, MensagensBase.TITULO_NULO);
             texto = Prepara(texto);
             Valida(texto);
             Texto = texto;

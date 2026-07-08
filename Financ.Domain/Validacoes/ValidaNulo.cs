@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Financ.Domain.Validacoes
 {
-    public static class ValidaNullo
+    public static class ValidaNulo
     {
         public static void Verifica([NotNull]object? objeto, string mensagem)
         {

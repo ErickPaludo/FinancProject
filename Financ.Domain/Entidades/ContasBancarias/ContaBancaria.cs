@@ -1,41 +1,38 @@
 ﻿using Financ.Domain.Entidades.Movimentações;
 using Financ.Domain.Enums.ContasBancarias;
-using Financ.Domain.Enums.Movimentações;
 using Financ.Domain.Objetos_de_Valor;
 using Financ.Domain.Objetos_de_Valor.Titulo;
 using Financ.Domain.Validacoes;
 using Financ.Domain.Validacoes.Base.Mensagens;
 using Financ.Domain.Validacoes.ContasBancarias;
 using Financ.Domain.Validacoes.ContasBancarias.Mensagens;
-using Financ.Domain.Validacoes.Movimentações;
-using Financ.Domain.Validacoes.Movimentações.Mensagens;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Financ.Domain.Entidades.ContasBancarias
 {
-    public sealed class Conta : EntidadeBase
+    public sealed class ContaBancaria : EntidadeBase
     {
         public TituloConta Titulo { get; private set; }
         public EStatusContas Status { get; private set; }
         public ETipoConta TipoConta { get; private set; }
         public Saldo Saldo { get; private set; }
         public Cor Cor { get; private set; }
-        public byte[] RowVersion { get; private set; }
+
+        #region Relacionamento com ContasUsuarios
         private readonly List<ContaUsuario> _contasUsuarios = new();
-        public IReadOnlyCollection<ContaUsuario> ContaUsuarios => _contasUsuarios;
+        public IReadOnlyCollection<ContaUsuario> ContaUsuarios => new List<ContaUsuario>();
+        #endregion
+
+        //Questionavel
+        #region Relacionamento com Convites 
         private readonly List<Convite> _convites = new();
         public IReadOnlyCollection<Convite> Convites => _convites;
-        private Conta() { }
+        #endregion
+        private ContaBancaria() { }
 
-        public Conta(TituloConta titulo, string? cor)
+        public ContaBancaria(TituloConta titulo, string? cor)
         {
-            ValidaNullo.Verifica(titulo, MensagensBase.TITULO_NULO);
+            ValidaNulo.Verifica(titulo, MensagensBase.TITULO_NULO);
             Titulo = titulo;
             Status = EStatusContas.Ativo;
             TipoConta = ETipoConta.Corrente;
@@ -65,14 +62,34 @@ namespace Financ.Domain.Entidades.ContasBancarias
         //{
         //   return ContaUsuarios.Any(x => x.IdUsuario == idUsuario && (x.Expiracao is null || x.Expiracao >= DateTime.UtcNow));
         //} 
-        //public void ProcessaMovimentacao(Movimentacao movimentacao)
+        public void ProcessaMovimentacao(Movimentacao movimentacao)
+        {
+            if (movimentacao.EhSaida())
+                DebitaSaldo(movimentacao.Saldo);
+            else
+                AdicionaSaldo(movimentacao.Saldo);
+                AdicionaSaldo(movimentacao.Saldo);
+        }
+        public void ProcessaExtorno(Movimentacao movimentacao)
+        {
+            if (movimentacao.EhSaida())
+                AdicionaSaldo(movimentacao.Saldo);
+            else
+                DebitaSaldo(movimentacao.Saldo);
+        }
+        private void DebitaSaldo(Saldo debito)
+        {
+            ContasValidacao.Verifica(Saldo.Subtrai(debito).Valor < 0, MensagensConta.SALDO_INSUFICIENTE);
+            Saldo = Saldo.Subtrai(debito);
+        }
+        private void AdicionaSaldo(Saldo saldo)
+        {
+            Saldo = Saldo.Soma(saldo);
+        }
+        //public void ProcessaFatura(Credito credito)
         //{
-        //    if (movimentacao.Status is EStatusMovimentacao.Concluido)
-        //    {
-        //        ContasValidacao.Verifica(movimentacao.Extorno, MensagensContas.NAO_PODE_PROCESSAR_MOVIMENTACAO_COM_EXTORNO);
-        //        ContasValidacao.Verifica(movimentacao.Tipo.Equals(ETipoMovimentacao.Saida) && movimentacao.Valor > Saldo, MensagensContas.SALDO_INSUFICIENTE);
-        //        Saldo = movimentacao.Tipo.Equals(ETipoMovimentacao.Entrada) ? Saldo + movimentacao.Valor : Saldo - movimentacao.Valor;
-        //    }
+        //    ProcessaMovimentacao(credito.movimentacao);
+        //    credito.ProecessaMovimentacao(credito.movimentacao);
         //}
         //public void ProcessaExtornoMovimentacao(Movimentacao movimentacao)
         //{

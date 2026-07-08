@@ -14,9 +14,9 @@ namespace Financ.Domain.Entidades.Usuarios
       
         private Usuario(Nome nome, Email endereco, Senha senha)
         {
-            ValidaNullo.Verifica(nome, MensagensUsuarios.NOME_NULO);
-            ValidaNullo.Verifica(endereco, MensagensUsuarios.EMAIL_NULO);
-            ValidaNullo.Verifica(senha, MensagensUsuarios.SENHA_NULA);
+            ValidaNulo.Verifica(nome, MensagensUsuarios.NOME_NULO);
+            ValidaNulo.Verifica(endereco, MensagensUsuarios.EMAIL_NULO);
+            ValidaNulo.Verifica(senha, MensagensUsuarios.SENHA_NULA);
 
             Nome = nome;
             Endereco = endereco;
@@ -30,7 +30,7 @@ namespace Financ.Domain.Entidades.Usuarios
 
         public void AtualizaSenha(Senha senha)
         {
-            ValidaNullo.Verifica(senha, MensagensUsuarios.SENHA_NULA);
+            ValidaNulo.Verifica(senha, MensagensUsuarios.SENHA_NULA);
             UsuariosValidacao.Verifica(Senha == senha, MensagensUsuarios.MESMA_SENHA);
             Senha = senha;
         }

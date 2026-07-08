@@ -11,7 +11,7 @@ namespace Financ.Domain.Entidades.ContasBancarias
 {
     public sealed class Convite : EntidadeBase
     {
-        public Conta Conta {  get; }
+        public ContaBancaria Conta {  get; }
         public ContaUsuario Remetente { get; }
         public Usuario Destinatario { get; }
 
@@ -23,14 +23,14 @@ namespace Financ.Domain.Entidades.ContasBancarias
 
         private Convite(ETiposAcessos acesso, ContaUsuario remetente, Usuario destinatario, ExpiracaoContaUsuario? expiracaoContaUsuario)
         {
-            ValidaNullo.Verifica(remetente, MensagensBase.REMETENTE_NULO);
-            ValidaNullo.Verifica(destinatario, MensagensBase.DESTINATARIO_NULO);
+            ValidaNulo.Verifica(remetente, MensagensBase.REMETENTE_NULO);
+            ValidaNulo.Verifica(destinatario, MensagensBase.DESTINATARIO_NULO);
 
             ConvitesValidacao.Verifica(!Enum.IsDefined(typeof(ETiposAcessos), acesso), MensagensContaUsuario.ACESSO_INVALIDO);
 
             //Precisa verificar a quantidade de usuarios mestres na conta
             
-            Conta = remetente.Conta;
+            Conta = remetente.ContaBancaria;
             Acesso = acesso;
             Remetente = remetente;
             Destinatario  = destinatario;
