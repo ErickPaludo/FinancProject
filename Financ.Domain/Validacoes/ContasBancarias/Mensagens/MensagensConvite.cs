@@ -28,7 +28,7 @@ namespace Financ.Domain.Validacoes.ContasBancarias.Mensagens
 
         public static string TEMPO_MIN_EXPIRACAO(int tempoMinimo) => $"O tempo mínimo de expiração para convites é  de {tempoMinimo} minutos.";
         public static string CONVITE_VISUALIZADO(EStatusConvite status) => $"Este convite foi {(status == EStatusConvite.Aceito ? "aceito" : "rejeitado")}";
-        
+        public static string LIMITE_ACESSOS(int quantidadeAcessos) => $"O número máximo de usuários na conta é {quantidadeAcessos}.";
 
     }
 }

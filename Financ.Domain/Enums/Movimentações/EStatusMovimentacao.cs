@@ -9,7 +9,7 @@ namespace Financ.Domain.Enums.Movimentações
     public enum EStatusMovimentacao
     {
         Pendente,
-        Concluido,
+        Concluida,
         Excluido,
         Oculta //Exclusivo para movimentação fixa base
     }

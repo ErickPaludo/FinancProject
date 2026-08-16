@@ -28,7 +28,7 @@ namespace Financ.Domain.Entidades.ContasBancarias
 
         public static ContaUsuario CriarPorConvite(Convite convite)
         {
-            return new ContaUsuario(convite.Conta, convite.Destinatario, convite.Acesso);
+            return new ContaUsuario(convite.ContaBancaria, convite.Destinatario, convite.Acesso);
         }
         public static ContaUsuario CriarPrimeiroUsuario(ContaBancaria conta, Usuario usuario)
         {

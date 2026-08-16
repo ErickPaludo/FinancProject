@@ -9,16 +9,19 @@ using System.Threading.Tasks;
 
 namespace Financ.Domain.Objetos_de_Valor
 {
-    public class Cor
+    public sealed record Cor
     {
         public string Valor { get; private set; }
         private Cor() { }
 
-        public Cor(string? valor)
+        private Cor(string valor)
         {
             ValidaCor(valor);
-            Valor = valor is not null ? valor : "#1d293db3";
+            Valor = valor;
         }
+
+        public static Cor Create(string valor) => new(valor);
+
         private void ValidaCor(string? valor)
         {
             if (valor is not null)
